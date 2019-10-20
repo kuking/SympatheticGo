@@ -8,4 +8,16 @@ public enum Color {
     Color(byte value) {
         b = value;
     }
+
+    public static Color fromByte(byte b) {
+        if (b == EMPTY.b) {
+            return EMPTY;
+        } else if (b == BLACK.b) {
+            return BLACK;
+        } else if (b == WHITE.b) {
+            return WHITE;
+        } else {
+            throw new IllegalStateException("Unexpected Color byte value: " + b);
+        }
+    }
 }
