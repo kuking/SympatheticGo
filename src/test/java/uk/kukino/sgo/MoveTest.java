@@ -45,7 +45,7 @@ public class MoveTest {
         assertTrue(move.parse("W AA100"));
         assertThat(move.color(), equalTo(Color.WHITE));
         assertTrue(move.isValid());
-        assertThat(move.x(), equalTo((byte) 26));
+        assertThat(move.x(), equalTo((byte) 27));
         assertThat(move.y(), equalTo((byte) 100));
         assertTrue(move.isStone());
 
@@ -69,18 +69,18 @@ public class MoveTest {
 
     @Test
     void values() {
-        short value = Move.parseToValue("W AB123");
+        short value = Move.parseToVal("W AB123");
 
         assertTrue(Move.isValid(value));
         assertThat(Move.color(value), equalTo(Color.WHITE));
-        assertThat(Move.x(value), equalTo((byte) 27));
+        assertThat(Move.x(value), equalTo((byte) 28));
         assertThat(Move.y(value), equalTo((byte) 123));
 
-        value = Move.parseToValue("BLACK PASS");
+        value = Move.parseToVal("BLACK PASS");
         assertThat(Move.color(value), equalTo(Color.BLACK));
         assertTrue(Move.isPass(value));
 
-        value = Move.parseToValue("invalid");
+        value = Move.parseToVal("invalid");
         assertFalse(Move.isValid(value));
     }
 
@@ -96,6 +96,15 @@ public class MoveTest {
         assertFalse(move.isValid());
 
         assertFalse(move.parse("B2"));
+        assertFalse(move.isValid());
+
+        assertFalse(move.parse("BLACK A"));
+        assertFalse(move.isValid());
+
+        assertFalse(move.parse("   "));
+        assertFalse(move.isValid());
+
+        assertFalse(move.parse(""));
         assertFalse(move.isValid());
 
         assertFalse(move.parse(null));

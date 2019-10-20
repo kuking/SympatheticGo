@@ -2,34 +2,15 @@ package uk.kukino.sgo;
 
 public class Parsing {
 
-    static public class UpperCaseCharSequence implements CharSequence {
+    public static int scanSpaces(final CharSequence seq, int i) {
+        while (i < seq.length() && seq.charAt(i) == ' ') i++;
+        return i;
+    }
 
-        private CharSequence wrapped;
-
-        public UpperCaseCharSequence() {
-            this.wrapped = null;
-        }
-
-        public void assign(final CharSequence charSequence) {
-            this.wrapped = charSequence;
-        }
-
-        @Override
-        public int length() {
-            return wrapped.length();
-        }
-
-        @Override
-        public char charAt(int index) {
-            return Character.toUpperCase(this.wrapped.charAt(index));
-        }
-
-        @Override
-        public CharSequence subSequence(int start, int end) {
-            //XXX: ALLOCATES
-            UpperCaseCharSequence newSeq = new UpperCaseCharSequence();
-            newSeq.assign(this.wrapped.subSequence(start, end));
-            return newSeq;
-        }
+    public static int scanAlphas(final CharSequence seq, int i) {
+        while (i < seq.length() &&
+                Character.toUpperCase(seq.charAt(i)) >= 'A' &&
+                Character.toUpperCase(seq.charAt(i)) <= 'Z') i++;
+        return i;
     }
 }

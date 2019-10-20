@@ -10,9 +10,9 @@ public class Game {
     private int lastMove;
 
     private static short[] HANDICAP_19 = new short[]{
-            Move.parseToValue("B D4"), Move.parseToValue("B Q16"), Move.parseToValue("B D16"),
-            Move.parseToValue("B Q4"), Move.parseToValue("B D10"), Move.parseToValue("B Q10"),
-            Move.parseToValue("B K4"), Move.parseToValue("B K16"), Move.parseToValue("B K10")
+            Move.parseToVal("B D4"), Move.parseToVal("B Q16"), Move.parseToVal("B D16"),
+            Move.parseToVal("B Q4"), Move.parseToVal("B D10"), Move.parseToVal("B Q10"),
+            Move.parseToVal("B K4"), Move.parseToVal("B K16"), Move.parseToVal("B K10")
     };
 
 

@@ -19,20 +19,13 @@ public class Coord {
 
     public static short parseToVal(final CharSequence seq) {
         if (seq == null) return INVALID;
+        int i = Parsing.scanSpaces(seq, 0);
+        if (i == seq.length()) return INVALID;
+        int j = Parsing.scanAlphas(seq, i);
+        if (i == j || i + 2 < j) return INVALID;
 
         byte x;
         byte y;
-        int i = 0;
-        int j;
-
-        while (i < seq.length() && seq.charAt(i) == ' ') i++;
-        if (i == seq.length()) return INVALID;
-        j = i;
-        while (j < seq.length() &&
-                Character.toUpperCase(seq.charAt(j)) >= 'A' &&
-                Character.toUpperCase(seq.charAt(j)) <= 'Z') j++;
-        if (i == j || i + 2 < j) return INVALID;
-
         byte a = (byte) (Character.toUpperCase(seq.charAt(i)) - 64);
         if (a > 'I' - 65) a--;
         if (i + 1 == j) {

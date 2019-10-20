@@ -40,7 +40,7 @@ public class GameTest {
     public void simpleMove() {
         game = new Game((byte) 19, (byte) 0, (byte) 55);
 
-        assertTrue(game.play(Move.parseToValue("B D4")));
+        assertTrue(game.play(Move.parseToVal("B D4")));
 
         assertThat(game.lastMove(), equalTo(1));
         assertThat(game.playerToPlay(), equalTo(Color.WHITE));
@@ -48,6 +48,16 @@ public class GameTest {
         assertFalse(game.finished());
         assertThat(game.deadStones(Color.BLACK), equalTo(0));
         assertThat(game.deadStones(Color.WHITE), equalTo(0));
+    }
+
+    @Test
+    public void simplestKill() {
+        game = new Game((byte) 19, (byte) 0, (byte) 55);
+        game.play(Move.parseToVal("B B1"));
+        game.play(Move.parseToVal("W A1"));
+        game.play(Move.parseToVal("B A2"));
+        assertThat(game.getBoard().get((byte) 1, (byte) 1), equalTo(Color.EMPTY)); //FIXME: create Coord class
+        assertThat(game.deadStones(Color.WHITE), equalTo(1));
     }
 
 }
