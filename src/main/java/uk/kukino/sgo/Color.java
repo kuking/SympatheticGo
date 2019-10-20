@@ -20,4 +20,16 @@ public enum Color {
             throw new IllegalStateException("Unexpected Color byte value: " + b);
         }
     }
+
+    public Color opposite() {
+        switch (this) {
+            case WHITE:
+                return BLACK;
+            case BLACK:
+                return WHITE;
+            case EMPTY:
+                return EMPTY;
+        }
+        throw new IllegalArgumentException("This needs further implementation, missing opposite Color configuration");
+    }
 }

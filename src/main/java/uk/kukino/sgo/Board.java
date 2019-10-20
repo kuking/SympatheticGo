@@ -2,7 +2,7 @@ package uk.kukino.sgo;
 
 public class Board {
 
-    final private byte size;
+    private final byte size;
     private byte[] board;
     // 2 bits per intersection i.e. 19x19 ~= 90 bytes, 9x9 ~= 20 bytes -- everything fits well in L1
 
@@ -27,6 +27,12 @@ public class Board {
                 board[ofs / 4] = (byte) ((board[ofs / 4] & (byte) 0b11111100) | color.b);
                 break;
             default:
+        }
+    }
+
+    public void set(final short value) {
+        if (Move.isStone(value)) {
+            set(Move.x(value), Move.y(value), Move.color(value));
         }
     }
 

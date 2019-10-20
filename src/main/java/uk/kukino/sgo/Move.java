@@ -6,20 +6,17 @@ public class Move {
     //         CCXXXXXXXYYYYYYY
     //
     private short value;
-    private byte x, y;
-    private Color color;
-    private boolean valid;
-
 
     private Parsing.UpperCaseCharSequence upperSeq = new Parsing.UpperCaseCharSequence();
 
     public Color color() {
-        return color;
+        return Move.color(value);
     }
 
     public boolean parse(final CharSequence sequence) {
-        x = y = 0;
-        color = Color.EMPTY;
+        byte x;
+        byte y;
+        Color color = Color.EMPTY;
 
         if (sequence == null) {
             return setInvalid();
@@ -51,16 +48,16 @@ public class Move {
         if (i == j) return setInvalid();
 
         if (j - i == 4 && "PASS".contentEquals(upperSeq.subSequence(i, j))) {
-            pass(color);
+            isPass(color);
         } else {
             byte a = (byte) (upperSeq.charAt(i) - 64);
             if (a > 'I' - 65) a--;
             if (i + 1 == j) {
                 x = a;
             } else {
-                byte b = (byte) (upperSeq.charAt(j-1) - 64);
+                byte b = (byte) (upperSeq.charAt(j - 1) - 64);
                 if (b > 'I' - 65) b--;
-                x = (byte) ((a * (byte)25) + b);
+                x = (byte) ((a * (byte) 25) + b);
             }
             y = 0;
             while (j < upperSeq.length() && upperSeq.charAt(j) >= '0' && upperSeq.charAt(j) <= '9') {
@@ -69,13 +66,18 @@ public class Move {
             }
             move(x, y, color);
         }
-        valid = true;
         return true;
+    }
+
+    private static Move moveForStaticParsing = new Move();
+
+    public static short parseToValue(final CharSequence sequence) {
+        moveForStaticParsing.parse(sequence);
+        return moveForStaticParsing.value;
     }
 
     private boolean setInvalid() {
         value = 0;
-        valid = false;
         return false;
     }
 
@@ -84,34 +86,59 @@ public class Move {
     }
 
     public void move(final byte x, final byte y, final Color color) {
-        this.x = x;
-        this.y = y;
-        this.color = color;
-        value = (short) ((color.b) << 14 + (x & 0x7f) << 7 + y & 0x7f);
+        value = (short) ((short) ((color.b) << 14) | (short) ((x & 0x7f) << 7) | (short) (y & 0x7f));
     }
 
-    public void pass(final Color color) {
-        this.x = 0;
-        this.y = 0;
-        this.color = color;
-        value = (short) ((color.b) << 14 + (x & 0x7f) << 7 + y & 0x7f);
+    public void isPass(final Color color) {
+        value = (short) ((color.b) << 14);
     }
 
-    public boolean valid() {
-        return valid;
+    public static byte x(final short value) {
+        return (byte) ((value >> 7) & 0x7f);
     }
 
     public byte x() {
-        return x;
-//        return (byte) ((value >>> 7) & 0x7f);
+        return Move.x(value);
+    }
+
+    public static byte y(final short value) {
+        return (byte) (value & 0x7f);
     }
 
     public byte y() {
-        return y;
-//        return (byte) (value & 0x7f);
+        return Move.y(value);
     }
 
-    public boolean pass() {
-        return x == 0 && y  == 0;
+    static public Color color(final short value) {
+        return Color.fromByte((byte) (value >> 14 & 3));
     }
+
+    static public boolean isPass(short value) {
+        return Move.x(value) == (short) 0 &&
+                Move.y(value) == (short) 0 &&
+                color(value) != Color.EMPTY;
+    }
+
+    public boolean isPass() {
+        return isPass(value);
+    }
+
+    public static boolean isValid(final short value) {
+        return value != (short) 0;
+    }
+
+    public boolean isValid() {
+        return Move.isValid(value);
+    }
+
+    public static boolean isStone(final short value) {
+        return isValid(value) && !isPass(value);
+
+    }
+
+    public boolean isStone() {
+        return isStone(value);
+    }
+
+
 }
