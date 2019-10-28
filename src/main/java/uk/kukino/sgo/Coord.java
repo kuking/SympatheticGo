@@ -84,21 +84,21 @@ public class Coord {
      * Adjacent cells are returned in wall clock order, if the coordinate does not have four adjacent, it will return
      * the number of adjacent interceptions, and the array will be filled up to four elements of invalid coordinates.
      * @param result
-     * @param val
-     * @param size
+     * @param coord
+     * @param boardSize
      * @return
      */
-    public static byte adjacents(short[] result, final short val, final byte size) {
+    public static byte adjacents(short[] result, final short coord, final byte boardSize) {
         int c = 0;
-        byte x = Coord.x(val);
-        byte y = Coord.y(val);
+        byte x = Coord.x(coord);
+        byte y = Coord.y(coord);
         if (y - 1 > 0) {
             result[c++] = Coord.XY(x, (byte) (y - 1));
         }
-        if (x + 1 < size) {
+        if (x + 1 < boardSize) {
             result[c++] = Coord.XY((byte) (x + 1), y);
         }
-        if (y + 1 < size) {
+        if (y + 1 < boardSize) {
             result[c++] = Coord.XY(x, (byte) (y + 1));
         }
         if (x - 1 > 0) {
