@@ -63,6 +63,28 @@ public class GameTest {
     }
 
     @Test
+    public void simpleSuicide() {
+        // +--------
+        // |   X  O
+        // |  X X O
+        // |   X  O
+        // TODO: use nice toString, when implemented
+
+        game = given19x19Game();
+        game.play("B C18");
+        game.play("W F18");
+        game.play("B D17");
+        game.play("W F17");
+        game.play("B C16");
+        game.play("W F16");
+        game.play("B B17");
+
+        assertFalse(game.play("W C17")); // suicide
+        game.play("W F15");
+        assertTrue(game.play("B C17")); // just a bunch of space
+    }
+
+    @Test
     public void simplestKill() {
         game = given19x19Game();
         game.play("B B1");

@@ -108,5 +108,15 @@ public class Board {
         return newRes;
     }
 
+    //TODO: This can be way optimised by scanning empty bytes
+    public int count(final Color color) {
+        int count = 0;
+        for (byte x = 0; x < size; x++) {
+            for (byte y = 0; y < size; y++) {
+                if (get(x, y) == color) count++;
+            }
+        }
+        return count;
+    }
 
 }
