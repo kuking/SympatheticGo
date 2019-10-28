@@ -10,12 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class GameTest {
 
     Game game;
-    Move move = new Move();
-
 
     @Test
     public void initialValues() {
-        game = new Game((byte) 19, (byte) 0, (byte) 55);
+        game = given19x19Game();
         assertThat(game.getHandicap(), equalTo((byte) 0));
         assertThat(game.getKomiX10(), equalTo((byte) 55));
         assertThat(game.getBoard().size(), equalTo((byte) 19));
@@ -38,9 +36,9 @@ public class GameTest {
 
     @Test
     public void simpleMove() {
-        game = new Game((byte) 19, (byte) 0, (byte) 55);
+        game = given19x19Game();
 
-        assertTrue(game.play(Move.parseToVal("B D4")));
+        assertTrue(game.play("B D4"));
 
         assertThat(game.lastMove(), equalTo(1));
         assertThat(game.playerToPlay(), equalTo(Color.WHITE));
@@ -50,14 +48,33 @@ public class GameTest {
         assertThat(game.deadStones(Color.WHITE), equalTo(0));
     }
 
+
+    @Test
+    public void someInvalidMoves() {
+        game = given19x19Game();
+
+        assertFalse(game.play("W A1")); // white can't play first
+
+        assertTrue(game.play("B A1"));
+        assertFalse(game.play("W A1"));
+
+        assertFalse(game.play("W Z25")); // outside the board
+        assertFalse(game.play("W A0")); // 0  is not valid
+    }
+
     @Test
     public void simplestKill() {
-        game = new Game((byte) 19, (byte) 0, (byte) 55);
-        game.play(Move.parseToVal("B B1"));
-        game.play(Move.parseToVal("W A1"));
-        game.play(Move.parseToVal("B A2"));
-        assertThat(game.getBoard().get((byte) 1, (byte) 1), equalTo(Color.EMPTY)); //FIXME: create Coord class
+        game = given19x19Game();
+        game.play("B B1");
+        game.play("W A1");
+        game.play("B A2");
+        assertThat(game.getBoard().get("A1"), equalTo(Color.EMPTY));
         assertThat(game.deadStones(Color.WHITE), equalTo(1));
+    }
+
+
+    private Game given19x19Game() {
+        return new Game((byte) 19, (byte) 0, (byte) 55);
     }
 
 }

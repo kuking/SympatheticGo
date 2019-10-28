@@ -52,7 +52,11 @@ public class Game {
     }
 
     boolean isValidMove(final short value) {
+        if (Move.color(value) != playerToPlay) return false;
+        if (Move.x(value) >= board.size() || Move.x(value) == 0) return false;
+        if (Move.y(value) >= board.size() || Move.y(value) == 0) return false;
         if (board.get(Move.x(value), Move.y(value)) != Color.EMPTY) return false;
+
         return true;
     }
 
