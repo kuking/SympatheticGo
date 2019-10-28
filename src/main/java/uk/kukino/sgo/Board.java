@@ -52,6 +52,14 @@ public class Board {
         }
     }
 
+    public Color get(final short coord) {
+        return get(Coord.x(coord), Coord.y(coord));
+    }
+
+    public Color get(final CharSequence coord) {
+        return get(Coord.parseToVal(coord));
+    }
+
     private int ofs(final byte x, final byte y) {
         return y * size + x;
     }

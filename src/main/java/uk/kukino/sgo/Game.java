@@ -69,6 +69,10 @@ public class Game {
         return true;
     }
 
+    boolean play(final CharSequence move) {
+        return play(Move.parseToVal(move));
+    }
+
     int deadStones(final Color color) {
         return 0;
     }
