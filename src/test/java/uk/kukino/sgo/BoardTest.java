@@ -58,4 +58,17 @@ public class BoardTest {
         }
     }
 
+    @Test
+    public void copyTo() {
+        board = new Board((byte) 19);
+        Board boardCopy = new Board((byte) 19);
+
+        board.set((byte) 4, (byte) 8, Color.BLACK);
+        assertThat(board.get((byte) 4, (byte) 8), equalTo(Color.BLACK));
+        assertThat(boardCopy.get((byte) 4, (byte) 8), equalTo(Color.EMPTY));
+
+        board.copyTo(boardCopy);
+        assertThat(boardCopy.get((byte) 4, (byte) 8), equalTo(Color.BLACK));
+    }
+
 }

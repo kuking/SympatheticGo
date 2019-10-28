@@ -68,4 +68,8 @@ public class Board {
         return this.size;
     }
 
+    public void copyTo(Board toBoard) {
+        System.arraycopy(this.board, 0, toBoard.board, 0, this.board.length);
+    }
+
 }
