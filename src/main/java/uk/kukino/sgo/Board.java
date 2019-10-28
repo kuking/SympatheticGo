@@ -72,4 +72,41 @@ public class Board {
         System.arraycopy(this.board, 0, toBoard.board, 0, this.board.length);
     }
 
+    public byte adjacentsWithColor(short[] arr, short coord, Color color) {
+        byte res = Coord.adjacents(arr, coord, size);
+        byte newRes = res;
+        for (byte i = 0; i < res; i++) {
+            if (get(arr[i]) != color) {
+                arr[i] = Coord.INVALID;
+                newRes--;
+            }
+        }
+
+        if (newRes == 0) {
+            return 0;
+        }
+
+        boolean done = false;
+        boolean somethingMoved = false;
+        byte i = 0;
+        while (!done) {
+            if (i < 3 && arr[i] == Coord.INVALID && arr[i + 1] != Coord.INVALID) {
+                arr[i] = arr[i + 1];
+                arr[i + 1] = Coord.INVALID;
+                somethingMoved = true;
+            }
+            i++;
+            if (i == res) {
+                if (somethingMoved) {
+                    somethingMoved = false;
+                    i = 0;
+                } else {
+                    done = true;
+                }
+            }
+        }
+        return newRes;
+    }
+
+
 }

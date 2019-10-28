@@ -71,4 +71,32 @@ public class BoardTest {
         assertThat(boardCopy.get((byte) 4, (byte) 8), equalTo(Color.BLACK));
     }
 
+    @Test
+    public void adjacentsWithColor() {
+        board = new Board((byte) 19);
+        board.set(Move.parseToVal("W C17"));
+        board.set(Move.parseToVal("B B18"));
+
+        short[] arr = new short[4];
+        byte res = board.adjacentsWithColor(arr, Coord.parseToVal("B17"), Color.BLACK);
+        assertThat(res, equalTo((byte) 1));
+        assertThat(arr[0], equalTo(Coord.parseToVal("B18")));
+
+        res = board.adjacentsWithColor(arr, Coord.parseToVal("B17"), Color.WHITE);
+        assertThat(res, equalTo((byte) 1));
+        assertThat(arr[0], equalTo(Coord.parseToVal("C17")));
+
+        res = board.adjacentsWithColor(arr, Coord.parseToVal("B17"), Color.EMPTY);
+        assertThat(res, equalTo((byte) 2));
+        assertThat(arr[0], equalTo(Coord.parseToVal("B16")));
+        assertThat(arr[1], equalTo(Coord.parseToVal("A17")));
+
+        res = board.adjacentsWithColor(arr, Coord.parseToVal("K10"), Color.EMPTY);
+        assertThat(res, equalTo((byte) 4));
+        assertThat(arr[0], equalTo(Coord.parseToVal("K9")));
+        assertThat(arr[1], equalTo(Coord.parseToVal("L10")));
+        assertThat(arr[2], equalTo(Coord.parseToVal("K11")));
+        assertThat(arr[3], equalTo(Coord.parseToVal("J10")));
+    }
+
 }
