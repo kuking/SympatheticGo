@@ -1,5 +1,7 @@
 package uk.kukino.sgo;
 
+import java.util.Arrays;
+
 public class Board {
 
     private final byte size;
@@ -119,4 +121,7 @@ public class Board {
         return count;
     }
 
+    public void clear() {
+        Arrays.fill(board, (byte) 0);
+    }
 }

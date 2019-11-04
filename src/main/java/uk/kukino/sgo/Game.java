@@ -10,8 +10,8 @@ public class Game {
     private int lastMove;
 
     // workplace
-    private final Board chainMarks;
-    private final Board libertiesMarks;
+    private final Board altBoard;
+    private final Board chainLibertyBoard;
     private final Buffers<short[]> adjacentBuffers;
 
     private static short[] HANDICAP_19 = new short[]{
@@ -23,8 +23,8 @@ public class Game {
 
     Game(final byte size, final byte handicap, final byte komiX10) {
         board = new Board(size);
-        chainMarks = new Board(size);
-        libertiesMarks = new Board(size);
+        altBoard = new Board(size);
+        chainLibertyBoard = new Board(size);
         adjacentBuffers = new Buffers<>(size * 4, () -> new short[4]);
 
         komi = komiX10;
@@ -60,32 +60,31 @@ public class Game {
         return playerToPlay;
     }
 
-    private void markChainAndLiberties(final short coord) {
-        board.copyTo(chainMarks);
-        board.copyTo(libertiesMarks);
-        Color color = board.get(coord);
+    private void markChainAndLiberties(final Board base, final short coord) {
+        chainLibertyBoard.clear();
+        Color color = base.get(coord);
 
         if (color == Color.EMPTY) {
             return;
         }
-        recursivePaint(coord, color);
+        recursivePaint(base, coord, color);
     }
 
-    private void recursivePaint(final short coord, final Color color) {
-        if (board.get(coord) != color) {
+    private void recursivePaint(final Board base, final short coord, final Color color) {
+        if (base.get(coord) != color) {
             return;
         }
-        chainMarks.set(Move.move(coord, color));
+        chainLibertyBoard.set(Move.move(coord, color));
 
         short[] adj = adjacentBuffers.lease();
         try {
-            byte adjN = board.adjacentsWithColor(adj, coord, Color.EMPTY);
+            byte adjN = base.adjacentsWithColor(adj, coord, Color.EMPTY);
             for (byte i = 0; i < adjN; i++) {
-                libertiesMarks.set(Move.move(adj[i], Color.MARK));
+                chainLibertyBoard.set(Move.move(adj[i], Color.MARK));
             }
-            adjN = board.adjacentsWithColor(adj, coord, color);
+            adjN = base.adjacentsWithColor(adj, coord, color);
             for (byte i = 0; i < adjN; i++) {
-                recursivePaint(adj[i], color);
+                recursivePaint(base, adj[i], color);
             }
         } finally {
             adjacentBuffers.ret(adj);
@@ -105,19 +104,36 @@ public class Game {
                 return true;
             }
 
+            adjsN = board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
+            for (int i = 0; i < adjsN; i++) {
+                markChainAndLiberties(board, adjs[i]);
+                if (chainLibertyBoard.count(Color.MARK) == 1) {
+                    return true;
+                }
+            }
+
+
             adjsN = board.adjacentsWithColor(adjs, move, playerToPlay);
             if (adjsN == 0) {
-                recursivePaint(move, playerToPlay.opposite());
-
-
-
-
-                // more complicated, to be implemented
+                board.copyTo(altBoard);
+                altBoard.set(move);
+                markChainAndLiberties(altBoard, move);
+                if (chainLibertyBoard.count(Color.MARK) == 0) {
+                    return false;
+                    // unless kills
+                }
+                return true;
+            } else {
+                for (int i = 0; i < adjsN; i++) {
+                    markChainAndLiberties(board, adjs[i]);
+                    if (chainLibertyBoard.count(Color.MARK) > 1) { // +1 because 1 liberty is the current pos
+                        return true;
+                    }
+                }
                 return false;
             }
 
 
-            return false;
         } finally {
             adjacentBuffers.ret(adjs);
         }

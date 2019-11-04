@@ -99,4 +99,23 @@ public class BoardTest {
         assertThat(arr[3], equalTo(Coord.parseToVal("J10")));
     }
 
+    @Test
+    public void clear() {
+        board = new Board((byte) 19);
+
+        for (byte x = 0; x < board.size(); x++) {
+            for (byte y = 0; y < board.size(); y++) {
+                board.set(x, y, Color.WHITE);
+            }
+        }
+
+        board.clear();
+
+        for (byte x = 0; x < board.size(); x++) {
+            for (byte y = 0; y < board.size(); y++) {
+                assertThat(board.get(x, y), equalTo(Color.EMPTY));
+            }
+        }
+    }
+
 }
