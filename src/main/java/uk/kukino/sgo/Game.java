@@ -117,11 +117,11 @@ public class Game
         {
             return false;
         }
-        if (Move.x(move) >= board.size() || Move.x(move) == 0)
+        if (Move.x(move) >= board.size())
         {
             return false;
         }
-        if (Move.y(move) >= board.size() || Move.y(move) == 0)
+        if (Move.y(move) >= board.size())
         {
             return false;
         }

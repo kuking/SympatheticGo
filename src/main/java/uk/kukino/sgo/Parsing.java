@@ -16,7 +16,7 @@ public class Parsing
     public static int scanAlphas(final CharSequence seq, final int i)
     {
         int j = i;
-        while (i < seq.length() &&
+        while (j < seq.length() &&
             Character.toUpperCase(seq.charAt(j)) >= 'A' &&
             Character.toUpperCase(seq.charAt(j)) <= 'Z')
         {

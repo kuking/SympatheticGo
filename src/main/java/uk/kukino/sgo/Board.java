@@ -157,20 +157,25 @@ public class Board
 
     public String toString()
     {
+        // nice to have: + in special places in the board
         final StringBuffer sb = new StringBuffer();
         sb.append(super.toString());
-        sb.append("\n  ");
+        sb.append("\n   ");
 
         for (int x = 0; x < size; x++)
         {
-            final char symb = (x > 'I' - 'A') ? (char) (65 + x) : (char) (65 + 1 + x);
+            final char symb = (x <= 'I' - 'A' - 1) ? (char) (65 + x) : (char) (65 + 1 + x);
             sb.append(symb).append(' ');
         }
         sb.append("\n");
 
         for (byte y = 0; y < size; y++)
         {
-            sb.append((y + 1) % 10);
+            if (y < 9)
+            {
+                sb.append(' ');
+            }
+            sb.append((y + 1));
             sb.append(' ');
             for (byte x = 0; x < size; x++)
             {
@@ -180,10 +185,10 @@ public class Board
             sb.append((y + 1) % 10).append("\n");
         }
 
-        sb.append("  ");
+        sb.append("   ");
         for (byte x = 0; x < size; x++)
         {
-            final char symb = (x > 'I' - 'A') ? (char) (65 + x) : (char) (65 + 1 + x);
+            final char symb = (x <= 'I' - 'A' - 1) ? (char) (65 + x) : (char) (65 + 1 + x);
             sb.append(symb).append(' ');
         }
 

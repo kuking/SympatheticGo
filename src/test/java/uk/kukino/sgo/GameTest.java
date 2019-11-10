@@ -33,8 +33,8 @@ public class GameTest
 
         assertThat(game.getHandicap(), equalTo((byte) 2));
         assertThat(game.playerToPlay(), equalTo(Color.WHITE));
-        assertThat(game.getBoard().get((byte) 4, (byte) 4), equalTo(Color.BLACK));
-        assertThat(game.getBoard().get((byte) 16, (byte) 16), equalTo(Color.BLACK));
+        assertThat(game.getBoard().get((byte) 3, (byte) 3), equalTo(Color.BLACK));
+        assertThat(game.getBoard().get((byte) 15, (byte) 15), equalTo(Color.BLACK));
     }
 
     @Test

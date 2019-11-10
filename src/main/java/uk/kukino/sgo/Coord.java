@@ -129,7 +129,7 @@ public class Coord
         int c = 0;
         final byte x = Coord.x(coord);
         final byte y = Coord.y(coord);
-        if (y - 1 > 0)
+        if (y - 1 >= 0)
         {
             result[c++] = Coord.XY(x, (byte) (y - 1));
         }
@@ -141,7 +141,7 @@ public class Coord
         {
             result[c++] = Coord.XY(x, (byte) (y + 1));
         }
-        if (x - 1 > 0)
+        if (x - 1 >= 0)
         {
             result[c++] = Coord.XY((byte) (x - 1), y);
         }

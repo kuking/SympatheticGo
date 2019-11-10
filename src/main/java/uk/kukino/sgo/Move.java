@@ -118,7 +118,7 @@ public class Move
 
     public static short pass(final Color color)
     {
-        return move((byte) 0, (byte) 0, color);
+        return move((byte) 127, (byte) 127, color);
     }
 
     public static byte x(final short value)
@@ -153,8 +153,8 @@ public class Move
 
     public static boolean isPass(final short value)
     {
-        return Move.x(value) == (short) 0 &&
-            Move.y(value) == (short) 0 &&
+        return Move.x(value) == (short) 127 &&
+            Move.y(value) == (short) 127 &&
             color(value) != Color.EMPTY;
     }
 

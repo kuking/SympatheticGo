@@ -44,7 +44,7 @@ public class CoordTest
     @Test
     public void adjacentOneCellBoard()
     {
-        assertThat(Coord.adjacents(res, Coord.XY((byte) 1, (byte) 1), (byte) 1), equalTo((byte) 0));
+        assertThat(Coord.adjacents(res, Coord.XY((byte) 0, (byte) 0), (byte) 1), equalTo((byte) 0));
         assertThat(res, equalTo(new short[] {
             Coord.INVALID, Coord.INVALID, Coord.INVALID, Coord.INVALID}));
     }
@@ -52,10 +52,10 @@ public class CoordTest
     @Test
     public void adjacentToTopLeftCorner()
     {
-        assertThat(Coord.adjacents(res, Coord.XY((byte) 1, (byte) 1), size), equalTo((byte) 2));
+        assertThat(Coord.adjacents(res, Coord.XY((byte) 0, (byte) 0), size), equalTo((byte) 2));
         assertThat(res, equalTo(new short[] {
-            Coord.XY((byte) 2, (byte) 1),
-            Coord.XY((byte) 1, (byte) 2),
+            Coord.XY((byte) 1, (byte) 0),
+            Coord.XY((byte) 0, (byte) 1),
             Coord.INVALID,
             Coord.INVALID
         }));
@@ -64,10 +64,10 @@ public class CoordTest
     @Test
     public void adjacentToTopRightCorner()
     {
-        assertThat(Coord.adjacents(res, Coord.XY((byte) 19, (byte) 1), size), equalTo((byte) 2));
+        assertThat(Coord.adjacents(res, Coord.XY((byte) 18, (byte) 0), size), equalTo((byte) 2));
         assertThat(res, equalTo(new short[] {
-            Coord.XY((byte) 19, (byte) 2),
             Coord.XY((byte) 18, (byte) 1),
+            Coord.XY((byte) 17, (byte) 0),
             Coord.INVALID,
             Coord.INVALID
         }));
@@ -88,11 +88,11 @@ public class CoordTest
     @Test
     public void adjacentToBottomLeftCorner()
     {
-        assertThat(Coord.adjacents(res, Coord.XY((byte) 1, (byte) 19), size), equalTo((byte) 2));
+        assertThat(Coord.adjacents(res, Coord.XY((byte) 0, (byte) 18), size), equalTo((byte) 2));
 
         assertThat(res, equalTo(new short[] {
+            Coord.XY((byte) 0, (byte) 17),
             Coord.XY((byte) 1, (byte) 18),
-            Coord.XY((byte) 2, (byte) 19),
             Coord.INVALID,
             Coord.INVALID
         }));
@@ -101,12 +101,12 @@ public class CoordTest
     @Test
     public void adjacentTopSide()
     {
-        assertThat(Coord.adjacents(res, Coord.XY((byte) 9, (byte) 1), size), equalTo((byte) 3));
+        assertThat(Coord.adjacents(res, Coord.XY((byte) 8, (byte) 0), size), equalTo((byte) 3));
 
         assertThat(res, equalTo(new short[] {
-            Coord.XY((byte) 10, (byte) 1),
-            Coord.XY((byte) 9, (byte) 2),
+            Coord.XY((byte) 9, (byte) 0),
             Coord.XY((byte) 8, (byte) 1),
+            Coord.XY((byte) 7, (byte) 0),
             Coord.INVALID
         }));
     }
@@ -140,12 +140,12 @@ public class CoordTest
     @Test
     public void adjacentLeftSide()
     {
-        assertThat(Coord.adjacents(res, Coord.XY((byte) 1, (byte) 9), size), equalTo((byte) 3));
+        assertThat(Coord.adjacents(res, Coord.XY((byte) 0, (byte) 8), size), equalTo((byte) 3));
 
         assertThat(res, equalTo(new short[] {
+            Coord.XY((byte) 0, (byte) 7),
             Coord.XY((byte) 1, (byte) 8),
-            Coord.XY((byte) 2, (byte) 9),
-            Coord.XY((byte) 1, (byte) 10),
+            Coord.XY((byte) 0, (byte) 9),
             Coord.INVALID
         }));
     }
@@ -184,7 +184,7 @@ public class CoordTest
     {
         assertThat(Coord.parseToVal("bz126"), equalTo(Coord.XY((byte) (26 * 2 + 24), (byte) 125)));
         assertThat(Coord.parseToVal("A1"), equalTo(Coord.XY((byte) 0, (byte) 0)));
-        assertThat(Coord.parseToVal("b2"), equalTo(Coord.XY((byte) 0, (byte) 1)));
+        assertThat(Coord.parseToVal("b2"), equalTo(Coord.XY((byte) 1, (byte) 1)));
     }
 
     @Test
@@ -233,9 +233,9 @@ public class CoordTest
     public void toStringIsParsed()
     {
         final Coord coord = new Coord();
-        for (byte x = 0; x < 250; x++)
+        for (byte x = 0; x < 125; x++)
         {
-            for (byte y = 0; y < 250; y++)
+            for (byte y = 0; y < 125; y++)
             {
                 coord.assignXY(x, y);
                 final String toString = coord.toString();
