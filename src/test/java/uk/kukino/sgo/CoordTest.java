@@ -7,14 +7,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CoordTest {
+public class CoordTest
+{
 
     byte size = (byte) 19;
     short[] res = new short[4];
     Coord coord = new Coord();
 
     @Test
-    public void simplest() {
+    public void simplest()
+    {
         short val = Coord.XY((byte) 2, (byte) 3);
         assertThat(Coord.x(val), equalTo((byte) 2));
         assertThat(Coord.y(val), equalTo((byte) 3));
@@ -28,9 +30,10 @@ public class CoordTest {
     }
 
     @Test
-    public void adjacentCentre() {
+    public void adjacentCentre()
+    {
         assertThat(Coord.adjacents(res, Coord.XY((byte) 5, (byte) 5), size), equalTo((byte) 4));
-        assertThat(res, equalTo(new short[]{
+        assertThat(res, equalTo(new short[] {
                 Coord.XY((byte) 5, (byte) 4),
                 Coord.XY((byte) 6, (byte) 5),
                 Coord.XY((byte) 5, (byte) 6),
@@ -39,16 +42,18 @@ public class CoordTest {
     }
 
     @Test
-    public void adjacentOneCellBoard() {
+    public void adjacentOneCellBoard()
+    {
         assertThat(Coord.adjacents(res, Coord.XY((byte) 1, (byte) 1), (byte) 1), equalTo((byte) 0));
-        assertThat(res, equalTo(new short[]{
+        assertThat(res, equalTo(new short[] {
                 Coord.INVALID, Coord.INVALID, Coord.INVALID, Coord.INVALID}));
     }
 
     @Test
-    public void adjacentToTopLeftCorner() {
+    public void adjacentToTopLeftCorner()
+    {
         assertThat(Coord.adjacents(res, Coord.XY((byte) 1, (byte) 1), size), equalTo((byte) 2));
-        assertThat(res, equalTo(new short[]{
+        assertThat(res, equalTo(new short[] {
                 Coord.XY((byte) 2, (byte) 1),
                 Coord.XY((byte) 1, (byte) 2),
                 Coord.INVALID,
@@ -57,9 +62,10 @@ public class CoordTest {
     }
 
     @Test
-    public void adjacentToTopRightCorner() {
+    public void adjacentToTopRightCorner()
+    {
         assertThat(Coord.adjacents(res, Coord.XY((byte) 19, (byte) 1), size), equalTo((byte) 2));
-        assertThat(res, equalTo(new short[]{
+        assertThat(res, equalTo(new short[] {
                 Coord.XY((byte) 19, (byte) 2),
                 Coord.XY((byte) 18, (byte) 1),
                 Coord.INVALID,
@@ -68,9 +74,10 @@ public class CoordTest {
     }
 
     @Test
-    public void adjacentToBottomRightCorner() {
+    public void adjacentToBottomRightCorner()
+    {
         assertThat(Coord.adjacents(res, Coord.XY((byte) 19, (byte) 19), size), equalTo((byte) 2));
-        assertThat(res, equalTo(new short[]{
+        assertThat(res, equalTo(new short[] {
                 Coord.XY((byte) 19, (byte) 18),
                 Coord.XY((byte) 18, (byte) 19),
                 Coord.INVALID,
@@ -79,10 +86,11 @@ public class CoordTest {
     }
 
     @Test
-    public void adjacentToBottomLeftCorner() {
+    public void adjacentToBottomLeftCorner()
+    {
         assertThat(Coord.adjacents(res, Coord.XY((byte) 1, (byte) 19), size), equalTo((byte) 2));
 
-        assertThat(res, equalTo(new short[]{
+        assertThat(res, equalTo(new short[] {
                 Coord.XY((byte) 1, (byte) 18),
                 Coord.XY((byte) 2, (byte) 19),
                 Coord.INVALID,
@@ -91,10 +99,11 @@ public class CoordTest {
     }
 
     @Test
-    public void adjacentTopSide() {
+    public void adjacentTopSide()
+    {
         assertThat(Coord.adjacents(res, Coord.XY((byte) 9, (byte) 1), size), equalTo((byte) 3));
 
-        assertThat(res, equalTo(new short[]{
+        assertThat(res, equalTo(new short[] {
                 Coord.XY((byte) 10, (byte) 1),
                 Coord.XY((byte) 9, (byte) 2),
                 Coord.XY((byte) 8, (byte) 1),
@@ -103,10 +112,11 @@ public class CoordTest {
     }
 
     @Test
-    public void adjacentRightSide() {
+    public void adjacentRightSide()
+    {
         assertThat(Coord.adjacents(res, Coord.XY((byte) 19, (byte) 9), size), equalTo((byte) 3));
 
-        assertThat(res, equalTo(new short[]{
+        assertThat(res, equalTo(new short[] {
                 Coord.XY((byte) 19, (byte) 8),
                 Coord.XY((byte) 19, (byte) 10),
                 Coord.XY((byte) 18, (byte) 9),
@@ -115,10 +125,11 @@ public class CoordTest {
     }
 
     @Test
-    public void adjacentBottomSide() {
+    public void adjacentBottomSide()
+    {
         assertThat(Coord.adjacents(res, Coord.XY((byte) 9, (byte) 19), size), equalTo((byte) 3));
 
-        assertThat(res, equalTo(new short[]{
+        assertThat(res, equalTo(new short[] {
                 Coord.XY((byte) 9, (byte) 18),
                 Coord.XY((byte) 10, (byte) 19),
                 Coord.XY((byte) 8, (byte) 19),
@@ -127,10 +138,11 @@ public class CoordTest {
     }
 
     @Test
-    public void adjacentLeftSide() {
+    public void adjacentLeftSide()
+    {
         assertThat(Coord.adjacents(res, Coord.XY((byte) 1, (byte) 9), size), equalTo((byte) 3));
 
-        assertThat(res, equalTo(new short[]{
+        assertThat(res, equalTo(new short[] {
                 Coord.XY((byte) 1, (byte) 8),
                 Coord.XY((byte) 2, (byte) 9),
                 Coord.XY((byte) 1, (byte) 10),
@@ -139,10 +151,11 @@ public class CoordTest {
     }
 
     @Test
-    public void adjacentCentreWithObject() {
+    public void adjacentCentreWithObject()
+    {
         coord.assignXY((byte) 5, (byte) 5);
         assertThat(coord.adjacents(res, size), equalTo((byte) 4));
-        assertThat(res, equalTo(new short[]{
+        assertThat(res, equalTo(new short[] {
                 Coord.XY((byte) 5, (byte) 4),
                 Coord.XY((byte) 6, (byte) 5),
                 Coord.XY((byte) 5, (byte) 6),
@@ -151,7 +164,8 @@ public class CoordTest {
     }
 
     @Test
-    public void parse() {
+    public void parse()
+    {
         assertTrue(coord.parse("Z126"));
         assertThat(coord.x(), equalTo((byte) 25));
         assertThat(coord.y(), equalTo((byte) 126));
@@ -166,21 +180,24 @@ public class CoordTest {
     }
 
     @Test
-    public void parseStatic() {
-        assertThat(Coord.parseToVal("bz126"), equalTo(Coord.XY((byte) (26*2 + 25), (byte) 126)));
+    public void parseStatic()
+    {
+        assertThat(Coord.parseToVal("bz126"), equalTo(Coord.XY((byte) (26 * 2 + 25), (byte) 126)));
         assertThat(Coord.parseToVal("A1"), equalTo(Coord.XY((byte) 1, (byte) 1)));
         assertThat(Coord.parseToVal("b2"), equalTo(Coord.XY((byte) 2, (byte) 2)));
     }
 
     @Test
-    public void parserCanTrim() {
+    public void parserCanTrim()
+    {
         assertTrue(coord.parse("   D10   "));
         assertThat(coord.x(), equalTo((byte) 4));
         assertThat(coord.y(), equalTo((byte) 10));
     }
 
     @Test
-    public void parserHandleInvalids() {
+    public void parserHandleInvalids()
+    {
         assertFalse(coord.parse("aasdasd"));
         assertFalse(coord.isValid());
 

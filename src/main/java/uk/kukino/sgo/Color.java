@@ -1,30 +1,42 @@
 package uk.kukino.sgo;
 
-public enum Color {
-    EMPTY((byte) 0), BLACK((byte) 1), WHITE((byte) 2), MARK((byte) 3);
+public enum Color
+{
+    EMPTY((byte) 0, '.'), BLACK((byte) 1, 'X'), WHITE((byte) 2, 'O'), MARK((byte) 3, '*');
 
     final byte b;
+    final char symbol;
 
-    Color(byte value) {
+    Color(byte value, char sym)
+    {
         b = value;
+        symbol = sym;
     }
 
-    public static Color fromByte(byte b) {
-        if (b == EMPTY.b) {
+    public static Color fromByte(byte b)
+    {
+        if (b == EMPTY.b)
+        {
             return EMPTY;
-        } else if (b == BLACK.b) {
+        } else if (b == BLACK.b)
+        {
             return BLACK;
-        } else if (b == WHITE.b) {
+        } else if (b == WHITE.b)
+        {
             return WHITE;
-        } else if (b == MARK.b) {
+        } else if (b == MARK.b)
+        {
             return MARK;
-        } else {
+        } else
+        {
             throw new IllegalStateException("Unexpected Color byte value: " + b);
         }
     }
 
-    public Color opposite() {
-        switch (this) {
+    public Color opposite()
+    {
+        switch (this)
+        {
             case WHITE:
                 return BLACK;
             case BLACK:
@@ -36,4 +48,5 @@ public enum Color {
         }
         throw new IllegalArgumentException("This needs further implementation, missing opposite Color configuration");
     }
+
 }

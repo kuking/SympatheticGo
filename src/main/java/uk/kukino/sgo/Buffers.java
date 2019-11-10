@@ -4,22 +4,26 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.function.Supplier;
 
-public class Buffers<T> {
-
+public class Buffers<T>
+{
     private Queue<T> availables;
 
-    public Buffers(final int quantity, Supplier<T> generator) {
+    public Buffers(final int quantity, Supplier<T> generator)
+    {
         availables = new ArrayDeque<>(quantity);
-        for (int i = 0; i < quantity; i++) {
+        for (int i = 0; i < quantity; i++)
+        {
             availables.add(generator.get());
         }
     }
 
-    public T lease() {
+    public T lease()
+    {
         return availables.poll();
     }
 
-    public void ret(final T t) {
+    public void ret(final T t)
+    {
         availables.add(t);
     }
 

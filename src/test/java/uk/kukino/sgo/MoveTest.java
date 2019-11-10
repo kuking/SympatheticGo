@@ -8,12 +8,14 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MoveTest {
+public class MoveTest
+{
 
     private Move move = new Move();
 
     @Test
-    public void simple() {
+    public void simple()
+    {
         assertTrue(move.parse("Black A2"));
         assertThat(move.color(), equalTo(Color.BLACK));
         assertThat(move.x(), equalTo((byte) 1));
@@ -23,7 +25,8 @@ public class MoveTest {
     }
 
     @Test
-    public void pass() {
+    public void pass()
+    {
         assertTrue(move.parse("White Pass"));
         assertThat(move.color(), equalTo(Color.WHITE));
         assertTrue(move.isValid());
@@ -34,7 +37,8 @@ public class MoveTest {
     }
 
     @Test
-    public void moreParsing() {
+    public void moreParsing()
+    {
         assertTrue(move.parse("B Z126"));
         assertThat(move.color(), equalTo(Color.BLACK));
         assertTrue(move.isValid());
@@ -58,7 +62,8 @@ public class MoveTest {
     }
 
     @Test
-    public void itParsesUntrimmedStrings() {
+    public void itParsesUntrimmedStrings()
+    {
         assertTrue(move.parse("   Black A2  "));
         assertTrue(move.isValid());
         assertThat(move.x(), is((byte) 1));
@@ -68,7 +73,8 @@ public class MoveTest {
     }
 
     @Test
-    void values() {
+    void values()
+    {
         short value = Move.parseToVal("W AB123");
 
         assertTrue(Move.isValid(value));
@@ -85,7 +91,8 @@ public class MoveTest {
     }
 
     @Test
-    public void invalids() {
+    public void invalids()
+    {
         assertFalse(move.parse("rubish"));
         assertFalse(move.isValid());
 

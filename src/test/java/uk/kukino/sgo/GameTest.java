@@ -7,12 +7,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class GameTest {
+public class GameTest
+{
 
     Game game;
 
     @Test
-    public void initialValues() {
+    public void initialValues()
+    {
         game = given19x19Game();
         assertThat(game.getHandicap(), equalTo((byte) 0));
         assertThat(game.getKomiX10(), equalTo((byte) 55));
@@ -25,7 +27,8 @@ public class GameTest {
     }
 
     @Test
-    public void handicap() {
+    public void handicap()
+    {
         game = new Game((byte) 19, (byte) 2, (byte) 55);
 
         assertThat(game.getHandicap(), equalTo((byte) 2));
@@ -35,7 +38,8 @@ public class GameTest {
     }
 
     @Test
-    public void simpleMove() {
+    public void simpleMove()
+    {
         game = given19x19Game();
 
         assertTrue(game.play("B D4"));
@@ -50,7 +54,8 @@ public class GameTest {
 
 
     @Test
-    public void someInvalidMoves() {
+    public void someInvalidMoves()
+    {
         game = given19x19Game();
 
         assertFalse(game.play("W A1")); // white can't play first
@@ -63,7 +68,8 @@ public class GameTest {
     }
 
     @Test
-    public void simpleSuicide() {
+    public void simpleSuicide()
+    {
         // +--------
         // |   X  O
         // |  X X O
@@ -85,17 +91,21 @@ public class GameTest {
     }
 
     @Test
-    public void simplestKill() {
+    public void simplestKill()
+    {
         game = given19x19Game();
         game.play("B B1");
         game.play("W A1");
         game.play("B A2");
+        System.out.println(game.getBoard());
+
         assertThat(game.getBoard().get("A1"), equalTo(Color.EMPTY));
         assertThat(game.deadStones(Color.WHITE), equalTo(1));
     }
 
 
-    private Game given19x19Game() {
+    private Game given19x19Game()
+    {
         return new Game((byte) 19, (byte) 0, (byte) 55);
     }
 
