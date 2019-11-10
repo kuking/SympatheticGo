@@ -9,6 +9,7 @@ public class Game
     private final byte komi;
     private Color playerToPlay;
     private int lastMove;
+    private int[] deadStones = new int[Color.values().length];
 
     // workplace
     private final Board altBoard;
@@ -182,14 +183,26 @@ public class Game
         }
     }
 
-    boolean play(final short value)
+    boolean play(final short move)
     {
-        if (!isValidMove(value))
+        if (!isValidMove(move))
         {
             return false;
         }
 
-        board.set(value);
+        board.set(move);
+
+        final short[] adjs = adjacentBuffers.lease();
+        final byte adjsN = board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
+        for (int i = 0; i < adjsN; i++)
+        {
+            markChainAndLiberties(board, adjs[i]);
+            if (chainLibertyBoard.count(Color.MARK) == 0) //killed
+            {
+                deadStones[playerToPlay.opposite().b] += board.extract(chainLibertyBoard);
+            }
+        }
+        adjacentBuffers.ret(adjs);
 
         playerToPlay = playerToPlay.opposite();
         lastMove++;
@@ -204,7 +217,7 @@ public class Game
 
     int deadStones(final Color color)
     {
-        return 0;
+        return deadStones[color.b];
     }
 
     boolean finished()

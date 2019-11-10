@@ -14,25 +14,27 @@ public class Board
         board = new byte[(this.size * this.size * 2 / 8) + 1];
     }
 
+    private byte setColorByteOffset(final byte origByte, final byte ofs, final Color color)
+    {
+        switch (ofs)
+        {
+            case 0:
+                return (byte) ((origByte & (byte) 0b00111111) | (color.b << 6));
+            case 1:
+                return (byte) ((origByte & (byte) 0b11001111) | (color.b << 4));
+            case 2:
+                return (byte) ((origByte & (byte) 0b11110011) | (color.b << 2));
+            case 3:
+                return (byte) ((origByte & (byte) 0b11111100) | color.b);
+            default:
+                return 0;
+        }
+    }
+
     public void set(final byte x, final byte y, final Color color)
     {
         final int ofs = ofs(x, y);
-        switch (ofs % 4)
-        {
-            case 0:
-                board[ofs / 4] = (byte) ((board[ofs / 4] & (byte) 0b00111111) | (color.b << 6));
-                break;
-            case 1:
-                board[ofs / 4] = (byte) ((board[ofs / 4] & (byte) 0b11001111) | (color.b << 4));
-                break;
-            case 2:
-                board[ofs / 4] = (byte) ((board[ofs / 4] & (byte) 0b11110011) | (color.b << 2));
-                break;
-            case 3:
-                board[ofs / 4] = (byte) ((board[ofs / 4] & (byte) 0b11111100) | color.b);
-                break;
-            default:
-        }
+        board[ofs / 4] = setColorByteOffset(board[ofs / 4], (byte) (ofs % 4), color);
     }
 
     public void set(final short value)
@@ -43,22 +45,27 @@ public class Board
         }
     }
 
-    public Color get(final byte x, final byte y)
+    private Color getColorByteOffset(final byte fullByte, final byte ofs)
     {
-        final int ofs = ofs(x, y);
-        switch (ofs % 4)
+        switch (ofs)
         {
             case 0:
-                return Color.fromByte((byte) (board[ofs / 4] >> 6 & 0b11));
+                return Color.fromByte((byte) (fullByte >> 6 & 0b11));
             case 1:
-                return Color.fromByte((byte) ((board[ofs / 4] & 0b00110000) >> 4));
+                return Color.fromByte((byte) ((fullByte & 0b00110000) >> 4));
             case 2:
-                return Color.fromByte((byte) ((board[ofs / 4] & 0b00001100) >>> 2));
+                return Color.fromByte((byte) ((fullByte & 0b00001100) >>> 2));
             case 3:
-                return Color.fromByte((byte) (board[ofs / 4] & 0b00000011));
+                return Color.fromByte((byte) (fullByte & 0b00000011));
             default:
                 return null;
         }
+    }
+
+    public Color get(final byte x, final byte y)
+    {
+        final int ofs = ofs(x, y);
+        return getColorByteOffset(board[ofs / 4], (byte) (ofs % 4));
     }
 
     public Color get(final short coord)
@@ -197,4 +204,29 @@ public class Board
         return sb.toString();
     }
 
+    public int extract(final Board other)
+    {
+        int result = 0;
+        if (other == null || other.size != size)
+        {
+            throw new IllegalArgumentException("Can't remove using different board sizes, or null boards.");
+        }
+        for (int i = 0; i < board.length; i++)
+        {
+            if (other.board[i] != 0)
+            {
+                for (byte j = 0; j < 4; j++)
+                {
+                    final Color bColor = getColorByteOffset(board[i], j);
+                    final Color oColor = getColorByteOffset(other.board[i], j);
+                    if (bColor != Color.EMPTY && bColor == oColor)
+                    {
+                        board[i] = setColorByteOffset(board[i], j, Color.EMPTY);
+                        result++;
+                    }
+                }
+            }
+        }
+        return result;
+    }
 }

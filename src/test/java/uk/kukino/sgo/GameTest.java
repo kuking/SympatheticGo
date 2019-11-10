@@ -97,8 +97,6 @@ public class GameTest
         game.play("B B1");
         game.play("W A1");
         game.play("B A2");
-        System.out.println(game.getBoard());
-
         assertThat(game.getBoard().get("A1"), equalTo(Color.EMPTY));
         assertThat(game.deadStones(Color.WHITE), equalTo(1));
     }
