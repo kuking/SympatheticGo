@@ -7,27 +7,31 @@ public enum Color
     final byte b;
     final char symbol;
 
-    Color(byte value, char sym)
+    Color(final byte value, final char sym)
     {
         b = value;
         symbol = sym;
     }
 
-    public static Color fromByte(byte b)
+    public static Color fromByte(final byte b)
     {
         if (b == EMPTY.b)
         {
             return EMPTY;
-        } else if (b == BLACK.b)
+        }
+        else if (b == BLACK.b)
         {
             return BLACK;
-        } else if (b == WHITE.b)
+        }
+        else if (b == WHITE.b)
         {
             return WHITE;
-        } else if (b == MARK.b)
+        }
+        else if (b == MARK.b)
         {
             return MARK;
-        } else
+        }
+        else
         {
             throw new IllegalStateException("Unexpected Color byte value: " + b);
         }

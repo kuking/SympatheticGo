@@ -3,23 +3,25 @@ package uk.kukino.sgo;
 public class Parsing
 {
 
-    public static int scanSpaces(final CharSequence seq, int i)
+    public static int scanSpaces(final CharSequence seq, final int i)
     {
-        while (i < seq.length() && seq.charAt(i) == ' ')
+        int j = i;
+        while (j < seq.length() && seq.charAt(j) == ' ')
         {
-            i++;
+            j++;
         }
-        return i;
+        return j;
     }
 
-    public static int scanAlphas(final CharSequence seq, int i)
+    public static int scanAlphas(final CharSequence seq, final int i)
     {
+        int j = i;
         while (i < seq.length() &&
-                Character.toUpperCase(seq.charAt(i)) >= 'A' &&
-                Character.toUpperCase(seq.charAt(i)) <= 'Z')
+            Character.toUpperCase(seq.charAt(j)) >= 'A' &&
+            Character.toUpperCase(seq.charAt(j)) <= 'Z')
         {
-            i++;
+            j++;
         }
-        return i;
+        return j;
     }
 }

@@ -13,6 +13,10 @@
     <module name="FileTabCharacter">
         <property name="eachLine" value="true"/>
     </module>
+    <module name="LineLength">
+        <property name="max" value="140"/>
+        <property name="ignorePattern" value="^[ \t]*\*.*@.*$"/>
+    </module>
 
     <module name="TreeWalker">
         <property name="tabWidth" value="4"/>
@@ -56,11 +60,6 @@
 
         <module name="UnusedImports"/>
 
-        <module name="LineLength">
-            <property name="max" value="140"/>
-            <property name="ignorePattern" value="^[ \t]*\*.*@.*$"/>
-        </module>
-
         <module name="MethodLength">
             <property name="tokens" value="METHOD_DEF"/>
             <property name="max" value="140"/>
@@ -74,12 +73,12 @@
 
         <module name="WhitespaceAfter">
             <property name="tokens"
-                      value="COMMA, SEMI, LITERAL_IF, LITERAL_ELSE, LITERAL_WHILE, LITERAL_DO, LITERAL_FOR, DO_WHILE"/>
+                      value="COMMA, SEMI, LITERAL_IF, LITERAL_ELSE, LITERAL_WHILE, TYPECAST, LITERAL_DO, LITERAL_FOR, DO_WHILE"/>
         </module>
 
         <module name="NoWhitespaceAfter">
             <property name="tokens"
-                      value="INC, DEC, UNARY_MINUS, UNARY_PLUS, BNOT, LNOT, DOT, TYPECAST, ARRAY_DECLARATOR, INDEX_OP, METHOD_REF"/>
+                      value="INC, DEC, UNARY_MINUS, UNARY_PLUS, BNOT, LNOT, DOT, ARRAY_DECLARATOR, INDEX_OP, METHOD_REF"/>
             <property name="allowLineBreaks" value="false"/>
         </module>
 
@@ -184,10 +183,12 @@
             <property name="illegalPattern" value="true"/>
             <property name="message" value="Please use JUnit 5."/>
         </module>
-
-        <module name="JavadocMethod">
-            <property name="allowMissingJavadoc" value="true"/>
-            <property name="allowUndeclaredRTE" value="true"/>
-        </module>
+        <!--
+                <module name="JavadocMethod">
+                    <property name="allowMissingJavadoc" value="true"/>
+                    <property name="allowMissingPropertyJavadoc" value="true"/>
+                    <property name="allowUndeclaredRTE" value="true"/>
+                </module>
+        -->
     </module>
 </module>

@@ -16,9 +16,9 @@ public class Game
     private final Buffers<short[]> adjacentBuffers;
 
     private static short[] HANDICAP_19 = new short[] {
-            Move.parseToVal("B D4"), Move.parseToVal("B Q16"), Move.parseToVal("B D16"),
-            Move.parseToVal("B Q4"), Move.parseToVal("B D10"), Move.parseToVal("B Q10"),
-            Move.parseToVal("B K4"), Move.parseToVal("B K16"), Move.parseToVal("B K10")
+        Move.parseToVal("B D4"), Move.parseToVal("B Q16"), Move.parseToVal("B D16"),
+        Move.parseToVal("B Q4"), Move.parseToVal("B D10"), Move.parseToVal("B Q10"),
+        Move.parseToVal("B K4"), Move.parseToVal("B K16"), Move.parseToVal("B K10")
     };
 
 
@@ -40,7 +40,8 @@ public class Game
         if (handicap == (byte) 0)
         {
             this.playerToPlay = Color.BLACK;
-        } else
+        }
+        else
         {
             if (board.size() != 19)
             {
@@ -73,7 +74,7 @@ public class Game
     private void markChainAndLiberties(final Board base, final short coord)
     {
         chainLibertyBoard.clear();
-        Color color = base.get(coord);
+        final Color color = base.get(coord);
 
         if (color == Color.EMPTY)
         {
@@ -90,7 +91,7 @@ public class Game
         }
         chainLibertyBoard.set(Move.move(coord, color));
 
-        short[] adj = adjacentBuffers.lease();
+        final short[] adj = adjacentBuffers.lease();
         try
         {
             byte adjN = base.adjacentsWithColor(adj, coord, Color.EMPTY);
@@ -103,7 +104,8 @@ public class Game
             {
                 recursivePaint(base, adj[i], color);
             }
-        } finally
+        }
+        finally
         {
             adjacentBuffers.ret(adj);
         }
@@ -128,7 +130,7 @@ public class Game
             return false;
         }
 
-        short[] adjs = adjacentBuffers.lease();
+        final short[] adjs = adjacentBuffers.lease();
         try
         {
             byte adjsN = board.adjacentsWithColor(adjs, move, Color.EMPTY);
@@ -160,7 +162,8 @@ public class Game
                     // unless kills
                 }
                 return true;
-            } else
+            }
+            else
             {
                 for (int i = 0; i < adjsN; i++)
                 {
@@ -172,9 +175,8 @@ public class Game
                 }
                 return false;
             }
-
-
-        } finally
+        }
+        finally
         {
             adjacentBuffers.ret(adjs);
         }

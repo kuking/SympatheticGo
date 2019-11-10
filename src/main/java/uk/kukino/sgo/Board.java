@@ -16,7 +16,7 @@ public class Board
 
     public void set(final byte x, final byte y, final Color color)
     {
-        int ofs = ofs(x, y);
+        final int ofs = ofs(x, y);
         switch (ofs % 4)
         {
             case 0:
@@ -45,7 +45,7 @@ public class Board
 
     public Color get(final byte x, final byte y)
     {
-        int ofs = ofs(x, y);
+        final int ofs = ofs(x, y);
         switch (ofs % 4)
         {
             case 0:
@@ -81,14 +81,14 @@ public class Board
         return this.size;
     }
 
-    public void copyTo(Board toBoard)
+    public void copyTo(final Board toBoard)
     {
         System.arraycopy(this.board, 0, toBoard.board, 0, this.board.length);
     }
 
-    public byte adjacentsWithColor(short[] arr, short coord, Color color)
+    public byte adjacentsWithColor(final short[] arr, final short coord, final Color color)
     {
-        byte res = Coord.adjacents(arr, coord, size);
+        final byte res = Coord.adjacents(arr, coord, size);
         byte newRes = res;
         for (byte i = 0; i < res; i++)
         {
@@ -122,7 +122,8 @@ public class Board
                 {
                     somethingMoved = false;
                     i = 0;
-                } else
+                }
+                else
                 {
                     done = true;
                 }
@@ -156,13 +157,13 @@ public class Board
 
     public String toString()
     {
-        StringBuffer sb = new StringBuffer();
+        final StringBuffer sb = new StringBuffer();
         sb.append(super.toString());
         sb.append("\n  ");
 
         for (int x = 0; x < size; x++)
         {
-            char symb = (x > 'I' - 'A') ? (char) (65 + x) : (char) (65 + 1 + x);
+            final char symb = (x > 'I' - 'A') ? (char) (65 + x) : (char) (65 + 1 + x);
             sb.append(symb).append(' ');
         }
         sb.append("\n");
@@ -182,7 +183,7 @@ public class Board
         sb.append("  ");
         for (byte x = 0; x < size; x++)
         {
-            char symb = (x > 'I' - 'A') ? (char) (65 + x) : (char) (65 + 1 + x);
+            final char symb = (x > 'I' - 'A') ? (char) (65 + x) : (char) (65 + 1 + x);
             sb.append(symb).append(' ');
         }
 

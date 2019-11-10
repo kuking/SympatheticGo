@@ -30,13 +30,13 @@ public class Coord
         {
             return INVALID;
         }
-        int j = Parsing.scanAlphas(seq, i);
+        final int j = Parsing.scanAlphas(seq, i);
         if (i == j || i + 2 < j)
         {
             return INVALID;
         }
 
-        byte x;
+        final byte x;
         byte y;
         byte a = (byte) (Character.toUpperCase(seq.charAt(i)) - 64);
         if (a > 'I' - 65)
@@ -46,7 +46,8 @@ public class Coord
         if (i + 1 == j)
         {
             x = a;
-        } else
+        }
+        else
         {
             byte b = (byte) (Character.toUpperCase(seq.charAt(j - 1)) - 64);
             if (b > 'I' - 65)
@@ -72,7 +73,7 @@ public class Coord
             return INVALID;
         }
 
-        return XY(x, y);
+        return XY((byte) (x - 1), (byte) (y - 1));
     }
 
     public static short XY(final byte x, final byte y)
@@ -123,11 +124,11 @@ public class Coord
      * @param boardSize
      * @return
      */
-    public static byte adjacents(short[] result, final short coord, final byte boardSize)
+    public static byte adjacents(final short[] result, final short coord, final byte boardSize)
     {
         int c = 0;
-        byte x = Coord.x(coord);
-        byte y = Coord.y(coord);
+        final byte x = Coord.x(coord);
+        final byte y = Coord.y(coord);
         if (y - 1 > 0)
         {
             result[c++] = Coord.XY(x, (byte) (y - 1));
@@ -151,9 +152,14 @@ public class Coord
         return (byte) c;
     }
 
-    public byte adjacents(short[] values, final byte size)
+    public byte adjacents(final short[] values, final byte size)
     {
         return Coord.adjacents(values, value, size);
     }
 
+    @Override
+    public String toString()
+    {
+        return "";
+    }
 }

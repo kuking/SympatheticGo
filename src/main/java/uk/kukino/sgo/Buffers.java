@@ -8,7 +8,7 @@ public class Buffers<T>
 {
     private Queue<T> availables;
 
-    public Buffers(final int quantity, Supplier<T> generator)
+    public Buffers(final int quantity, final Supplier<T> generator)
     {
         availables = new ArrayDeque<>(quantity);
         for (int i = 0; i < quantity; i++)
