@@ -69,11 +69,13 @@ public class GameTest
     @Test
     public void simpleSuicide()
     {
-        // +--------
-        // |   X  O
-        // |  X X O
-        // |   X  O
-        // TODO: use nice toString, when implemented
+        //  14 . . . . . . . .
+        //  15 . . . . . . . .
+        //  16 . . X . . O . .
+        //  17 . X . X . O . .
+        //  18 . . X . . O . .
+        //  19 . . . . . . . .
+        //     A B C D E F G H
 
         game = given19x19Game();
         game.play("B C18");
@@ -103,29 +105,16 @@ public class GameTest
     @Test
     public void notSoSimpleKill()
     {
-        /*
-   A B C D E F G H J K L M N O P Q R S T
- 1 . . . . . . . . . . . . . . . . . . . 1
- 2 . . . . . . . . . . . . . . . . . . . 2
- 3 . . . . . . . . . . . . . . . . . . . 3
- 4 . . . . . . . . . . . . . . . . . . . 4
- 5 . . . . . . . . . . . . . . . . . . . 5
- 6 . . . . . . . . . . . . . . . . . . . 6
- 7 . . . . . . . . . . . . . . . . . . . 7
- 8 . . . X . . . . O O . . . . . . . . . 8
- 9 . . . X . . . O . . O . . . . . . . . 9
-10 . . . X . . . O . . O . . . . . . . . 0
-11 . . . X . . . . O O . . . . . . . . . 1
-12 . . . . . . . . . . . . . . . . . . . 2
-13 . . . . . . . . . . . . . . . . . . . 3
-14 . . . . . . . . . . . . . . . . . . . 4
-15 . . . . . . . . . . . . . . . . . . . 5
-16 . . . . . . . . . . . . . . . . . . . 6
-17 . . . . . . . . . . . . . . . . . . . 7
-18 . . . . . . . . . . . . . . . . . . . 8
-19 . . . . . . . . . . . . . . . . . . . 9
-   A B C D E F G H J K L M N O P Q R S T
-         */
+        //    A B C D E F G H J K L M N O P Q R S T
+        //  1 . . . . . . . . . . . . . . . . . . . 1
+        // ....
+        //  7 . . . . . . . . . . . . . . . . . . . 7
+        //  8 . . . X . . . . O O . . . . . . . . . 8
+        //  9 . . . X . . . O . . O . . . . . . . . 9
+        // 10 . . . X . . . O . . O . . . . . . . . 0
+        // 11 . . . X . . . . O O . . . . . . . . . 1
+        // 12 . . . . . . . . . . . . . . . . . . . 2
+
         game = given19x19Game();
         game.play("b k10");
         game.play("w l10");
@@ -155,6 +144,16 @@ public class GameTest
     @Test
     public void simplestKillThenDobleKill()
     {
+        //    A B C D E F G H J K L M N O P Q R S T
+        //  1 . . . . . . . . . . . . . . . . . . . 1
+        // ....
+        //  7 . . . . . . . . . . . . . . . . . . . 7
+        //  8 . . . X . . . . O O . . . . . . . . . 8
+        //  9 . . . X . . . O . O O . . . . . . . . 9
+        // 10 . . . X . . . O O . O . . . . . . . . 0
+        // 11 . . . X . . . . O O . . . . . . . . . 1
+        // 12 . . . . . . . . . . . . . . . . . . . 2
+
         game = given19x19Game();
         game.play("b k10");
         game.play("w l10");
@@ -176,6 +175,7 @@ public class GameTest
         game.play("w j10");
         game.play("b j9");
         game.play("w k9"); // eats 2 different groups
+        System.out.println(game.getBoard());
         assertTrue(game.getBoard().get("k10") == Color.EMPTY);
         assertTrue(game.getBoard().get("j9") == Color.EMPTY);
         assertTrue(game.getBoard().get("j10") == Color.WHITE);
@@ -193,25 +193,43 @@ public class GameTest
          *  1(X)O O O . . . . .
          *    A B C D E F G H J
          */
-        game = given19x19Game();
+        game = given9x9Game();
         assertTrue(game.play("b a1"));
         assertTrue(game.play("w b1"));
         assertTrue(game.play("b a3"));
         assertTrue(game.play("w c1"));
         assertTrue(game.play("b b2"));
         assertTrue(game.play("w a2"));  // eat, valid.
-        assertFalse(game.isValidMove("b a1")); // invalid.
+        assertFalse(game.play("b a1")); // invalid.
         assertTrue(game.play("b b3"));
-        assertTrue(game.isValidMove("w a1")); // white can finish ko
+        assertTrue(game.play("w a1"));  // white can finish ko
+
+        game = given9x9Game();
+        assertTrue(game.play("b a1"));
+        assertTrue(game.play("w b1"));
+        assertTrue(game.play("b a3"));
+        assertTrue(game.play("w c1"));
+        assertTrue(game.play("b b2"));
+        assertTrue(game.play("w a2"));  // eat, valid.
+        assertFalse(game.play("b a1")); // invalid.
+        assertTrue(game.play("b b3"));
         assertTrue(game.play("w d1"));
         assertTrue(game.play("b a1")); // now black can eat again
         assertFalse(game.play("w a2")); // and white can´t eat at A2 because its a KO
     }
 
 
+    //TODO: https://senseis.xmp.net/?PinwheelKo
+
+
     private Game given19x19Game()
     {
         return new Game((byte) 19, (byte) 0, (byte) 55);
+    }
+
+    private Game given9x9Game()
+    {
+        return new Game((byte) 9, (byte) 0, (byte) 45);
     }
 
 }

@@ -1,5 +1,7 @@
 package uk.kukino.sgo;
 
+import java.util.Arrays;
+
 public class Game
 {
 
@@ -10,6 +12,9 @@ public class Game
     private Color playerToPlay;
     private int lastMove;
     private int[] deadStones = new int[Color.values().length];
+    private short[] moves;
+    private int[] superKos;
+    private int lastSuperKoP;
 
     // workplace
     private final Board altBoard;
@@ -22,13 +27,16 @@ public class Game
         Move.parseToVal("B K4"), Move.parseToVal("B K16"), Move.parseToVal("B K10")
     };
 
-
-    Game(final byte size, final byte handicap, final byte komiX10)
+    public Game(final byte size, final byte handicap, final byte komiX10)
     {
         board = new Board(size);
         altBoard = new Board(size);
         chainLibertyBoard = new Board(size);
         adjacentBuffers = new Buffers<>(size * 4, () -> new short[4]);
+        moves = new short[size * size];
+        Arrays.fill(moves, Move.INVALID);
+        superKos = new int[size * size];
+        lastSuperKoP = 0;
 
         komi = komiX10;
         this.handicap = handicap;
@@ -55,21 +63,6 @@ public class Game
             this.playerToPlay = Color.WHITE;
         }
 
-    }
-
-    public byte getHandicap()
-    {
-        return handicap;
-    }
-
-    public byte getKomiX10()
-    {
-        return komi;
-    }
-
-    public Color playerToPlay()
-    {
-        return playerToPlay;
     }
 
     private void markChainAndLiberties(final Board base, final short coord)
@@ -114,7 +107,7 @@ public class Game
         }
     }
 
-    boolean isValidMove(final short move)
+    private boolean isOKMove(final short move)
     {
         if (Move.color(move) != playerToPlay)
         {
@@ -185,18 +178,14 @@ public class Game
         }
     }
 
-    boolean isValidMove(final CharSequence move)
+    public boolean play(final short move)
     {
-        return isValidMove(Move.parseToVal(move));
-    }
-
-    boolean play(final short move)
-    {
-        if (!isValidMove(move))
+        if (!isOKMove(move))
         {
             return false;
         }
-
+        boolean killsOccured = false;
+        int moveKills = 0;
         board.set(move);
 
         final short[] adjs = adjacentBuffers.lease();
@@ -206,23 +195,71 @@ public class Game
             markChainAndLiberties(board, adjs[i]);
             if (chainLibertyBoard.count(Color.MARK) == 0) //killed
             {
-                deadStones[playerToPlay.opposite().b] += board.extract(chainLibertyBoard);
+                if (!killsOccured)
+                {
+                    board.copyTo(altBoard); // lazy makes a copy of the board, just in case it has to be rollback for a superKo
+                    altBoard.set(Move.x(move), Move.y(move), Color.EMPTY);
+                    killsOccured = true;
+                }
+                moveKills += board.extract(chainLibertyBoard);
             }
         }
         adjacentBuffers.ret(adjs);
 
+        if (killsOccured)
+        {
+            if (isSuperKo(board.hashCode()))
+            {
+                altBoard.copyTo(board);
+                return false;
+            }
+            superKos[lastSuperKoP++] = altBoard.hashCode();
+        }
+
+        deadStones[playerToPlay.opposite().b] += moveKills;
         playerToPlay = playerToPlay.opposite();
-        lastMove++;
+        moves[lastMove++] = move;
 
         return true;
     }
 
-    boolean play(final CharSequence move)
+    private boolean isSuperKo(final int hash)
+    {
+        for (int i = 0; i < lastSuperKoP; i++)
+        {
+            if (superKos[i] == hash)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /*
+        Below the typical public methods for a Game
+     */
+
+    public byte getHandicap()
+    {
+        return handicap;
+    }
+
+    public byte getKomiX10()
+    {
+        return komi;
+    }
+
+    public Color playerToPlay()
+    {
+        return playerToPlay;
+    }
+
+    public boolean play(final CharSequence move)
     {
         return play(Move.parseToVal(move));
     }
 
-    int deadStones(final Color color)
+    public int deadStones(final Color color)
     {
         return deadStones[color.b];
     }
@@ -232,15 +269,14 @@ public class Game
         return false;
     }
 
-    Board getBoard()
+    public Board getBoard()
     {
         return board;
     }
 
-    int lastMove()
+    public int lastMove()
     {
         return lastMove;
     }
-
 
 }

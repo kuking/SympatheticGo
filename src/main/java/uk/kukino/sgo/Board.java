@@ -166,7 +166,7 @@ public class Board
     {
         // nice to have: + in special places in the board
         final StringBuffer sb = new StringBuffer();
-        sb.append(super.toString());
+        sb.append("hash: ").append(hashCode());
         sb.append("\n   ");
 
         for (int x = 0; x < size; x++)
@@ -228,5 +228,32 @@ public class Board
             }
         }
         return result;
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        // Adler algorithm: https://en.wikipedia.org/wiki/Adler-32
+        // a & b should be unsigned, not perfect but OK enough.
+        final int modAdler = 65521;
+        int a = 1;
+        int b = 0;
+        for (int i = 0; i < board.length; i++)
+        {
+            a = (a + board[i]) % modAdler;
+            b = (b + a) % modAdler;
+        }
+        return (b << 16) | a;
+    }
+
+    @Override
+    public boolean equals(final Object obj)
+    {
+        if (!(obj instanceof Board))
+        {
+            return false;
+        }
+        return this.hashCode() == obj.hashCode();
     }
 }
