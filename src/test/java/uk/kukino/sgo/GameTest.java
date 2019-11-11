@@ -1,6 +1,9 @@
 package uk.kukino.sgo;
 
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;
+
+import java.util.Collection;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -155,31 +158,14 @@ public class GameTest
         // 12 . . . . . . . . . . . . . . . . . . . 2
 
         game = given19x19Game();
-        game.play("b k10");
-        game.play("w l10");
-        game.play("b k9");
-        game.play("w l9");
-        game.play("b j10");
-        game.play("w k11");
-        game.play("b j9");
-        game.play("w j11");
-        game.play("b d10");
-        game.play("w h10");
-        game.play("b d9");
-        game.play("w h9");
-        game.play("b d8");
-        game.play("w j8");
-        game.play("b d11");
-        game.play("w k8");  // eat 4
-        game.play("b k10");
-        game.play("w j10");
-        game.play("b j9");
-        game.play("w k9"); // eats 2 different groups
+        assertAllValid(game, Lists.newArrayList("b k10", "w l10", "b k9", "w l9", "b j10", "w k11", "b j9",
+            "w j11", "b d10", "w h10", "b d9", "w h9", "b d8", "w j8", "b d11", "w k8"/* eat 4 */, "b k10",
+            "w j10", "b j9", "w k9" /* eat 2 different groups */));
         System.out.println(game.getBoard());
-        assertTrue(game.getBoard().get("k10") == Color.EMPTY);
-        assertTrue(game.getBoard().get("j9") == Color.EMPTY);
-        assertTrue(game.getBoard().get("j10") == Color.WHITE);
-        assertTrue(game.getBoard().get("k9") == Color.WHITE);
+        assertSame(game.getBoard().get("k10"), Color.EMPTY);
+        assertSame(game.getBoard().get("j9"), Color.EMPTY);
+        assertSame(game.getBoard().get("j10"), Color.WHITE);
+        assertSame(game.getBoard().get("k9"), Color.WHITE);
     }
 
     @Test
@@ -218,9 +204,76 @@ public class GameTest
         assertFalse(game.play("w a2")); // and white can´t eat at A2 because its a KO
     }
 
-
     //TODO: https://senseis.xmp.net/?PinwheelKo
 
+    @Test
+    public void twoConsecutiveBlackMovesAreNotValid()
+    {
+        game = given9x9Game();
+        game.play("black A3");
+        assertFalse(game.play("black G5"));
+    }
+
+    @Test
+    public void twoConsecutiveWhiteMovesAreNotValid()
+    {
+        game = given9x9Game();
+        game.play("black A3");
+        game.play("white A6");
+        assertFalse(game.play("white F2"));
+    }
+
+    @Test
+    public void simpleFinishGame()
+    {
+        game = given9x9Game();
+        game.play("black a1");
+        game.play("white pass");
+        game.play("black pass");
+        assertTrue(game.finished());
+    }
+
+    @Test
+    public void shortestGame()
+    {
+        game = given9x9Game();
+        game.play("black pass");
+        game.play("white pass");
+        assertTrue(game.finished());
+    }
+
+    @Test
+    public void notSoSimpleFinishGame()
+    {
+        game = given19x19Game();
+        assertAllValid(game, Lists.newArrayList("black a1", "white pass", "black g10", "white f10", "black pass", "white pass"));
+        assertTrue(game.finished());
+    }
+
+    @Test
+    public void suicideSimple()
+    {
+        //  A B C D E F G H J
+        // 1 . X . . . . . . . 1
+        // 2 X . . . . . . . . 2
+        // 3 . . . O . . . . . 3
+        // 4 . . . . . . . . . 4
+        // => White A1 is not a valid move
+
+        game = given9x9Game();
+        game.play("b a2");
+        game.play("w d3");
+        game.play("b b1");
+        System.out.println(game.getBoard());
+        assertFalse(game.play("w a1"));
+    }
+
+    /* --------------------------------------------------------------------------------------------------------------------------------- */
+
+    private void assertAllValid(final Game game, Collection<String> moves)
+    {
+        moves.forEach(move -> assertTrue(game.play(move), () ->  "Move " + move + " Failed!"));
+    }
 
     private Game given19x19Game()
     {

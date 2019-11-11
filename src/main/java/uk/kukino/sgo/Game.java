@@ -11,10 +11,12 @@ public class Game
     private final byte komi;
     private Color playerToPlay;
     private int lastMove;
-    private int[] deadStones = new int[Color.values().length];
+    private int blackDeaths;
+    private int whiteDeaths;
     private short[] moves;
     private int[] superKos;
     private int lastSuperKoP;
+    private boolean finished;
 
     // workplace
     private final Board altBoard;
@@ -34,9 +36,12 @@ public class Game
         chainLibertyBoard = new Board(size);
         adjacentBuffers = new Buffers<>(size * 4, () -> new short[4]);
         moves = new short[size * size];
+        blackDeaths = 0;
+        whiteDeaths = 0;
         Arrays.fill(moves, Move.INVALID);
         superKos = new int[size * size];
         lastSuperKoP = 0;
+        finished = false;
 
         komi = komiX10;
         this.handicap = handicap;
@@ -109,10 +114,21 @@ public class Game
 
     private boolean isOKMove(final short move)
     {
+
         if (Move.color(move) != playerToPlay)
         {
             return false;
         }
+        if (finished)
+        {
+            return false;
+        }
+        if (Move.isPass(move))
+        {
+            return true;
+        }
+
+        // from now on, all stone checks
         if (Move.x(move) >= board.size())
         {
             return false;
@@ -125,6 +141,7 @@ public class Game
         {
             return false;
         }
+
 
         final short[] adjs = adjacentBuffers.lease();
         try
@@ -185,38 +202,58 @@ public class Game
             return false;
         }
         boolean killsOccured = false;
-        int moveKills = 0;
-        board.set(move);
 
-        final short[] adjs = adjacentBuffers.lease();
-        final byte adjsN = board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
-        for (int i = 0; i < adjsN; i++)
+        if (Move.isPass(move))
         {
-            markChainAndLiberties(board, adjs[i]);
-            if (chainLibertyBoard.count(Color.MARK) == 0) //killed
+            if (lastMove > 0 && Move.isPass(moves[lastMove - 1]))
             {
-                if (!killsOccured)
+                finished = true;
+            }
+        }
+        else if (Move.isStone(move))
+        {
+            int moveKills = 0;
+            board.set(move);
+
+            final short[] adjs = adjacentBuffers.lease();
+            final byte adjsN = board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
+            for (int i = 0; i < adjsN; i++)
+            {
+                markChainAndLiberties(board, adjs[i]);
+                if (chainLibertyBoard.count(Color.MARK) == 0) //killed
                 {
-                    board.copyTo(altBoard); // lazy makes a copy of the board, just in case it has to be rollback for a superKo
-                    altBoard.set(Move.x(move), Move.y(move), Color.EMPTY);
-                    killsOccured = true;
+                    if (!killsOccured)
+                    {
+                        board.copyTo(altBoard); // lazy makes a copy of the board, just in case it has to be rollback for a superKo
+                        altBoard.set(Move.x(move), Move.y(move), Color.EMPTY);
+                        killsOccured = true;
+                    }
+                    moveKills += board.extract(chainLibertyBoard);
                 }
-                moveKills += board.extract(chainLibertyBoard);
             }
-        }
-        adjacentBuffers.ret(adjs);
+            adjacentBuffers.ret(adjs);
 
-        if (killsOccured)
-        {
-            if (isSuperKo(board.hashCode()))
+            if (killsOccured)
             {
-                altBoard.copyTo(board);
-                return false;
+                if (isSuperKo(board.hashCode()))
+                {
+                    altBoard.copyTo(board);
+                    return false;
+                }
+                superKos[lastSuperKoP++] = altBoard.hashCode();
             }
-            superKos[lastSuperKoP++] = altBoard.hashCode();
+
+            // latest accounts and moves
+            if (playerToPlay == Color.WHITE)
+            {
+                blackDeaths += moveKills;
+            }
+            else
+            {
+                whiteDeaths = moveKills;
+            }
         }
 
-        deadStones[playerToPlay.opposite().b] += moveKills;
         playerToPlay = playerToPlay.opposite();
         moves[lastMove++] = move;
 
@@ -261,12 +298,20 @@ public class Game
 
     public int deadStones(final Color color)
     {
-        return deadStones[color.b];
+        if (color == Color.WHITE)
+        {
+            return whiteDeaths;
+        }
+        else if (color == Color.BLACK)
+        {
+            return blackDeaths;
+        }
+        throw new IllegalArgumentException("I don't count dead stones for: " + color);
     }
 
     boolean finished()
     {
-        return false;
+        return finished;
     }
 
     public Board getBoard()
