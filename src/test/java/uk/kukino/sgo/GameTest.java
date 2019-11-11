@@ -4,13 +4,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTest
 {
 
-    Game game;
+    private Game game;
 
     @Test
     public void initialValues()
@@ -99,6 +98,114 @@ public class GameTest
         game.play("B A2");
         assertThat(game.getBoard().get("A1"), equalTo(Color.EMPTY));
         assertThat(game.deadStones(Color.WHITE), equalTo(1));
+    }
+
+    @Test
+    public void notSoSimpleKill()
+    {
+        /*
+   A B C D E F G H J K L M N O P Q R S T
+ 1 . . . . . . . . . . . . . . . . . . . 1
+ 2 . . . . . . . . . . . . . . . . . . . 2
+ 3 . . . . . . . . . . . . . . . . . . . 3
+ 4 . . . . . . . . . . . . . . . . . . . 4
+ 5 . . . . . . . . . . . . . . . . . . . 5
+ 6 . . . . . . . . . . . . . . . . . . . 6
+ 7 . . . . . . . . . . . . . . . . . . . 7
+ 8 . . . X . . . . O O . . . . . . . . . 8
+ 9 . . . X . . . O . . O . . . . . . . . 9
+10 . . . X . . . O . . O . . . . . . . . 0
+11 . . . X . . . . O O . . . . . . . . . 1
+12 . . . . . . . . . . . . . . . . . . . 2
+13 . . . . . . . . . . . . . . . . . . . 3
+14 . . . . . . . . . . . . . . . . . . . 4
+15 . . . . . . . . . . . . . . . . . . . 5
+16 . . . . . . . . . . . . . . . . . . . 6
+17 . . . . . . . . . . . . . . . . . . . 7
+18 . . . . . . . . . . . . . . . . . . . 8
+19 . . . . . . . . . . . . . . . . . . . 9
+   A B C D E F G H J K L M N O P Q R S T
+         */
+        game = given19x19Game();
+        game.play("b k10");
+        game.play("w l10");
+        game.play("b k9");
+        game.play("w l9");
+        game.play("b j10");
+        game.play("w k11");
+        game.play("b j9");
+        game.play("w j11");
+        game.play("b d10");
+        game.play("w h10");
+        game.play("b d9");
+        game.play("w h9");
+        game.play("b d8");
+        game.play("w j8");
+        game.play("b d11");
+        game.play("w k8");
+
+        assertTrue(game.getBoard().get("k10") == Color.EMPTY);
+        assertTrue(game.getBoard().get("j9") == Color.EMPTY);
+        assertTrue(game.getBoard().get("j10") == Color.EMPTY);
+        assertTrue(game.getBoard().get("k9") == Color.EMPTY);
+        assertEquals(0, game.deadStones(Color.WHITE));
+        assertEquals(4, game.deadStones(Color.BLACK));
+    }
+
+    @Test
+    public void simplestKillThenDobleKill()
+    {
+        game = given19x19Game();
+        game.play("b k10");
+        game.play("w l10");
+        game.play("b k9");
+        game.play("w l9");
+        game.play("b j10");
+        game.play("w k11");
+        game.play("b j9");
+        game.play("w j11");
+        game.play("b d10");
+        game.play("w h10");
+        game.play("b d9");
+        game.play("w h9");
+        game.play("b d8");
+        game.play("w j8");
+        game.play("b d11");
+        game.play("w k8");  // eat 4
+        game.play("b k10");
+        game.play("w j10");
+        game.play("b j9");
+        game.play("w k9"); // eats 2 different groups
+        assertTrue(game.getBoard().get("k10") == Color.EMPTY);
+        assertTrue(game.getBoard().get("j9") == Color.EMPTY);
+        assertTrue(game.getBoard().get("j10") == Color.WHITE);
+        assertTrue(game.getBoard().get("k9") == Color.WHITE);
+    }
+
+    @Test
+    public void basicKO()
+    {
+        /*
+         *  5 . . . . . . . . .
+         *  4 . . . + . . . . .
+         *  3 X X . . . . . . .
+         *  2 . X . . . . . . .
+         *  1(X)O O O . . . . .
+         *    A B C D E F G H J
+         */
+        game = given19x19Game();
+        assertTrue(game.play("b a1"));
+        assertTrue(game.play("w b1"));
+        assertTrue(game.play("b a3"));
+        assertTrue(game.play("w c1"));
+        assertTrue(game.play("b b2"));
+        assertTrue(game.play("w a2"));  // eat, valid.
+        assertFalse(game.isValidMove("b a1")); // invalid.
+        assertTrue(game.play("b b3"));
+        assertTrue(game.isValidMove("w a1")); // white can finish ko
+        assertTrue(game.play("w d1"));
+        assertTrue(game.play("b a1")); // now black can eat again
+        assertFalse(game.play("w a2")); // and white can´t eat at A2 because its a KO
     }
 
 

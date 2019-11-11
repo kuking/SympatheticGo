@@ -91,7 +91,6 @@ public class Game
             return;
         }
         chainLibertyBoard.set(Move.move(coord, color));
-
         final short[] adj = adjacentBuffers.lease();
         try
         {
@@ -103,7 +102,10 @@ public class Game
             adjN = base.adjacentsWithColor(adj, coord, color);
             for (byte i = 0; i < adjN; i++)
             {
-                recursivePaint(base, adj[i], color);
+                if (chainLibertyBoard.get(adj[i]) == Color.EMPTY)
+                {
+                    recursivePaint(base, adj[i], color);
+                }
             }
         }
         finally
@@ -181,6 +183,11 @@ public class Game
         {
             adjacentBuffers.ret(adjs);
         }
+    }
+
+    boolean isValidMove(final CharSequence move)
+    {
+        return isValidMove(Move.parseToVal(move));
     }
 
     boolean play(final short move)
