@@ -34,7 +34,7 @@ public class Game
         board = new Board(size);
         altBoard = new Board(size);
         chainLibertyBoard = new Board(size);
-        adjacentBuffers = new Buffers<>(size * size, () -> new short[4]);
+        adjacentBuffers = new Buffers<>(size * size / 2, () -> new short[4]);
         moves = new short[size * size * 2];
         blackDeaths = 0;
         whiteDeaths = 0;
@@ -87,22 +87,17 @@ public class Game
 
     private void markChainAndLiberties(final Board base, final short coord)
     {
-        chainLibertyBoard.clear();
         final Color color = base.get(coord);
-
         if (color == Color.EMPTY)
         {
             return;
         }
+        chainLibertyBoard.clear();
         recursivePaint(base, coord, color);
     }
 
     private void recursivePaint(final Board base, final short coord, final Color color)
     {
-        if (base.get(coord) != color)
-        {
-            return;
-        }
         chainLibertyBoard.set(Move.move(coord, color));
         final short[] adj = adjacentBuffers.lease();
         try
@@ -185,7 +180,7 @@ public class Game
             for (int i = 0; i < adjsN; i++)
             {
                 markChainAndLiberties(board, adjs[i]);
-                if (chainLibertyBoard.count(Color.MARK) == 0) //killed
+                if (chainLibertyBoard.countIsZero(Color.MARK)) //killed
                 {
                     if (!killsOccured)
                     {
@@ -213,7 +208,7 @@ public class Game
                 if (adjsN == 0)
                 {
                     markChainAndLiberties(board, move);
-                    if (chainLibertyBoard.count(Color.MARK) == 0)
+                    if (chainLibertyBoard.countIsZero(Color.MARK))
                     {
                         // suicide!
                         board.set(Move.x(move), Move.y(move), Color.EMPTY); //undo

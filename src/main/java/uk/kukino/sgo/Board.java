@@ -139,21 +139,57 @@ public class Board
         return newRes;
     }
 
-    //TODO: This can be way optimised by scanning empty bytes and patterns
     public int count(final Color color)
     {
         int count = 0;
-        for (byte x = 0; x < size; x++)
+        for (int i = 0; i < board.length; i++)
         {
-            for (byte y = 0; y < size; y++)
+            final byte b = board[i];
+            if (b == 0)
             {
-                if (get(x, y) == color)
+                if (color == Color.EMPTY)
                 {
-                    count++;
+                    count += 4;
+                }
+            }
+            else
+            {
+                for (byte idx = 0; idx < 4; idx++)
+                {
+                    if (getColorByteOffset(b, idx) == color)
+                    {
+                        count++;
+                    }
                 }
             }
         }
         return count;
+    }
+
+    public boolean countIsZero(final Color color)
+    {
+        for (int i = 0; i < board.length; i++)
+        {
+            final byte b = board[i];
+            if (b == 0)
+            {
+                if (color == Color.EMPTY)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                for (byte idx = 0; idx < 4; idx++)
+                {
+                    if (getColorByteOffset(b, idx) == color)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     public void clear()
