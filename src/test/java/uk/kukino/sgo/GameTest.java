@@ -70,7 +70,25 @@ public class GameTest
     }
 
     @Test
-    public void simpleSuicide()
+    public void cornerSuicide()
+    {
+        //  A B C D E F G H J
+        // 1 . X . . . . . . . 1
+        // 2 X . . . . . . . . 2
+        // 3 . . . O . . . . . 3
+        // 4 . . . . . . . . . 4
+        // => White A1 is not a valid move
+
+        game = given9x9Game();
+        game.play("b a2");
+        game.play("w d3");
+        game.play("b b1");
+        System.out.println(game.getBoard());
+        assertFalse(game.play("w a1"));
+    }
+
+    @Test
+    public void oneSuicide()
     {
         //  14 . . . . . . . .
         //  15 . . . . . . . .
@@ -248,24 +266,6 @@ public class GameTest
         game = given19x19Game();
         assertAllValid(game, Lists.newArrayList("black a1", "white pass", "black g10", "white f10", "black pass", "white pass"));
         assertTrue(game.finished());
-    }
-
-    @Test
-    public void suicideSimple()
-    {
-        //  A B C D E F G H J
-        // 1 . X . . . . . . . 1
-        // 2 X . . . . . . . . 2
-        // 3 . . . O . . . . . 3
-        // 4 . . . . . . . . . 4
-        // => White A1 is not a valid move
-
-        game = given9x9Game();
-        game.play("b a2");
-        game.play("w d3");
-        game.play("b b1");
-        System.out.println(game.getBoard());
-        assertFalse(game.play("w a1"));
     }
 
     /* --------------------------------------------------------------------------------------------------------------------------------- */

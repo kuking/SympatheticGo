@@ -157,57 +157,7 @@ public class Game
             return false;
         }
 
-
-        final short[] adjs = adjacentBuffers.lease();
-        try
-        {
-            byte adjsN = board.adjacentsWithColor(adjs, move, Color.EMPTY);
-            if (adjsN > 0)
-            {
-                return true;
-            }
-
-            adjsN = board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
-            for (int i = 0; i < adjsN; i++)
-            {
-                markChainAndLiberties(board, adjs[i]);
-                if (chainLibertyBoard.count(Color.MARK) == 1)
-                {
-                    return true;
-                }
-            }
-
-
-            adjsN = board.adjacentsWithColor(adjs, move, playerToPlay);
-            if (adjsN == 0)
-            {
-                board.copyTo(altBoard);
-                altBoard.set(move);
-                markChainAndLiberties(altBoard, move);
-                if (chainLibertyBoard.count(Color.MARK) == 0)
-                {
-                    return false;
-                    // unless kills
-                }
-                return true;
-            }
-            else
-            {
-                for (int i = 0; i < adjsN; i++)
-                {
-                    markChainAndLiberties(board, adjs[i]);
-                    if (chainLibertyBoard.count(Color.MARK) > 1)
-                    { // +1 because 1 liberty is the current pos
-                        return true;
-                    }
-                }
-                return false;
-            }
-        }
-        finally
-        {
-            adjacentBuffers.ret(adjs);
-        }
+        return true;
     }
 
     public boolean play(final short move)
@@ -231,7 +181,7 @@ public class Game
             board.set(move);
 
             final short[] adjs = adjacentBuffers.lease();
-            final byte adjsN = board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
+            byte adjsN = board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
             for (int i = 0; i < adjsN; i++)
             {
                 markChainAndLiberties(board, adjs[i]);
@@ -256,6 +206,21 @@ public class Game
                     return false;
                 }
                 superKos[lastSuperKoP++] = altBoard.hashCode();
+            }
+            else
+            {
+                adjsN = board.adjacentsWithColor(adjs, move, Color.EMPTY);
+                if (adjsN == 0)
+                {
+                    markChainAndLiberties(board, move);
+                    if (chainLibertyBoard.count(Color.MARK) == 0)
+                    {
+                        // suicide!
+                        board.set(Move.x(move), Move.y(move), Color.EMPTY); //undo
+                        return false;
+                    }
+                }
+
             }
 
             // latest accounts and moves
