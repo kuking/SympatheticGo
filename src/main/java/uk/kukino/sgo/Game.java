@@ -107,15 +107,15 @@ public class Game
         final short[] adj = adjacentBuffers.lease();
         try
         {
-            byte adjN = base.adjacentsWithColor(adj, coord, Color.EMPTY);
+            final byte adjN = Coord.adjacents(adj, coord, base.size());
             for (byte i = 0; i < adjN; i++)
             {
-                chainLibertyBoard.set(Move.move(adj[i], Color.MARK));
-            }
-            adjN = base.adjacentsWithColor(adj, coord, color);
-            for (byte i = 0; i < adjN; i++)
-            {
-                if (chainLibertyBoard.get(adj[i]) == Color.EMPTY)
+                final Color baseAdjColor = base.get(adj[i]);
+                if (baseAdjColor == Color.EMPTY)
+                {
+                    chainLibertyBoard.set(Move.move(adj[i], Color.MARK));
+                }
+                if (baseAdjColor == color && chainLibertyBoard.get(adj[i]) == Color.EMPTY)
                 {
                     recursivePaint(base, adj[i], color);
                 }
