@@ -1,5 +1,7 @@
 package uk.kukino.sgo;
 
+import java.util.Random;
+
 public class Move
 {
 
@@ -9,6 +11,8 @@ public class Move
     //         CC00000000000000 = Pass
 
     static final short INVALID = 0xffffffff;
+
+    static final Random RND = new Random(System.currentTimeMillis());
 
     private short value;
 
@@ -156,6 +160,11 @@ public class Move
         return Move.x(value) == (short) 127 &&
             Move.y(value) == (short) 127 &&
             color(value) != Color.EMPTY;
+    }
+
+    public static short random(final byte size, final Color color)
+    {
+        return Move.move((byte) RND.nextInt(size), (byte) RND.nextInt(size), color);
     }
 
     public boolean isPass()

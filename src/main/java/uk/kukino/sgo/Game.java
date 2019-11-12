@@ -7,8 +7,8 @@ public class Game
 
     // state
     private final Board board;
-    private final byte handicap;
-    private final byte komi;
+    private byte handicap;
+    private byte komi;
     private Color playerToPlay;
     private int lastMove;
     private int blackDeaths;
@@ -34,12 +34,12 @@ public class Game
         board = new Board(size);
         altBoard = new Board(size);
         chainLibertyBoard = new Board(size);
-        adjacentBuffers = new Buffers<>(size * 4, () -> new short[4]);
-        moves = new short[size * size];
+        adjacentBuffers = new Buffers<>(size * size, () -> new short[4]);
+        moves = new short[size * size * 2];
         blackDeaths = 0;
         whiteDeaths = 0;
         Arrays.fill(moves, Move.INVALID);
-        superKos = new int[size * size];
+        superKos = new int[(size * size) / 2];
         lastSuperKoP = 0;
         finished = false;
 
@@ -47,6 +47,22 @@ public class Game
         this.handicap = handicap;
         initializeHandicap();
         lastMove = 0;
+    }
+
+    public void copyTo(final Game other)
+    {
+        board.copyTo(other.board);
+        other.handicap = handicap;
+        other.komi = komi;
+        other.playerToPlay = playerToPlay;
+        other.lastMove = lastMove;
+        other.blackDeaths = blackDeaths;
+        other.whiteDeaths = whiteDeaths;
+        System.arraycopy(moves, 0, other.moves, 0, moves.length);
+        System.arraycopy(superKos, 0, other.superKos, 0, superKos.length);
+        other.lastSuperKoP = lastSuperKoP;
+        other.finished = finished;
+        // probably no at they are tmp: altBoard, chainLibertyBoard, adjacentBuffers;
     }
 
     private void initializeHandicap()
@@ -67,7 +83,6 @@ public class Game
             }
             this.playerToPlay = Color.WHITE;
         }
-
     }
 
     private void markChainAndLiberties(final Board base, final short coord)
@@ -271,6 +286,54 @@ public class Game
         }
         return false;
     }
+
+    public void randomPlay()
+    {
+        int invalidCount = 0;
+        while (!finished())
+        {
+            short move = Move.INVALID;
+            if (invalidCount < board.size())
+            {
+                move = Move.random(board.size(), playerToPlay);
+            }
+            else
+            {
+                final int empties = board.count(Color.EMPTY);
+                int npos = Move.RND.nextInt(empties);
+                for (byte x = 0; x < board.size() && npos != -1; x++)
+                {
+                    for (byte y = 0; y < board.size() && npos != -1; y++)
+                    {
+                        if (board.get(x, y) == Color.EMPTY)
+                        {
+                            npos--;
+                        }
+                        if (npos == 0)
+                        {
+                            move = Move.move(x, y, playerToPlay);
+                            npos = -1;
+                        }
+                    }
+                }
+            }
+
+            if (play(move))
+            {
+                invalidCount = 0;
+            }
+            else
+            {
+                invalidCount++;
+            }
+
+            if (invalidCount > board.size() * 2 || lastMove > board.size() * board.size())
+            {
+                play(Move.pass(playerToPlay));
+            }
+        }
+    }
+
 
     /*
         Below the typical public methods for a Game
