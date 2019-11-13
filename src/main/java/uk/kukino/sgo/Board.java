@@ -95,48 +95,34 @@ public class Board
 
     public byte adjacentsWithColor(final short[] arr, final short coord, final Color color)
     {
-        final byte res = Coord.adjacents(arr, coord, size);
-        byte newRes = res;
-        for (byte i = 0; i < res; i++)
-        {
-            if (get(arr[i]) != color)
-            {
-                arr[i] = Coord.INVALID;
-                newRes--;
-            }
-        }
-
-        if (newRes == 0)
-        {
-            return 0;
-        }
-
+        byte res = Coord.adjacents(arr, coord, size);
+        int i = 0;
         boolean done = false;
-        boolean somethingMoved = false;
-        byte i = 0;
         while (!done)
         {
-            if (i < 3 && arr[i] == Coord.INVALID && arr[i + 1] != Coord.INVALID)
+            done = true;
+            while (i < res && get(arr[i]) == color)
             {
-                arr[i] = arr[i + 1];
-                arr[i + 1] = Coord.INVALID;
-                somethingMoved = true;
+                i++;
             }
-            i++;
-            if (i == res)
+            if (i + 1 < res)
             {
-                if (somethingMoved)
+                for (int ii = i; ii + 1 < res; ii++)
                 {
-                    somethingMoved = false;
-                    i = 0;
+                    arr[ii] = arr[ii + 1];
                 }
-                else
+                res--;
+                done = false;
+            }
+            else if (i + 1 == res)
+            {
+                if (get(arr[i]) != color)
                 {
-                    done = true;
+                    res--;
                 }
             }
         }
-        return newRes;
+        return res;
     }
 
     public int count(final Color color)
@@ -200,7 +186,7 @@ public class Board
 
     public String toString()
     {
-        // nice to have: + in special places in the board
+// nice to have: + in special places in the board
         final StringBuffer sb = new StringBuffer();
         sb.append("hash: ").append(hashCode());
         sb.append("\n   ");
@@ -270,8 +256,8 @@ public class Board
     @Override
     public int hashCode()
     {
-        // Adler algorithm: https://en.wikipedia.org/wiki/Adler-32
-        // a & b should be unsigned, not perfect but OK enough.
+// Adler algorithm: https://en.wikipedia.org/wiki/Adler-32
+// a & b should be unsigned, not perfect but OK enough.
         final int modAdler = 65521;
         int a = 1;
         int b = 0;

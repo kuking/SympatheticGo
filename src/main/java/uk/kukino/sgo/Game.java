@@ -110,7 +110,7 @@ public class Game
                 {
                     chainLibertyBoard.set(Move.move(adj[i], Color.MARK));
                 }
-                if (baseAdjColor == color && chainLibertyBoard.get(adj[i]) == Color.EMPTY)
+                else if (baseAdjColor == color && chainLibertyBoard.get(adj[i]) == Color.EMPTY)
                 {
                     recursivePaint(base, adj[i], color);
                 }
@@ -176,56 +176,60 @@ public class Game
             board.set(move);
 
             final short[] adjs = adjacentBuffers.lease();
-            byte adjsN = board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
-            for (int i = 0; i < adjsN; i++)
+            try
             {
-                markChainAndLiberties(board, adjs[i]);
-                if (chainLibertyBoard.countIsZero(Color.MARK)) //killed
+                byte adjsN = board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
+                for (int i = 0; i < adjsN; i++)
                 {
-                    if (!killsOccured)
+                    markChainAndLiberties(board, adjs[i]);
+                    if (chainLibertyBoard.countIsZero(Color.MARK)) //killed
                     {
-                        board.copyTo(altBoard); // lazy makes a copy of the board, just in case it has to be rollback for a superKo
-                        altBoard.set(Move.x(move), Move.y(move), Color.EMPTY);
-                        killsOccured = true;
+                        if (!killsOccured)
+                        {
+                            board.copyTo(altBoard); // lazy makes a copy of the board, just in case it has to be rollback for a superKo
+                            altBoard.set(Move.x(move), Move.y(move), Color.EMPTY);
+                            killsOccured = true;
+                        }
+                        moveKills += board.extract(chainLibertyBoard);
                     }
-                    moveKills += board.extract(chainLibertyBoard);
                 }
-            }
-            adjacentBuffers.ret(adjs);
 
-            if (killsOccured)
-            {
-                if (isSuperKo(board.hashCode()))
+                if (killsOccured)
                 {
-                    altBoard.copyTo(board);
-                    return false;
-                }
-                superKos[lastSuperKoP++] = altBoard.hashCode();
-            }
-            else
-            {
-                adjsN = board.adjacentsWithColor(adjs, move, Color.EMPTY);
-                if (adjsN == 0)
-                {
-                    markChainAndLiberties(board, move);
-                    if (chainLibertyBoard.countIsZero(Color.MARK))
+                    if (isSuperKo(board.hashCode()))
                     {
-                        // suicide!
-                        board.set(Move.x(move), Move.y(move), Color.EMPTY); //undo
+                        altBoard.copyTo(board);
                         return false;
                     }
+                    superKos[lastSuperKoP++] = altBoard.hashCode();
                 }
-
+                else
+                {
+                    adjsN = board.adjacentsWithColor(adjs, move, Color.EMPTY);
+                    if (adjsN == 0)
+                    {
+                        markChainAndLiberties(board, move);
+                        if (chainLibertyBoard.countIsZero(Color.MARK))
+                        {
+                            // suicide!
+                            board.set(Move.x(move), Move.y(move), Color.EMPTY); //undo
+                            return false;
+                        }
+                    }
+                }
+                // latest accounts and moves
+                if (playerToPlay == Color.WHITE)
+                {
+                    blackDeaths += moveKills;
+                }
+                else
+                {
+                    whiteDeaths = moveKills;
+                }
             }
-
-            // latest accounts and moves
-            if (playerToPlay == Color.WHITE)
+            finally
             {
-                blackDeaths += moveKills;
-            }
-            else
-            {
-                whiteDeaths = moveKills;
+                adjacentBuffers.ret(adjs);
             }
         }
 

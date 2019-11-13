@@ -57,8 +57,8 @@ public class GamePerfTest
     public static void main(String[] args)
     {
         byte size = 9;
-        int totalPlayouts = 1_000_000 / size;
-        int threads = 4;
+        int totalPlayouts = 2_000_000 / size;
+        int threads = 1;
         ForkJoinPool pool = new ForkJoinPool(threads);
 
         final long startMs = System.currentTimeMillis();
@@ -86,10 +86,10 @@ public class GamePerfTest
 Grand Total: 583785ms, 4444444 plys,  7613.15 ply/s
  Wall clock: 146019ms
 
-   thrd.  0: 100715ms, 1111111 plys, 11032.23 ply/s
+   thrd.  0:   9805ms,  111111 plys, 11332.08 ply/s
 ------------- -------- ------------ --------------
-Grand Total: 100715ms, 1111111 plys, 11032.23 ply/s
- Wall clock: 100739ms
+Grand Total:   9805ms,  111111 plys, 11332.08 ply/s
+ Wall clock:   9829ms
 
 
      */
