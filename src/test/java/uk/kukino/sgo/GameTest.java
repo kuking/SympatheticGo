@@ -83,7 +83,6 @@ public class GameTest
         game.play("b a2");
         game.play("w d3");
         game.play("b b1");
-        System.out.println(game.getBoard());
         assertFalse(game.play("w a1"));
     }
 
@@ -179,7 +178,6 @@ public class GameTest
         assertAllValid(game, Lists.newArrayList("b k10", "w l10", "b k9", "w l9", "b j10", "w k11", "b j9",
             "w j11", "b d10", "w h10", "b d9", "w h9", "b d8", "w j8", "b d11", "w k8"/* eat 4 */, "b k10",
             "w j10", "b j9", "w k9" /* eat 2 different groups */));
-        System.out.println(game.getBoard());
         assertSame(game.getBoard().get("k10"), Color.EMPTY);
         assertSame(game.getBoard().get("j9"), Color.EMPTY);
         assertSame(game.getBoard().get("j10"), Color.WHITE);
