@@ -45,6 +45,11 @@ public class Board
         }
     }
 
+    public void set(final short move, final Color color)
+    {
+        set(Move.x(move), Move.y(move), color);
+    }
+
     private Color getColorByteOffset(final byte fullByte, final byte ofs)
     {
         switch (ofs)

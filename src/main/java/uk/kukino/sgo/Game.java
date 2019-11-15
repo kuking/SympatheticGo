@@ -98,7 +98,7 @@ public class Game
 
     private void recursivePaint(final Board base, final short coord, final Color color)
     {
-        chainLibertyBoard.set(Move.move(coord, color));
+        chainLibertyBoard.set(coord, color);
         final short[] adj = adjacentBuffers.lease();
         try
         {
@@ -108,7 +108,7 @@ public class Game
                 final Color baseAdjColor = base.get(adj[i]);
                 if (baseAdjColor == Color.EMPTY)
                 {
-                    chainLibertyBoard.set(Move.move(adj[i], Color.MARK));
+                    chainLibertyBoard.set(adj[i], Color.MARK);
                 }
                 else if (baseAdjColor == color && chainLibertyBoard.get(adj[i]) == Color.EMPTY)
                 {
