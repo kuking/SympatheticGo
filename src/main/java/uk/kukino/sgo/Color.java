@@ -15,25 +15,18 @@ public enum Color
 
     public static Color fromByte(final byte b)
     {
-        if (b == EMPTY.b)
+        switch (b)
         {
-            return EMPTY;
-        }
-        else if (b == BLACK.b)
-        {
-            return BLACK;
-        }
-        else if (b == WHITE.b)
-        {
-            return WHITE;
-        }
-        else if (b == MARK.b)
-        {
-            return MARK;
-        }
-        else
-        {
-            throw new IllegalStateException("Unexpected Color byte value: " + b);
+            case 0:
+                return EMPTY;
+            case 1:
+                return BLACK;
+            case 2:
+                return WHITE;
+            case 3:
+                return MARK;
+            default:
+                throw new IllegalStateException("Unexpected Color byte value: " + b);
         }
     }
 

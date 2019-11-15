@@ -34,7 +34,7 @@ public class Board
     public void set(final byte x, final byte y, final Color color)
     {
         final int ofs = ofs(x, y);
-        board[ofs / 4] = setColorByteOffset(board[ofs / 4], (byte) (ofs % 4), color);
+        board[ofs >> 2] = setColorByteOffset(board[ofs >> 2], (byte) (ofs & 0b11), color);
     }
 
     public void set(final short value)
@@ -47,7 +47,7 @@ public class Board
 
     public void set(final short move, final Color color)
     {
-        set(Move.x(move), Move.y(move), color);
+        set(Coord.x(move), Coord.y(move), color);
     }
 
     private Color getColorByteOffset(final byte fullByte, final byte ofs)
@@ -57,7 +57,7 @@ public class Board
             case 0:
                 return Color.fromByte((byte) (fullByte >> 6 & 0b11));
             case 1:
-                return Color.fromByte((byte) ((fullByte & 0b00110000) >> 4));
+                return Color.fromByte((byte) ((fullByte & 0b00110000) >>> 4));
             case 2:
                 return Color.fromByte((byte) ((fullByte & 0b00001100) >>> 2));
             case 3:
@@ -70,7 +70,7 @@ public class Board
     public Color get(final byte x, final byte y)
     {
         final int ofs = ofs(x, y);
-        return getColorByteOffset(board[ofs / 4], (byte) (ofs % 4));
+        return getColorByteOffset(board[ofs >> 2], (byte) (ofs & 0b11));
     }
 
     public Color get(final short coord)
@@ -140,7 +140,7 @@ public class Board
             {
                 if (color == Color.EMPTY)
                 {
-                    count += 4;
+                    count = count << 2;
                 }
             }
             else
@@ -159,9 +159,8 @@ public class Board
 
     public boolean countIsZero(final Color color)
     {
-        for (int i = 0; i < board.length; i++)
+        for (final byte b : board)
         {
-            final byte b = board[i];
             if (b == 0)
             {
                 if (color == Color.EMPTY)
