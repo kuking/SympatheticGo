@@ -58,7 +58,7 @@ public class GamePerfTest
     {
         byte size = 9;
         int totalPlayouts = 2_000_000 / size;
-        int threads = 4;
+        int threads = 16;
         ForkJoinPool pool = new ForkJoinPool(threads);
 
         final long startMs = System.currentTimeMillis();
@@ -86,6 +86,9 @@ public class GamePerfTest
 ------------- -------- ------------ --------------
 Agr. & avg.: 114335ms,  222222 plys,  7774.42 ply/s
 Effectively:  28638ms,  888888 plys, 31038.76 ply/s
+
+Agr. & avg.: 547855ms,  222222 plys,  6489.95 ply/s
+Effectively:  34560ms, 3555552 plys, 102880.56 ply/s
 
      */
     }

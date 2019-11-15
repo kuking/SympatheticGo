@@ -157,31 +157,6 @@ public class Board
         return count;
     }
 
-    public boolean countIsZero(final Color color)
-    {
-        for (final byte b : board)
-        {
-            if (b == 0)
-            {
-                if (color == Color.EMPTY)
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                for (byte idx = 0; idx < 4; idx++)
-                {
-                    if (getColorByteOffset(b, idx) == color)
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
     public void clear()
     {
         Arrays.fill(board, (byte) 0);
