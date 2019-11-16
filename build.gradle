@@ -19,7 +19,7 @@ dependencies {
 
 application {
     // Define the main class for the application
-    mainClassName = 'uk.kukino.sgo.App'
+    mainClassName = 'uk.kukino.sgo.PerfStats'
 }
 
 test {
