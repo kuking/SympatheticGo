@@ -1,17 +1,22 @@
 package uk.kukino.sgo;
 
-import java.util.Arrays;
+import net.openhft.chronicle.bytes.Bytes;
+
+import java.nio.ByteBuffer;
 
 public class Board
 {
     private final byte size;
-    private byte[] board;
+    private final int boardSize;
+    private Bytes<ByteBuffer> board;
     // 2 bits per intersection i.e. 19x19 ~= 90 bytes, 9x9 ~= 20 bytes -- everything fits well in L1
 
     public Board(final byte size)
     {
         this.size = size;
-        board = new byte[(this.size * this.size * 2 / 8) + 1];
+        boardSize = (this.size * this.size * 2 / 8) + 1;
+        board = Bytes.elasticByteBuffer(boardSize);
+        clear();
     }
 
     private byte setColorByteOffset(final byte origByte, final byte ofs, final Color color)
@@ -34,7 +39,8 @@ public class Board
     public void set(final byte x, final byte y, final Color color)
     {
         final int ofs = ofs(x, y);
-        board[ofs >> 2] = setColorByteOffset(board[ofs >> 2], (byte) (ofs & 0b11), color);
+        // board[ofs >> 2] = setColorByteOffset(board[ofs >> 2], (byte) (ofs & 0b11), color);
+        board.writeByte(ofs >> 2, setColorByteOffset(board.readByte(ofs >> 2), (byte) (ofs & 0b11), color));
     }
 
     public void set(final short value)
@@ -70,7 +76,7 @@ public class Board
     public Color get(final byte x, final byte y)
     {
         final int ofs = ofs(x, y);
-        return getColorByteOffset(board[ofs >> 2], (byte) (ofs & 0b11));
+        return getColorByteOffset(board.readByte(ofs >> 2), (byte) (ofs & 0b11));
     }
 
     public Color get(final short coord)
@@ -95,7 +101,7 @@ public class Board
 
     public void copyTo(final Board toBoard)
     {
-        System.arraycopy(this.board, 0, toBoard.board, 0, this.board.length);
+        toBoard.board.writePosition(0).write(board.readPosition(0));
     }
 
     public byte adjacentsWithColor(final short[] arr, final short coord, final Color color)
@@ -133,9 +139,12 @@ public class Board
     public int count(final Color color)
     {
         int count = 0;
-        for (int i = 0; i < board.length; i++)
+        //for (int i = 0; i < board.length; i++)
+        board.readPosition(0);
+        for (int i = 0; i < boardSize; i++)
         {
-            final byte b = board[i];
+            //final byte b = board[i];
+            final byte b = board.readByte();
             if (b == 0)
             {
                 if (color == Color.EMPTY)
@@ -159,7 +168,11 @@ public class Board
 
     public void clear()
     {
-        Arrays.fill(board, (byte) 0);
+        board.writePosition(0);
+        for (int i = 0; i < boardSize; i++)
+        {
+            board.writeByte((byte) 0);
+        }
     }
 
 
@@ -205,6 +218,11 @@ public class Board
         return sb.toString();
     }
 
+    public String toHexString()
+    {
+        return board.toHexString(0, boardSize);
+    }
+
     public int extract(final Board other)
     {
         int result = 0;
@@ -212,17 +230,17 @@ public class Board
         {
             throw new IllegalArgumentException("Can't remove using different board sizes, or null boards.");
         }
-        for (int i = 0; i < board.length; i++)
+        for (int i = 0; i < boardSize; i++)
         {
-            if (other.board[i] != 0)
+            if (other.board.readByte(i) != 0)
             {
                 for (byte j = 0; j < 4; j++)
                 {
-                    final Color bColor = getColorByteOffset(board[i], j);
-                    final Color oColor = getColorByteOffset(other.board[i], j);
+                    final Color bColor = getColorByteOffset(board.readByte(i), j);
+                    final Color oColor = getColorByteOffset(other.board.readByte(i), j);
                     if (bColor != Color.EMPTY && bColor == oColor)
                     {
-                        board[i] = setColorByteOffset(board[i], j, Color.EMPTY);
+                        board.writeByte(i, setColorByteOffset(board.readByte(i), j, Color.EMPTY));
                         result++;
                     }
                 }
@@ -231,18 +249,18 @@ public class Board
         return result;
     }
 
-
     @Override
     public int hashCode()
     {
 // Adler algorithm: https://en.wikipedia.org/wiki/Adler-32
 // a & b should be unsigned, not perfect but OK enough.
+        board.readPosition(0);
         final int modAdler = 65521;
         int a = 1;
         int b = 0;
-        for (int i = 0; i < board.length; i++)
+        for (int i = 0; i < boardSize; i++)
         {
-            a = (a + board[i]) % modAdler;
+            a = (a + board.readByte()) % modAdler;
             b = (b + a) % modAdler;
         }
         return (b << 16) | a;

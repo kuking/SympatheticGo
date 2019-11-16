@@ -35,18 +35,19 @@ public class Game
         altBoard = new Board(size);
         chainLibertyBoard = new Board(size);
         adjacentBuffers = new Buffers<>(size * size / 2, () -> new short[4]);
-        moves = new short[size * size * 2];
         blackDeaths = 0;
         whiteDeaths = 0;
+        moves = new short[size * size * 2];
+        lastMove = 0;
         Arrays.fill(moves, Move.INVALID);
         superKos = new int[(size * size) / 2];
+        Arrays.fill(superKos, Move.INVALID);
         lastSuperKoP = 0;
         finished = false;
 
         komi = komiX10;
         this.handicap = handicap;
         initializeHandicap();
-        lastMove = 0;
     }
 
     public void copyTo(final Game other)
@@ -85,7 +86,7 @@ public class Game
         }
     }
 
-    private int markChainAndLiberties(final Board base, final short coord)
+    private int markChainAndLiberties(final Board base, final short coord, final boolean finishFastOnLiberty)
     {
         final Color color = base.get(coord);
         if (color == Color.EMPTY)
@@ -93,10 +94,11 @@ public class Game
             return -1;
         }
         chainLibertyBoard.clear();
-        return recursivePaint(base, coord, color);
+        return recursivePaint(base, coord, color, finishFastOnLiberty);
     }
 
-    private int recursivePaint(final Board base, final short coord, final Color color)
+
+    private int recursivePaint(final Board base, final short coord, final Color color, final boolean finishFastOnLiberty)
     {
         int liberties = 0;
         chainLibertyBoard.set(coord, color);
@@ -111,10 +113,18 @@ public class Game
                 {
                     chainLibertyBoard.set(adj[i], Color.MARK);
                     liberties++;
+                    if (finishFastOnLiberty)
+                    {
+                        return 1;
+                    }
                 }
                 else if (baseAdjColor == color && chainLibertyBoard.get(adj[i]) == Color.EMPTY)
                 {
-                    liberties += recursivePaint(base, adj[i], color);
+                    liberties += recursivePaint(base, adj[i], color, finishFastOnLiberty);
+                    if (finishFastOnLiberty && liberties > 0)
+                    {
+                        return liberties;
+                    }
                 }
             }
         }
@@ -150,12 +160,7 @@ public class Game
         {
             return false;
         }
-        if (board.get(move) != Color.EMPTY)
-        {
-            return false;
-        }
-
-        return true;
+        return board.get(move) == Color.EMPTY;
     }
 
     public boolean play(final short move)
@@ -184,7 +189,7 @@ public class Game
                 byte adjsN = board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
                 for (int i = 0; i < adjsN; i++)
                 {
-                    if (markChainAndLiberties(board, adjs[i]) == 0) //killed
+                    if (markChainAndLiberties(board, adjs[i], true) == 0) //killed
                     {
                         if (!killsOccured)
                         {
@@ -210,7 +215,7 @@ public class Game
                     adjsN = board.adjacentsWithColor(adjs, move, Color.EMPTY);
                     if (adjsN == 0)
                     {
-                        if (markChainAndLiberties(board, move) == 0) // suicide?
+                        if (markChainAndLiberties(board, move, true) == 0) // suicide?
                         {
                             board.set(Move.x(move), Move.y(move), Color.EMPTY); //undo
                             return false;

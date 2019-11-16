@@ -157,9 +157,9 @@ public class Move
 
     public static boolean isPass(final short value)
     {
-        return Move.x(value) == (short) 127 &&
-            Move.y(value) == (short) 127 &&
-            color(value) != Color.EMPTY;
+        return color(value) != Color.EMPTY &&
+            Move.x(value) == (short) 127 &&
+            Move.y(value) == (short) 127;
     }
 
     public static short random(final byte size, final Color color)

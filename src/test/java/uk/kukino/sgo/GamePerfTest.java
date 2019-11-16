@@ -1,5 +1,6 @@
 package uk.kukino.sgo;
 
+import net.openhft.affinity.AffinityLock;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -58,21 +59,37 @@ public class GamePerfTest
     {
         byte size = 9;
         int totalPlayouts = 2_000_000 / size;
-        int threads = 16;
-        ForkJoinPool pool = new ForkJoinPool(threads);
+        final int minThreads = 16;
+        final int maxThreads = 16;
+        for (int threads = minThreads; threads <= maxThreads; threads++)
+        {
+            System.out.println("===================================================");
+            System.out.println(String.format("Running %d concurrent threads ...", threads));
+            ForkJoinPool pool = new ForkJoinPool(threads);
 
-        final long startMs = System.currentTimeMillis();
-        final long totalMs = IntStream.range(0, threads).boxed().parallel()
-            .map((t) -> pool.submit(() -> new GamePerfTest().randomPlays(t, size, totalPlayouts)))
-            .mapToLong(GamePerfTest::consume)
-            .sum();
-        final long wallClockMs = System.currentTimeMillis() - startMs;
+            final long startMs = System.currentTimeMillis();
+            final long totalMs = IntStream.range(0, threads).boxed().parallel()
+                .map((t) -> pool.submit(() -> {
+                    AffinityLock al = AffinityLock.acquireLock();
+                    try
+                    {
+                        return new GamePerfTest().randomPlays(t, size, totalPlayouts);
+                    }
+                    finally
+                    {
+                        al.release();
+                    }
+                }))
+                .mapToLong(GamePerfTest::consume)
+                .sum();
+            final long wallClockMs = System.currentTimeMillis() - startMs;
 
-        System.out.println("------------- -------- ------------ --------------");
-        System.out.println(String.format("Agr. & avg.: %6dms, %7d plys, %8.2f ply/s",
-            totalMs, totalPlayouts, (totalPlayouts * threads * 1000.0d) / totalMs));
-        System.out.println(String.format("Effectively: %6dms, %7d plys, %8.2f ply/s",
-            wallClockMs, totalPlayouts * threads, (totalPlayouts * threads * 1000.0d) / wallClockMs));
+            System.out.println("------------- -------- ------------ ---------------");
+            System.out.println(String.format("Agr. & avg.: %6dms, %7d plys, %8.2f ply/s",
+                totalMs, totalPlayouts, (totalPlayouts * threads * 1000.0d) / totalMs));
+            System.out.println(String.format("Effectively: %6dms, %7d plys, %8.2f ply/s",
+                wallClockMs, totalPlayouts * threads, (totalPlayouts * threads * 1000.0d) / wallClockMs));
+        }
         // 9x9 = 3500pls
         // 9x9 = 8539pls   19x19=1068pls
         // 9x9 = 10116pls
