@@ -39,7 +39,6 @@ public class Board
     public void set(final byte x, final byte y, final Color color)
     {
         final int ofs = ofs(x, y);
-        // board[ofs >> 2] = setColorByteOffset(board[ofs >> 2], (byte) (ofs & 0b11), color);
         board.writeByte(ofs >> 2, setColorByteOffset(board.readByte(ofs >> 2), (byte) (ofs & 0b11), color));
     }
 

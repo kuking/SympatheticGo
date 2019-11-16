@@ -171,4 +171,39 @@ public class BoardTest
 
     }
 
+    @Test
+    public void onlyOneAtATime()
+    {
+        board = new Board((byte) 19);
+
+        for (byte c = 1; c < 4; c++)
+        {
+            for (byte x = 0; x < board.size(); x++)
+            {
+                for (byte y = 0; y < board.size(); y++)
+                {
+                    board.set(x, y, Color.fromByte(c));
+
+                    for (byte xx = 0; xx < board.size(); xx++)
+                    {
+                        for (byte yy = 0; yy < board.size(); yy++)
+                        {
+
+                            if (xx == x && yy == y)
+                            {
+                                assertThat(board.get(xx, yy), equalTo(Color.fromByte(c)));
+                            }
+                            else
+                            {
+                                assertThat(board.get(xx, yy), equalTo(Color.EMPTY));
+                            }
+                        }
+                    }
+
+                    board.set(x, y, Color.EMPTY);
+                }
+            }
+        }
+    }
+
 }

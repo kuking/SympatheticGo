@@ -145,10 +145,6 @@ public class Coord
         {
             result[c++] = Coord.XY((byte) (x - 1), y);
         }
-        for (int i = c; i < 4; i++)
-        {
-            result[i] = Coord.INVALID;
-        }
         return (byte) c;
     }
 

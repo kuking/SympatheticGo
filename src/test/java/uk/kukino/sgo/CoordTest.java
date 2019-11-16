@@ -45,8 +45,7 @@ public class CoordTest
     public void adjacentOneCellBoard()
     {
         assertThat(Coord.adjacents(res, Coord.XY((byte) 0, (byte) 0), (byte) 1), equalTo((byte) 0));
-        assertThat(res, equalTo(new short[] {
-            Coord.INVALID, Coord.INVALID, Coord.INVALID, Coord.INVALID}));
+        assertThat(res, equalTo(new short[] {0, 0, 0, 0}));
     }
 
     @Test
@@ -56,8 +55,8 @@ public class CoordTest
         assertThat(res, equalTo(new short[] {
             Coord.XY((byte) 1, (byte) 0),
             Coord.XY((byte) 0, (byte) 1),
-            Coord.INVALID,
-            Coord.INVALID
+            0,
+            0
         }));
     }
 
@@ -68,8 +67,8 @@ public class CoordTest
         assertThat(res, equalTo(new short[] {
             Coord.XY((byte) 18, (byte) 1),
             Coord.XY((byte) 17, (byte) 0),
-            Coord.INVALID,
-            Coord.INVALID
+            0,
+            0
         }));
     }
 
@@ -80,8 +79,8 @@ public class CoordTest
         assertThat(res, equalTo(new short[] {
             Coord.XY((byte) 19, (byte) 18),
             Coord.XY((byte) 18, (byte) 19),
-            Coord.INVALID,
-            Coord.INVALID
+            0,
+            0
         }));
     }
 
@@ -93,8 +92,8 @@ public class CoordTest
         assertThat(res, equalTo(new short[] {
             Coord.XY((byte) 0, (byte) 17),
             Coord.XY((byte) 1, (byte) 18),
-            Coord.INVALID,
-            Coord.INVALID
+            0,
+            0
         }));
     }
 
@@ -107,7 +106,7 @@ public class CoordTest
             Coord.XY((byte) 9, (byte) 0),
             Coord.XY((byte) 8, (byte) 1),
             Coord.XY((byte) 7, (byte) 0),
-            Coord.INVALID
+            0
         }));
     }
 
@@ -120,7 +119,7 @@ public class CoordTest
             Coord.XY((byte) 19, (byte) 8),
             Coord.XY((byte) 19, (byte) 10),
             Coord.XY((byte) 18, (byte) 9),
-            Coord.INVALID
+            0
         }));
     }
 
@@ -133,7 +132,7 @@ public class CoordTest
             Coord.XY((byte) 9, (byte) 18),
             Coord.XY((byte) 10, (byte) 19),
             Coord.XY((byte) 8, (byte) 19),
-            Coord.INVALID
+            0
         }));
     }
 
@@ -146,7 +145,7 @@ public class CoordTest
             Coord.XY((byte) 0, (byte) 7),
             Coord.XY((byte) 1, (byte) 8),
             Coord.XY((byte) 0, (byte) 9),
-            Coord.INVALID
+            0
         }));
     }
 
