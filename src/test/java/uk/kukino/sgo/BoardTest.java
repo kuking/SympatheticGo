@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class BoardTest
@@ -135,6 +136,39 @@ public class BoardTest
                 assertThat(board.get(x, y), equalTo(Color.EMPTY));
             }
         }
+    }
+
+    @Test
+    public void hashing()
+    {
+        board = new Board((byte) 19);
+        for (byte x = 0; x < board.size(); x++)
+        {
+            for (byte y = 0; y < board.size(); y++)
+            {
+                board.set(x, y, Color.EMPTY);
+            }
+        }
+
+        int hashOrig = board.hashCode();
+        for (byte x = 0; x < board.size(); x++)
+        {
+            for (byte y = 0; y < board.size(); y++)
+            {
+                board.set(x, y, Color.WHITE);
+                assertThat(board.hashCode(), not(equalTo(hashOrig)));
+                int hashForWhite = board.hashCode();
+
+                board.set(x, y, Color.BLACK);
+                assertThat(board.hashCode(), not(equalTo(hashOrig)));
+                assertThat(board.hashCode(), not(equalTo(hashForWhite)));
+
+                board.set(x, y, Color.EMPTY);
+                assertThat(board.hashCode(), equalTo(hashOrig));
+            }
+        }
+
+
     }
 
 }
