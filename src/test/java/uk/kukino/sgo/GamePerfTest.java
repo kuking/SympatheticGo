@@ -24,7 +24,9 @@ public class GamePerfTest
         }
         final long totalMs = System.currentTimeMillis() - startMs;
         final double playoutsSec = (games * 1000.0 / totalMs);
-        System.out.println(String.format("   thrd. %2d: %6dms, %7d plys, %8.2f ply/s", threadNo, totalMs, games, playoutsSec));
+        System.out.println(String.format("   thrd. %2d: %6dms, %7d plys, %9.2f ply/s, %3.3fμs/ply",
+            threadNo, totalMs, games, playoutsSec, (double) 1_000_000 * totalMs / 1000d / games));
+
         return totalMs;
     }
 
@@ -59,11 +61,11 @@ public class GamePerfTest
     {
         byte size = 9;
         int totalPlayouts = 2_000_000 / size;
-        final int minThreads = 16;
+        final int minThreads = 1;
         final int maxThreads = 16;
         for (int threads = minThreads; threads <= maxThreads; threads++)
         {
-            System.out.println("===================================================");
+            System.out.println("===================================================================");
             System.out.println(String.format("Running %d concurrent threads ...", threads));
             ForkJoinPool pool = new ForkJoinPool(threads);
 
@@ -84,11 +86,18 @@ public class GamePerfTest
                 .sum();
             final long wallClockMs = System.currentTimeMillis() - startMs;
 
-            System.out.println("------------- -------- ------------ ---------------");
-            System.out.println(String.format("Agr. & avg.: %6dms, %7d plys, %8.2f ply/s",
-                totalMs, totalPlayouts, (totalPlayouts * threads * 1000.0d) / totalMs));
-            System.out.println(String.format("Effectively: %6dms, %7d plys, %8.2f ply/s",
-                wallClockMs, totalPlayouts * threads, (totalPlayouts * threads * 1000.0d) / wallClockMs));
+            System.out.println("------------- -------- ------------ ----------------- -------------");
+
+            System.out.println(String.format("Agr. & avg.: %6dms, %7d plys, %9.2f ply/s, %3.3fμs/ply",
+                totalMs, totalPlayouts,
+                (totalPlayouts * threads * 1000.0d) / totalMs,
+                (double) 1_000_000 * totalMs / 1000d / (totalPlayouts * threads)));
+
+            System.out.println(String.format("Effectively: %6dms, %7d plys, %9.2f ply/s, %3.3fμs/ply",
+                wallClockMs, totalPlayouts * threads,
+                (totalPlayouts * threads * 1000.0d) / wallClockMs,
+                (double) 1_000_000 * wallClockMs / 1000d / (totalPlayouts * threads)
+            ));
         }
         // 9x9 = 3500pls
         // 9x9 = 8539pls   19x19=1068pls
@@ -107,6 +116,8 @@ Effectively:  28638ms,  888888 plys, 31038.76 ply/s
 Agr. & avg.: 547855ms,  222222 plys,  6489.95 ply/s
 Effectively:  34560ms, 3555552 plys, 102880.56 ply/s
 
+Agr. & avg.: 510096ms,  222222 plys,   6970.36 ply/s, 143.465μs/ply
+Effectively:  32740ms, 3555552 plys, 108599.63 ply/s, 9.208μs/ply
      */
     }
 
