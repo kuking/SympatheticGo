@@ -174,36 +174,69 @@ public class BoardTest
     @Test
     public void onlyOneAtATime()
     {
-        board = new Board((byte) 19);
-
-        for (byte c = 1; c < 4; c++)
+        for (byte size = 9; size <= 25; size++)
         {
-            for (byte x = 0; x < board.size(); x++)
+            board = new Board(size);
+            for (byte c = 1; c < 4; c++)
             {
-                for (byte y = 0; y < board.size(); y++)
+                for (byte x = 0; x < board.size(); x++)
                 {
-                    board.set(x, y, Color.fromByte(c));
-
-                    for (byte xx = 0; xx < board.size(); xx++)
+                    for (byte y = 0; y < board.size(); y++)
                     {
-                        for (byte yy = 0; yy < board.size(); yy++)
-                        {
+                        board.set(x, y, Color.fromByte(c));
 
-                            if (xx == x && yy == y)
+
+                        for (byte xx = 0; xx < board.size(); xx++)
+                        {
+                            for (byte yy = 0; yy < board.size(); yy++)
                             {
-                                assertThat(board.get(xx, yy), equalTo(Color.fromByte(c)));
-                            }
-                            else
-                            {
-                                assertThat(board.get(xx, yy), equalTo(Color.EMPTY));
+                                if (xx == x && yy == y)
+                                {
+                                    assertThat(board.get(xx, yy), equalTo(Color.fromByte(c)));
+                                }
+                                else
+                                {
+                                    assertThat(board.get(xx, yy), equalTo(Color.EMPTY));
+                                }
                             }
                         }
+                        assertThat(board.count(Color.fromByte(c)), equalTo(1));
+                        assertThat(board.count(Color.EMPTY), equalTo((size * size) - 1));
+                        board.set(x, y, Color.EMPTY);
                     }
-
-                    board.set(x, y, Color.EMPTY);
                 }
             }
         }
+    }
+
+    @Test
+    public void testToString()
+    {
+        final Board board = new Board((byte) 19);
+        board.set(Move.parseToVal("B C12"));
+        assertThat(board.toString(), equalTo(
+            "hash: 8519682\n" +
+                "   A B C D E F G H J K L M N O P Q R S T \n" +
+                "19 . . . . . . . . . . . . . . . . . . . 19\n" +
+                "18 . . . . . . . . . . . . . . . . . . . 18\n" +
+                "17 . . . . . . . . . . . . . . . . . . . 17\n" +
+                "16 . . . . . . . . . . . . . . . . . . . 16\n" +
+                "15 . . . . . . . . . . . . . . . . . . . 15\n" +
+                "14 . . . . . . . . . . . . . . . . . . . 14\n" +
+                "13 . . . . . . . . . . . . . . . . . . . 13\n" +
+                "12 . . X . . . . . . . . . . . . . . . . 12\n" +
+                "11 . . . . . . . . . . . . . . . . . . . 11\n" +
+                "10 . . . . . . . . . . . . . . . . . . . 10\n" +
+                " 9 . . . . . . . . . . . . . . . . . . . 9\n" +
+                " 8 . . . . . . . . . . . . . . . . . . . 8\n" +
+                " 7 . . . . . . . . . . . . . . . . . . . 7\n" +
+                " 6 . . . . . . . . . . . . . . . . . . . 6\n" +
+                " 5 . . . . . . . . . . . . . . . . . . . 5\n" +
+                " 4 . . . . . . . . . . . . . . . . . . . 4\n" +
+                " 3 . . . . . . . . . . . . . . . . . . . 3\n" +
+                " 2 . . . . . . . . . . . . . . . . . . . 2\n" +
+                " 1 . . . . . . . . . . . . . . . . . . . 1\n" +
+                "   A B C D E F G H J K L M N O P Q R S T \n"));
     }
 
 }

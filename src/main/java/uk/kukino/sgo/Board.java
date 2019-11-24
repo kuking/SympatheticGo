@@ -191,18 +191,19 @@ public class Board
 
         for (byte y = 0; y < size; y++)
         {
-            if (y < 9)
+            final int yToUse = size - y;
+            if (yToUse < 10)
             {
                 sb.append(' ');
             }
-            sb.append((y + 1));
+            sb.append(yToUse);
             sb.append(' ');
             for (byte x = 0; x < size; x++)
             {
-                sb.append(get(x, y).symbol);
+                sb.append(get(x, (byte) (yToUse - 1)).symbol);
                 sb.append(' ');
             }
-            sb.append((y + 1) % 10).append("\n");
+            sb.append(yToUse).append("\n");
         }
 
         sb.append("   ");
