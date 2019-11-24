@@ -108,6 +108,10 @@ i7 after SplittableRandom & Move pass bugfix
 Agr. & avg.: 154625ms,  222222 plys,  11497.34 ply/s, 86.977μs/ply
 Effectively:  19497ms, 1777776 plys,  91182.03 ply/s, 10.967μs/ply
 
+Ryzer 3800
+Agr. & avg.: 397514ms,  222222 plys,   8944.47 ply/s, 111.801μs/ply
+Effectively:  25055ms, 3555552 plys, 141909.88 ply/s, 7.047μs/ply
+
      */
     }
 
