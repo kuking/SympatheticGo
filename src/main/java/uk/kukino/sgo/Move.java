@@ -1,6 +1,6 @@
 package uk.kukino.sgo;
 
-import java.util.Random;
+import java.util.SplittableRandom;
 
 public class Move
 {
@@ -12,7 +12,7 @@ public class Move
 
     static final short INVALID = 0xffffffff;
 
-    static final Random RND = new Random(System.currentTimeMillis());
+    static final SplittableRandom RND = new SplittableRandom(System.currentTimeMillis());
 
     private short value;
 
