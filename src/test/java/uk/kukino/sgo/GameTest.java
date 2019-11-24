@@ -162,6 +162,41 @@ public class GameTest
     }
 
     @Test
+    public void bigKill()
+    {
+        //   A B C D E F G H J
+        // 9 . . . . . . . . . 1
+        // 8 O . . . . . . . . 2
+        // 7 X O O O O O . . . 3
+        // 6 X X X X X X O . . 4
+        // 5 X X X X X X O . . 5
+        // 4 X O O O O O . . . 6
+        // 3 . . . . . . . . . 7
+        // 2 . . . . . . . . . 8
+        // 1 . . . . . . . . . 9
+        //   A B C D E F G H J
+        game = given9x9Game();
+        assertAllValid(game, Lists.newArrayList(
+            "b c7", "w c8", "b d7", "w d8", "b e7", "w e8", "b f7", "w f8", "b f6", "w g7", "b e6", "w g6", "b d6", "w f5", "b c6",
+            "w e5", "b b7", "w d5", "b b6", "w c5", "b a6", "w b5", "b a7", "w b8", "b a8", "w a9", "b a5"));
+        game.play("w a4");
+        assertThat(game.deadStones(Color.BLACK), equalTo(14));
+        assertThat(game.getBoard().get(Coord.parseToVal("D7")), equalTo(Color.EMPTY));
+        assertTrue(game.play("B D7"));
+        //   A B C D E F G H J
+        // 9 . . . . . . . . . 1
+        // 8 O . . . . . . . . 2
+        // 7 . O O O O O . . . 3
+        // 6 . . . X . . O . . 4
+        // 5 . . . . . . O . . 5
+        // 4 . O O O O O . . . 6
+        // 3 O . . . . . . . . 7
+        // 2 . . . . . . . . . 8
+        // 1 . . . . . . . . . 9
+        // A B C D E F G H J
+    }
+
+    @Test
     public void simplestKillThenDobleKill()
     {
         //    A B C D E F G H J K L M N O P Q R S T
@@ -270,7 +305,7 @@ public class GameTest
 
     private void assertAllValid(final Game game, Collection<String> moves)
     {
-        moves.forEach(move -> assertTrue(game.play(move), () ->  "Move " + move + " Failed!"));
+        moves.forEach(move -> assertTrue(game.play(move), () -> "Move " + move + " Failed!"));
     }
 
     private Game given19x19Game()
