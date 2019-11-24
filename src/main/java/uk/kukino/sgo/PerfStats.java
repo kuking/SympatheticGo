@@ -18,7 +18,7 @@ public class PerfStats
         for (int i = 0; i < games; i++)
         {
             gameOrig.copyTo(game);
-            game.randomPlay();
+            game.finishRandomly();
         }
         final long totalMs = System.currentTimeMillis() - startMs;
         final double playoutsSec = (games * 1000.0 / totalMs);
@@ -103,6 +103,11 @@ Effectively:  34560ms, 3555552 plys, 102880.56 ply/s
 
 Agr. & avg.: 510096ms,  222222 plys,   6970.36 ply/s, 143.465μs/ply
 Effectively:  32740ms, 3555552 plys, 108599.63 ply/s, 9.208μs/ply
+
+i7 after SplittableRandom & Move pass bugfix
+Agr. & avg.: 154625ms,  222222 plys,  11497.34 ply/s, 86.977μs/ply
+Effectively:  19497ms, 1777776 plys,  91182.03 ply/s, 10.967μs/ply
+
      */
     }
 

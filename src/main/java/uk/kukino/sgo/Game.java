@@ -256,7 +256,7 @@ public class Game
         return false;
     }
 
-    public void randomPlay()
+    public void finishRandomly()
     {
         int invalidCount = 0;
         while (!finished())
@@ -269,19 +269,26 @@ public class Game
             else
             {
                 final int empties = board.count(Color.EMPTY);
-                int npos = Move.RND.nextInt(empties);
-                for (byte x = 0; x < board.size() && npos != -1; x++)
+                if (empties == 0)
                 {
-                    for (byte y = 0; y < board.size() && npos != -1; y++)
+                    move = Move.pass(playerToPlay);
+                }
+                else
+                {
+                    int npos = Move.RND.nextInt(empties);
+                    for (byte x = 0; x < board.size() && npos != -1; x++)
                     {
-                        if (board.get(x, y) == Color.EMPTY)
+                        for (byte y = 0; y < board.size() && npos != -1; y++)
                         {
-                            npos--;
-                        }
-                        if (npos == 0)
-                        {
-                            move = Move.move(x, y, playerToPlay);
-                            npos = -1;
+                            if (board.get(x, y) == Color.EMPTY)
+                            {
+                                npos--;
+                            }
+                            if (npos == 0)
+                            {
+                                move = Move.move(x, y, playerToPlay);
+                                npos = -1;
+                            }
                         }
                     }
                 }
