@@ -86,21 +86,26 @@ public class Game
         }
     }
 
-    private int markChainAndLiberties(final Board base, final short coord)
+    /***
+     *
+     * @param base
+     * @param coord
+     * @return true if alive (and partially marked)
+     */
+    private boolean markChainAndLiberties(final Board base, final short coord)
     {
         final Color color = base.get(coord);
         if (color == Color.EMPTY)
         {
-            return -1;
+            return true;
         }
         chainLibertyBoard.clear();
         return recursivePaint(base, coord, color);
     }
 
 
-    private int recursivePaint(final Board base, final short coord, final Color color)
+    private boolean recursivePaint(final Board base, final short coord, final Color color)
     {
-        int liberties = 0;
         chainLibertyBoard.set(coord, color);
         final short[] adj = adjacentBuffers.lease();
         try
@@ -111,16 +116,14 @@ public class Game
                 final Color baseAdjColor = base.get(adj[i]);
                 if (baseAdjColor == Color.EMPTY)
                 {
-                    chainLibertyBoard.set(adj[i], Color.MARK);
-                    liberties++;
-                    return liberties;
+                    // chainLibertyBoard.set(adj[i], Color.MARK);
+                    return true;
                 }
                 else if (baseAdjColor == color && chainLibertyBoard.get(adj[i]) == Color.EMPTY)
                 {
-                    liberties += recursivePaint(base, adj[i], color);
-                    if (liberties > 0)
+                    if (recursivePaint(base, adj[i], color))
                     {
-                        return liberties;
+                        return true;
                     }
                 }
             }
@@ -129,7 +132,7 @@ public class Game
         {
             adjacentBuffers.ret(adj);
         }
-        return liberties;
+        return false;
     }
 
     private boolean isOKMove(final short move)
@@ -186,7 +189,7 @@ public class Game
                 byte adjsN = board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
                 for (int i = 0; i < adjsN; i++)
                 {
-                    if (markChainAndLiberties(board, adjs[i]) == 0) //killed
+                    if (!markChainAndLiberties(board, adjs[i])) //killed
                     {
                         if (!killsOccured)
                         {
@@ -212,7 +215,7 @@ public class Game
                     adjsN = board.adjacentsWithColor(adjs, move, Color.EMPTY);
                     if (adjsN == 0)
                     {
-                        if (markChainAndLiberties(board, move) == 0) // suicide?
+                        if (!markChainAndLiberties(board, move)) // suicide?
                         {
                             board.set(Move.x(move), Move.y(move), Color.EMPTY); //undo
                             return false;
