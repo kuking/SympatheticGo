@@ -148,7 +148,7 @@ public class Board
             {
                 if (color == Color.EMPTY)
                 {
-                    count = count << 2;
+                    count = count + (8 / 2); // 8 bits, 2 bits per byte, generalize
                 }
             }
             else
