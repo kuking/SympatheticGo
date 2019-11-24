@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 public class Board
 {
     private final byte size;
+    private final int boardBits;
     private final int boardSize;
     private Bytes<ByteBuffer> board;
     // 2 bits per intersection i.e. 19x19 ~= 90 bytes, 9x9 ~= 20 bytes -- everything fits well in L1
@@ -14,7 +15,8 @@ public class Board
     public Board(final byte size)
     {
         this.size = size;
-        boardSize = (this.size * this.size * 2 / 8) + 1;
+        boardBits = this.size * this.size * 2;
+        boardSize = (boardBits / 8) + ((boardBits % 8 == 0) ? 0 : 1);
         board = Bytes.elasticByteBuffer(boardSize);
         clear();
     }
@@ -137,12 +139,12 @@ public class Board
 
     public int count(final Color color)
     {
+
+        final boolean incompleteFinalByte = boardBits % 8 != 0;
         int count = 0;
-        //for (int i = 0; i < board.length; i++)
         board.readPosition(0);
-        for (int i = 0; i < boardSize; i++)
+        for (int i = 0; i < boardSize - (incompleteFinalByte ? 1 : 0); i++)
         {
-            //final byte b = board[i];
             final byte b = board.readByte();
             if (b == 0)
             {
@@ -159,6 +161,17 @@ public class Board
                     {
                         count++;
                     }
+                }
+            }
+        }
+        if (incompleteFinalByte)
+        {
+            final byte b = board.readByte(); // last byte
+            for (byte idx = 0; idx < (boardBits % 8) / 2; idx++)
+            {
+                if (getColorByteOffset(b, idx) == color)
+                {
+                    count++;
                 }
             }
         }

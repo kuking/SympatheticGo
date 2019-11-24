@@ -86,7 +86,7 @@ public class Game
         }
     }
 
-    private int markChainAndLiberties(final Board base, final short coord, final boolean finishFastOnLiberty)
+    private int markChainAndLiberties(final Board base, final short coord)
     {
         final Color color = base.get(coord);
         if (color == Color.EMPTY)
@@ -94,11 +94,11 @@ public class Game
             return -1;
         }
         chainLibertyBoard.clear();
-        return recursivePaint(base, coord, color, finishFastOnLiberty);
+        return recursivePaint(base, coord, color);
     }
 
 
-    private int recursivePaint(final Board base, final short coord, final Color color, final boolean finishFastOnLiberty)
+    private int recursivePaint(final Board base, final short coord, final Color color)
     {
         int liberties = 0;
         chainLibertyBoard.set(coord, color);
@@ -113,15 +113,12 @@ public class Game
                 {
                     chainLibertyBoard.set(adj[i], Color.MARK);
                     liberties++;
-                    if (finishFastOnLiberty)
-                    {
-                        return 1;
-                    }
+                    return liberties;
                 }
                 else if (baseAdjColor == color && chainLibertyBoard.get(adj[i]) == Color.EMPTY)
                 {
-                    liberties += recursivePaint(base, adj[i], color, finishFastOnLiberty);
-                    if (finishFastOnLiberty && liberties > 0)
+                    liberties += recursivePaint(base, adj[i], color);
+                    if (liberties > 0)
                     {
                         return liberties;
                     }
@@ -189,7 +186,7 @@ public class Game
                 byte adjsN = board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
                 for (int i = 0; i < adjsN; i++)
                 {
-                    if (markChainAndLiberties(board, adjs[i], true) == 0) //killed
+                    if (markChainAndLiberties(board, adjs[i]) == 0) //killed
                     {
                         if (!killsOccured)
                         {
@@ -215,7 +212,7 @@ public class Game
                     adjsN = board.adjacentsWithColor(adjs, move, Color.EMPTY);
                     if (adjsN == 0)
                     {
-                        if (markChainAndLiberties(board, move, true) == 0) // suicide?
+                        if (markChainAndLiberties(board, move) == 0) // suicide?
                         {
                             board.set(Move.x(move), Move.y(move), Color.EMPTY); //undo
                             return false;
@@ -269,29 +266,31 @@ public class Game
             else
             {
                 final int empties = board.count(Color.EMPTY);
-                if (empties == 0)
+                int npos = 0;
+                if (empties > 0)
                 {
-                    move = Move.pass(playerToPlay);
+                    npos = Move.RND.nextInt(empties);
                 }
-                else
+                for (byte x = 0; x < board.size() && npos != 0; x++)
                 {
-                    int npos = Move.RND.nextInt(empties);
-                    for (byte x = 0; x < board.size() && npos != -1; x++)
+                    for (byte y = 0; y < board.size() && npos != 0; y++)
                     {
-                        for (byte y = 0; y < board.size() && npos != -1; y++)
+                        if (board.get(x, y) == Color.EMPTY)
                         {
-                            if (board.get(x, y) == Color.EMPTY)
-                            {
-                                npos--;
-                            }
-                            if (npos == 0)
-                            {
-                                move = Move.move(x, y, playerToPlay);
-                                npos = -1;
-                            }
+                            npos--;
+                        }
+                        if (npos == 0)
+                        {
+                            move = Move.move(x, y, playerToPlay);
+                            npos = -1;
                         }
                     }
                 }
+            }
+
+            if (move == Move.INVALID || invalidCount > board.size() * 2 || lastMove > board.size() * board.size())
+            {
+                move = Move.pass(playerToPlay);
             }
 
             if (play(move))
@@ -301,11 +300,6 @@ public class Game
             else
             {
                 invalidCount++;
-            }
-
-            if (invalidCount > board.size() * 2 || lastMove > board.size() * board.size())
-            {
-                play(Move.pass(playerToPlay));
             }
         }
     }
