@@ -48,13 +48,13 @@ public class Board
     {
         if (Move.isStone(value))
         {
-            set(Move.x(value), Move.y(value), Move.color(value));
+            set(Move.X(value), Move.Y(value), Move.color(value));
         }
     }
 
     public void set(final short move, final Color color)
     {
-        set(Coord.x(move), Coord.y(move), color);
+        set(Coord.X(move), Coord.Y(move), color);
     }
 
     private Color getColorByteOffset(final byte fullByte, final byte ofs)
@@ -82,7 +82,7 @@ public class Board
 
     public Color get(final short coord)
     {
-        return get(Coord.x(coord), Coord.y(coord));
+        return get(Coord.X(coord), Coord.Y(coord));
     }
 
     public Color get(final CharSequence coord)
@@ -135,6 +135,24 @@ public class Board
             }
         }
         return res;
+    }
+
+    public void adjacentsWithColor(final Bytes<ByteBuffer> adjs, final short coord, final Color color)
+    {
+        Coord.adjacents(adjs, coord, size);
+        adjs.readPosition();
+        long writePosition = 0;
+        while (!adjs.isEmpty())
+        {
+            final short read = adjs.readShort();
+            if (get(read) == color)
+            {
+                adjs.writeShort(writePosition, read);
+                writePosition += 2;
+            }
+        }
+        adjs.writePosition(writePosition);
+        adjs.readPosition(0);
     }
 
     public int count(final Color color)

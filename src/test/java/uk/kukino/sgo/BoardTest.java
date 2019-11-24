@@ -1,7 +1,9 @@
 package uk.kukino.sgo;
 
+import net.openhft.chronicle.bytes.Bytes;
 import org.junit.jupiter.api.Test;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -9,11 +11,14 @@ import java.util.Random;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BoardTest
 {
 
     Board board;
+
+    Bytes<ByteBuffer> adjs = Bytes.elasticByteBuffer(2 * 10);
 
     @Test
     public void simple()
@@ -112,6 +117,36 @@ public class BoardTest
         assertThat(arr[1], equalTo(Coord.parseToVal("L10")));
         assertThat(arr[2], equalTo(Coord.parseToVal("K11")));
         assertThat(arr[3], equalTo(Coord.parseToVal("J10")));
+    }
+
+    @Test
+    public void adjacentsWithColor_bytes()
+    {
+        board = new Board((byte) 19);
+        board.set(Move.parseToVal("W C17"));
+        board.set(Move.parseToVal("B B18"));
+
+        board.adjacentsWithColor(adjs, Coord.parseToVal("B17"), Color.BLACK);
+        assertThat(adjs.readLimit(), equalTo(2L));
+        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("B18")));
+        assertTrue(adjs.isEmpty());
+
+        board.adjacentsWithColor(adjs, Coord.parseToVal("B17"), Color.WHITE);
+        assertThat(adjs.readLimit(), equalTo(2L));
+        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("C17")));
+
+        board.adjacentsWithColor(adjs, Coord.parseToVal("B17"), Color.EMPTY);
+        assertThat(adjs.readLimit(), equalTo(4L));
+        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("B16")));
+        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("A17")));
+
+        board.adjacentsWithColor(adjs, Coord.parseToVal("K10"), Color.EMPTY);
+        assertThat(adjs.readLimit(), equalTo(8L));
+        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("K9")));
+        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("L10")));
+        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("K11")));
+        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("J10")));
+        assertTrue(adjs.isEmpty());
     }
 
     @Test
