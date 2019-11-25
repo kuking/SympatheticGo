@@ -1,7 +1,7 @@
 # SympatheticGo engine
 
 Monte Carlo Mechanically Symphatetic Go Engine.
-This trial aims to be hardware symphatetic, allocation & GC free, sized to run MC simulations within L1.
+This aims to be hardware symphatetic, allocation & GC free, and run in L1.
 
 Some ideas from http://mechanical-sympathy.blogspot.com and some libraries from https://github.com/OpenHFT.
 
