@@ -50,7 +50,7 @@ public class PerfStats
         for (int threads = minThreads; threads <= maxThreads; threads++)
         {
             System.out.println("===================================================================");
-            System.out.println(String.format("Running %d concurrent threads ...", threads));
+            System.out.println(String.format("Running %d concurrent threads with %dx%d games ...", threads, size, size));
             final ForkJoinPool pool = new ForkJoinPool(threads);
 
             final long startMs = System.currentTimeMillis();
