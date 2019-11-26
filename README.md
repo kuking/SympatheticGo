@@ -95,3 +95,9 @@ Running 16 concurrent threads with 9x9 games ...
 Agr. & avg.: 401565ms,  222222 plys,   8854.24 ply/s, 112.940μs/ply
 Effectively:  25360ms, 3555552 plys, 140203.15 ply/s, 7.133μs/ply
 ```
+
+## TODO
+- Try to make adjacent crosses calculation to be a bitset instead of a list of coords.
+- MCTS implementation
+- SGF protocol
+
