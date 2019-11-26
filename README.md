@@ -7,12 +7,14 @@ Some ideas from http://mechanical-sympathy.blogspot.com and some libraries from 
 
 Stats so far:
 
-| Size| Processor| # Threads  | Ply/s | 1 Ply (avg)   |
-|-----|----------|------------|-------|---------------|
-| 9x9 | i7-8559U | 1          | 20k   | 50.769μs      |
-| 9x9 | i7-8559U | 4 (=cores) | 64k   | 15.442μs      |
-| 9x9 | i7-8559U | 8          | 82k   | 12.146μs      |
-
+| Size| Processor     | # Threads  | Ply/s | 1 Ply (avg)   |
+|-----|---------------|------------|-------|---------------|
+| 9x9 | i7-8559U      | 1          | 20k   | 50.769μs      |
+| 9x9 | i7-8559U      | 4 (=cores) | 64k   | 15.442μs      |
+| 9x9 | i7-8559U      | 8          | 82k   | 12.146μs      |
+| 9x9 | Ryzen 7 3800X | 1          | 21k   | 47.160μs      |  
+| 9x9 | Ryzen 7 3800X | 8 (=cores) | 101k  | 9.816μs       |               
+| 9x9 | Ryzen 7 3800X | 16         | 140k  | 7.133μs       |
 
 The fact we get more processing from using hyper-threads needs further investigation.
 
@@ -35,55 +37,7 @@ Running 2 concurrent threads with 9x9 games ...
 Agr. & avg.:  22777ms,  222222 plys,  19512.84 ply/s, 51.248μs/ply
 Effectively:  11395ms,  444444 plys,  39003.42 ply/s, 25.639μs/ply
 ===================================================================
-Running 3 concurrent threads with 9x9 games ...
-   thrd.  2:  12308ms,  222222 plys,  18055.09 ply/s, 55.386μs/ply
-   thrd.  0:  12311ms,  222222 plys,  18050.69 ply/s, 55.400μs/ply
-   thrd.  1:  12323ms,  222222 plys,  18033.11 ply/s, 55.454μs/ply
-------------- -------- ------------ ----------------- -------------
-Agr. & avg.:  36942ms,  222222 plys,  18046.29 ply/s, 55.413μs/ply
-Effectively:  12323ms,  666666 plys,  54099.33 ply/s, 18.485μs/ply
-===================================================================
-Running 4 concurrent threads with 9x9 games ...
-   thrd.  3:  13701ms,  222222 plys,  16219.40 ply/s, 61.655μs/ply
-   thrd.  0:  13703ms,  222222 plys,  16217.03 ply/s, 61.664μs/ply
-   thrd.  2:  13707ms,  222222 plys,  16212.30 ply/s, 61.682μs/ply
-   thrd.  1:  13724ms,  222222 plys,  16192.22 ply/s, 61.758μs/ply
-------------- -------- ------------ ----------------- -------------
-Agr. & avg.:  54835ms,  222222 plys,  16210.23 ply/s, 61.689μs/ply
-Effectively:  13726ms,  888888 plys,  64759.43 ply/s, 15.442μs/ply
-===================================================================
-Running 5 concurrent threads with 9x9 games ...
-   thrd.  2:  15837ms,  222222 plys,  14031.82 ply/s, 71.267μs/ply
-   thrd.  0:  15895ms,  222222 plys,  13980.62 ply/s, 71.528μs/ply
-   thrd.  1:  15903ms,  222222 plys,  13973.59 ply/s, 71.564μs/ply
-   thrd.  4:  15949ms,  222222 plys,  13933.29 ply/s, 71.771μs/ply
-   thrd.  3:  16056ms,  222222 plys,  13840.43 ply/s, 72.252μs/ply
-------------- -------- ------------ ----------------- -------------
-Agr. & avg.:  79640ms,  222222 plys,  13951.66 ply/s, 71.676μs/ply
-Effectively:  16057ms, 1111110 plys,  69197.86 ply/s, 14.451μs/ply
-===================================================================
-Running 6 concurrent threads with 9x9 games ...
-   thrd.  1:  17704ms,  222222 plys,  12552.08 ply/s, 79.668μs/ply
-   thrd.  0:  17813ms,  222222 plys,  12475.27 ply/s, 80.159μs/ply
-   thrd.  5:  17829ms,  222222 plys,  12464.08 ply/s, 80.231μs/ply
-   thrd.  3:  17846ms,  222222 plys,  12452.20 ply/s, 80.307μs/ply
-   thrd.  4:  18046ms,  222222 plys,  12314.20 ply/s, 81.207μs/ply
-   thrd.  2:  18617ms,  222222 plys,  11936.51 ply/s, 83.777μs/ply
-------------- -------- ------------ ----------------- -------------
-Agr. & avg.: 107855ms,  222222 plys,  12362.26 ply/s, 80.891μs/ply
-Effectively:  18618ms, 1333332 plys,  71615.21 ply/s, 13.964μs/ply
-===================================================================
-Running 7 concurrent threads with 9x9 games ...
-   thrd.  6:  19811ms,  222222 plys,  11217.10 ply/s, 89.150μs/ply
-   thrd.  0:  19828ms,  222222 plys,  11207.48 ply/s, 89.226μs/ply
-   thrd.  1:  19876ms,  222222 plys,  11180.42 ply/s, 89.442μs/ply
-   thrd.  3:  19879ms,  222222 plys,  11178.73 ply/s, 89.456μs/ply
-   thrd.  2:  19901ms,  222222 plys,  11166.37 ply/s, 89.555μs/ply
-   thrd.  4:  20029ms,  222222 plys,  11095.01 ply/s, 90.131μs/ply
-   thrd.  5:  20089ms,  222222 plys,  11061.87 ply/s, 90.401μs/ply
-------------- -------- ------------ ----------------- -------------
-Agr. & avg.: 139413ms,  222222 plys,  11157.88 ply/s, 89.623μs/ply
-Effectively:  20089ms, 1555554 plys,  77433.12 ply/s, 12.914μs/ply
+[...]
 ===================================================================
 Running 8 concurrent threads with 9x9 games ...
    thrd.  2:  21409ms,  222222 plys,  10379.84 ply/s, 96.341μs/ply
@@ -97,4 +51,47 @@ Running 8 concurrent threads with 9x9 games ...
 ------------- -------- ------------ ----------------- -------------
 Agr. & avg.: 171889ms,  222222 plys,  10342.58 ply/s, 96.688μs/ply
 Effectively:  21592ms, 1777776 plys,  82334.94 ply/s, 12.146μs/ply
+```
+
+```
+$ lscpu | grep "Model name"
+Model name:          AMD Ryzen 7 3800X 8-Core Processor
+
+$ ./gradlew run
+===================================================================
+Running 1 concurrent threads with 9x9 games ...
+   thrd.  0:  10480ms,  222222 plys,  21204.39 ply/s, 47.160μs/ply
+------------- -------- ------------ ----------------- -------------
+Agr. & avg.:  10480ms,  222222 plys,  21204.39 ply/s, 47.160μs/ply
+Effectively:  10694ms,  222222 plys,  20780.06 ply/s, 48.123μs/ply
+===================================================================
+Running 2 concurrent threads with 9x9 games ...
+   thrd.  0:  10832ms,  222222 plys,  20515.32 ply/s, 48.744μs/ply
+   thrd.  1:  11221ms,  222222 plys,  19804.12 ply/s, 50.495μs/ply
+------------- -------- ------------ ----------------- -------------
+Agr. & avg.:  22053ms,  222222 plys,  20153.45 ply/s, 49.619μs/ply
+Effectively:  11230ms,  444444 plys,  39576.49 ply/s, 25.268μs/ply
+===================================================================
+[...]
+==================================================================
+Running 16 concurrent threads with 9x9 games ...
+   thrd.  7:  25041ms,  222222 plys,   8874.33 ply/s, 112.685μs/ply
+   thrd.  9:  25060ms,  222222 plys,   8867.60 ply/s, 112.770μs/ply
+   thrd. 12:  25057ms,  222222 plys,   8868.66 ply/s, 112.757μs/ply
+   thrd. 14:  25051ms,  222222 plys,   8870.78 ply/s, 112.730μs/ply
+   thrd.  2:  25043ms,  222222 plys,   8873.62 ply/s, 112.694μs/ply
+   thrd.  8:  25060ms,  222222 plys,   8867.60 ply/s, 112.770μs/ply
+   thrd.  5:  25050ms,  222222 plys,   8871.14 ply/s, 112.725μs/ply
+   thrd.  1:  25075ms,  222222 plys,   8862.29 ply/s, 112.838μs/ply
+   thrd. 10:  25087ms,  222222 plys,   8858.05 ply/s, 112.892μs/ply
+   thrd.  0:  25061ms,  222222 plys,   8867.24 ply/s, 112.775μs/ply
+   thrd. 11:  25096ms,  222222 plys,   8854.88 ply/s, 112.932μs/ply
+   thrd.  3:  25074ms,  222222 plys,   8862.65 ply/s, 112.833μs/ply
+   thrd. 13:  25113ms,  222222 plys,   8848.88 ply/s, 113.009μs/ply
+   thrd.  6:  25205ms,  222222 plys,   8816.58 ply/s, 113.423μs/ply
+   thrd.  4:  25187ms,  222222 plys,   8822.88 ply/s, 113.342μs/ply
+   thrd. 15:  25305ms,  222222 plys,   8781.74 ply/s, 113.873μs/ply
+------------- -------- ------------ ----------------- -------------
+Agr. & avg.: 401565ms,  222222 plys,   8854.24 ply/s, 112.940μs/ply
+Effectively:  25360ms, 3555552 plys, 140203.15 ply/s, 7.133μs/ply
 ```
