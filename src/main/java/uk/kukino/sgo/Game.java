@@ -1,5 +1,8 @@
 package uk.kukino.sgo;
 
+import net.openhft.chronicle.bytes.Bytes;
+
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class Game
@@ -21,7 +24,8 @@ public class Game
     // workplace
     private final Board altBoard;
     private final Board chainLibertyBoard;
-    private final Buffers<short[]> adjacentBuffers;
+    private final Buffers<Bytes<ByteBuffer>> adjacentBuffers;
+
 
     private static short[] HANDICAP_19 = new short[] {
         Move.parseToVal("B D4"), Move.parseToVal("B Q16"), Move.parseToVal("B D16"),
@@ -34,7 +38,7 @@ public class Game
         board = new Board(size);
         altBoard = new Board(size);
         chainLibertyBoard = new Board(size);
-        adjacentBuffers = new Buffers<>(size * size / 2, () -> new short[4]);
+        adjacentBuffers = new Buffers<>(size * size / 2, () -> Bytes.elasticByteBuffer(2 * 4));
         blackDeaths = 0;
         whiteDeaths = 0;
         moves = new short[size * size * 2];
@@ -107,21 +111,22 @@ public class Game
     private boolean recursivePaint(final Board base, final short coord, final Color color)
     {
         chainLibertyBoard.set(coord, color);
-        final short[] adj = adjacentBuffers.lease();
+        final Bytes<ByteBuffer> adj = adjacentBuffers.lease();
         try
         {
-            final byte adjN = Coord.adjacents(adj, coord, base.size());
-            for (byte i = 0; i < adjN; i++)
+            Coord.adjacents(adj, coord, base.size());
+            while (!adj.isEmpty())
             {
-                final Color baseAdjColor = base.get(adj[i]);
+                final short value = adj.readShort();
+                final Color baseAdjColor = base.get(value);
                 if (baseAdjColor == Color.EMPTY)
                 {
                     // chainLibertyBoard.set(adj[i], Color.MARK);
                     return true;
                 }
-                else if (baseAdjColor == color && chainLibertyBoard.get(adj[i]) == Color.EMPTY)
+                else if (baseAdjColor == color && chainLibertyBoard.get(value) == Color.EMPTY)
                 {
-                    if (recursivePaint(base, adj[i], color))
+                    if (recursivePaint(base, value, color))
                     {
                         return true;
                     }
@@ -152,11 +157,11 @@ public class Game
         }
 
         // from now on, all stone checks
-        if (Move.x(move) >= board.size())
+        if (Move.X(move) >= board.size())
         {
             return false;
         }
-        if (Move.y(move) >= board.size())
+        if (Move.Y(move) >= board.size())
         {
             return false;
         }
@@ -183,18 +188,19 @@ public class Game
             int moveKills = 0;
             board.set(move);
 
-            final short[] adjs = adjacentBuffers.lease();
+            final Bytes<ByteBuffer> adjs = adjacentBuffers.lease();
             try
             {
-                byte adjsN = board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
-                for (int i = 0; i < adjsN; i++)
+                board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
+                while (!adjs.isEmpty())
                 {
-                    if (!markChainAndLiberties(board, adjs[i])) //killed
+                    final short adj = adjs.readShort();
+                    if (!markChainAndLiberties(board, adj)) //killed
                     {
                         if (!killsOccured)
                         {
                             board.copyTo(altBoard); // lazy makes a copy of the board, just in case it has to be rollback for a superKo
-                            altBoard.set(Move.x(move), Move.y(move), Color.EMPTY);
+                            altBoard.set(Move.X(move), Move.Y(move), Color.EMPTY);
                             killsOccured = true;
                         }
                         moveKills += board.extract(chainLibertyBoard);
@@ -212,12 +218,12 @@ public class Game
                 }
                 else
                 {
-                    adjsN = board.adjacentsWithColor(adjs, move, Color.EMPTY);
-                    if (adjsN == 0)
+                    board.adjacentsWithColor(adjs, move, Color.EMPTY);
+                    if (adjs.isEmpty())
                     {
                         if (!markChainAndLiberties(board, move)) // suicide?
                         {
-                            board.set(Move.x(move), Move.y(move), Color.EMPTY); //undo
+                            board.set(Move.X(move), Move.Y(move), Color.EMPTY); //undo
                             return false;
                         }
                     }

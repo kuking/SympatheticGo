@@ -2,7 +2,7 @@ package uk.kukino.sgo;
 
 import java.util.SplittableRandom;
 
-public class Move
+public final class Move
 {
 
     // short = 0123456789abcdef
@@ -14,12 +14,8 @@ public class Move
 
     static final SplittableRandom RND = new SplittableRandom(System.currentTimeMillis());
 
-    private short value;
-
-    public boolean parse(final CharSequence sequence)
+    private Move()
     {
-        value = Move.parseToVal(sequence);
-        return isValid(value);
     }
 
     public static short parseToVal(final CharSequence seq)
@@ -125,24 +121,14 @@ public class Move
         return move((byte) 127, (byte) 127, color);
     }
 
-    public static byte x(final short value)
+    public static byte X(final short value)
     {
         return (byte) ((value >> 7) & 0x7f);
     }
 
-    public byte x()
-    {
-        return Move.x(value);
-    }
-
-    public static byte y(final short value)
+    public static byte Y(final short value)
     {
         return (byte) (value & 0x7f);
-    }
-
-    public byte y()
-    {
-        return Move.y(value);
     }
 
     public static Color color(final short value)
@@ -150,16 +136,11 @@ public class Move
         return Color.fromByte((byte) (value >> 14 & 3));
     }
 
-    public Color color()
-    {
-        return Move.color(value);
-    }
-
     public static boolean isPass(final short value)
     {
         return color(value) != Color.EMPTY &&
-            Move.x(value) == (short) 127 &&
-            Move.y(value) == (short) 127;
+            Move.X(value) == (short) 127 &&
+            Move.Y(value) == (short) 127;
     }
 
     public static short random(final byte size, final Color color)
@@ -167,29 +148,14 @@ public class Move
         return Move.move((byte) RND.nextInt(size), (byte) RND.nextInt(size), color);
     }
 
-    public boolean isPass()
-    {
-        return Move.isPass(value);
-    }
-
     public static boolean isValid(final short value)
     {
         return value != INVALID;
     }
 
-    public boolean isValid()
-    {
-        return Move.isValid(value);
-    }
-
     public static boolean isStone(final short value)
     {
         return isValid(value) && !isPass(value);
-    }
-
-    public boolean isStone()
-    {
-        return isStone(value);
     }
 
 }

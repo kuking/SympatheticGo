@@ -11,65 +11,66 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MoveTest
 {
 
-    private Move move = new Move();
-
     @Test
     public void simple()
     {
-        assertTrue(move.parse("Black A2"));
-        assertThat(move.color(), equalTo(Color.BLACK));
-        assertThat(move.x(), equalTo((byte) 0));
-        assertThat(move.y(), equalTo((byte) 1));
-        assertTrue(move.isStone());
-        assertFalse(move.isPass());
+        final short move = Move.parseToVal("Black A2");
+        assertThat(Move.color(move), equalTo(Color.BLACK));
+        assertThat(Move.X(move), equalTo((byte) 0));
+        assertThat(Move.Y(move), equalTo((byte) 1));
+        assertTrue(Move.isValid(move));
+        assertTrue(Move.isStone(move));
+        assertFalse(Move.isPass(move));
     }
 
     @Test
     public void pass()
     {
-        assertTrue(move.parse("White Pass"));
-        assertThat(move.color(), equalTo(Color.WHITE));
-        assertTrue(move.isValid());
-        assertThat(move.x(), is((byte) 127));
-        assertThat(move.y(), is((byte) 127));
-        assertFalse(move.isStone());
-        assertTrue(move.isPass());
+        final short move = Move.parseToVal("White Pass");
+        assertThat(Move.color(move), equalTo(Color.WHITE));
+        assertThat(Move.X(move), equalTo((byte) 127));
+        assertThat(Move.Y(move), equalTo((byte) 127));
+        assertTrue(Move.isValid(move));
+        assertFalse(Move.isStone(move));
+        assertTrue(Move.isPass(move));
     }
 
     @Test
     public void moreParsing()
     {
-        assertTrue(move.parse("B Z126"));
-        assertThat(move.color(), equalTo(Color.BLACK));
-        assertTrue(move.isValid());
-        assertThat(move.x(), equalTo((byte) 24));
-        assertThat(move.y(), equalTo((byte) 125));
-        assertTrue(move.isStone());
+        short move = Move.parseToVal("B Z126");
+        assertThat(Move.color(move), equalTo(Color.BLACK));
+        assertTrue(Move.isValid(move));
+        assertThat(Move.X(move), equalTo((byte) 24));
+        assertThat(Move.Y(move), equalTo((byte) 125));
+        assertTrue(Move.isStone(move));
 
-        assertTrue(move.parse("W AA100"));
-        assertThat(move.color(), equalTo(Color.WHITE));
-        assertTrue(move.isValid());
-        assertThat(move.x(), equalTo((byte) 26));
-        assertThat(move.y(), equalTo((byte) 99));
-        assertTrue(move.isStone());
+        move = Move.parseToVal("W AA100");
+        assertTrue(Move.isValid(move));
+        assertThat(Move.color(move), equalTo(Color.WHITE));
+        assertTrue(Move.isValid(move));
+        assertThat(Move.X(move), equalTo((byte) 26));
+        assertThat(Move.Y(move), equalTo((byte) 99));
+        assertTrue(Move.isStone(move));
 
-        assertTrue(move.parse("Black J8"));
-        assertThat(move.color(), equalTo(Color.BLACK));
-        assertTrue(move.isValid());
-        assertThat(move.x(), equalTo((byte) 8));
-        assertThat(move.y(), equalTo((byte) 7));
-        assertTrue(move.isStone());
+        move = Move.parseToVal("Black J8");
+        assertTrue(Move.isValid(move));
+        assertThat(Move.color(move), equalTo(Color.BLACK));
+        assertTrue(Move.isValid(move));
+        assertThat(Move.X(move), equalTo((byte) 8));
+        assertThat(Move.Y(move), equalTo((byte) 7));
+        assertTrue(Move.isStone(move));
     }
 
     @Test
     public void itParsesUntrimmedStrings()
     {
-        assertTrue(move.parse("   Black A2  "));
-        assertTrue(move.isValid());
-        assertThat(move.x(), is((byte) 0));
-        assertThat(move.y(), is((byte) 1));
-        assertFalse(move.isPass());
-        assertTrue(move.isStone());
+        final short move = Move.parseToVal("   Black A2  ");
+        assertTrue(Move.isValid(move));
+        assertThat(Move.X(move), is((byte) 0));
+        assertThat(Move.Y(move), is((byte) 1));
+        assertFalse(Move.isPass(move));
+        assertTrue(Move.isStone(move));
     }
 
     @Test
@@ -79,8 +80,8 @@ public class MoveTest
 
         assertTrue(Move.isValid(value));
         assertThat(Move.color(value), equalTo(Color.WHITE));
-        assertThat(Move.x(value), equalTo((byte) 27));
-        assertThat(Move.y(value), equalTo((byte) 122));
+        assertThat(Move.X(value), equalTo((byte) 27));
+        assertThat(Move.Y(value), equalTo((byte) 122));
 
         value = Move.parseToVal("BLACK PASS");
         assertThat(Move.color(value), equalTo(Color.BLACK));
@@ -93,28 +94,13 @@ public class MoveTest
     @Test
     public void invalids()
     {
-        assertFalse(move.parse("rubish"));
-        assertFalse(move.isValid());
-
-        assertFalse(move.parse("Black"));
-        assertFalse(move.isValid());
-
-        assertFalse(move.parse("Blac"));
-        assertFalse(move.isValid());
-
-        assertFalse(move.parse("B2"));
-        assertFalse(move.isValid());
-
-        assertFalse(move.parse("BLACK A"));
-        assertFalse(move.isValid());
-
-        assertFalse(move.parse("   "));
-        assertFalse(move.isValid());
-
-        assertFalse(move.parse(""));
-        assertFalse(move.isValid());
-
-        assertFalse(move.parse(null));
-        assertFalse(move.isValid());
+        assertFalse(Move.isValid(Move.parseToVal("rubish")));
+        assertFalse(Move.isValid(Move.parseToVal("Black")));
+        assertFalse(Move.isValid(Move.parseToVal("Blac")));
+        assertFalse(Move.isValid(Move.parseToVal("B2")));
+        assertFalse(Move.isValid(Move.parseToVal("BLACK A")));
+        assertFalse(Move.isValid(Move.parseToVal("   ")));
+        assertFalse(Move.isValid(Move.parseToVal("")));
+        assertFalse(Move.isValid(Move.parseToVal(null)));
     }
 }

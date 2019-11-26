@@ -1,6 +1,10 @@
 package uk.kukino.sgo;
 
-public class Coord
+import net.openhft.chronicle.bytes.Bytes;
+
+import java.nio.ByteBuffer;
+
+public final class Coord
 {
 
     // short = 0123456789abcdef
@@ -10,14 +14,20 @@ public class Coord
 
     static final short INVALID = 0xffffffff;
 
-    private short value;
-
-    boolean parse(final CharSequence seq)
+    private Coord()
     {
-        value = Coord.parseToVal(seq);
-        return isValid();
     }
 
+    public static String shortToString(final short value)
+    {
+        final byte x = Coord.X(value);
+        final byte y = Coord.Y(value);
+
+        final char symb = (x <= 'I' - 'A' - 1) ? (char) (65 + x) : (char) (65 + 1 + x);
+        final int yToUse = y + 1; //FIXME: size - y;
+
+        return String.valueOf(symb) + yToUse;
+    }
 
     public static short parseToVal(final CharSequence seq)
     {
@@ -81,39 +91,19 @@ public class Coord
         return (short) ((short) ((x & 0x7f) << 7) | (short) (y & 0x7f));
     }
 
-    public void assignXY(final byte x, final byte y)
-    {
-        value = Coord.XY(x, y);
-    }
-
-    public static byte x(final short val)
+    public static byte X(final short val)
     {
         return (byte) ((val >> 7) & 0x7f);
     }
 
-    public byte x()
-    {
-        return Coord.x(value);
-    }
-
-    public static byte y(final short val)
+    public static byte Y(final short val)
     {
         return (byte) (val & 0x7f);
-    }
-
-    public byte y()
-    {
-        return Coord.y(value);
     }
 
     public static boolean isValid(final short val)
     {
         return val != INVALID;
-    }
-
-    public boolean isValid()
-    {
-        return Coord.isValid(value);
     }
 
     /***
@@ -127,8 +117,8 @@ public class Coord
     public static byte adjacents(final short[] result, final short coord, final byte boardSize)
     {
         int c = 0;
-        final byte x = Coord.x(coord);
-        final byte y = Coord.y(coord);
+        final byte x = Coord.X(coord);
+        final byte y = Coord.Y(coord);
         if (y - 1 >= 0)
         {
             result[c++] = Coord.XY(x, (byte) (y - 1));
@@ -148,14 +138,28 @@ public class Coord
         return (byte) c;
     }
 
-    public byte adjacents(final short[] values, final byte size)
+
+    public static void adjacents(final Bytes<ByteBuffer> result, final short coord, final byte boardSize)
     {
-        return Coord.adjacents(values, value, size);
+        result.clear();
+        final byte x = Coord.X(coord);
+        final byte y = Coord.Y(coord);
+        if (y - 1 >= 0)
+        {
+            result.writeShort(Coord.XY(x, (byte) (y - 1)));
+        }
+        if (x + 1 < boardSize)
+        {
+            result.writeShort(Coord.XY((byte) (x + 1), y));
+        }
+        if (y + 1 < boardSize)
+        {
+            result.writeShort(Coord.XY(x, (byte) (y + 1)));
+        }
+        if (x - 1 >= 0)
+        {
+            result.writeShort(Coord.XY((byte) (x - 1), y));
+        }
     }
 
-    @Override
-    public String toString()
-    {
-        return "";
-    }
 }

@@ -1,6 +1,9 @@
 package uk.kukino.sgo;
 
+import net.openhft.chronicle.bytes.Bytes;
 import org.junit.jupiter.api.Test;
+
+import java.nio.ByteBuffer;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -12,21 +15,16 @@ public class CoordTest
 
     byte size = (byte) 19;
     short[] res = new short[4];
-    Coord coord = new Coord();
+
+    Bytes<ByteBuffer> adjs = Bytes.elasticByteBuffer(2 * 10);
 
     @Test
     public void simplest()
     {
         short val = Coord.XY((byte) 2, (byte) 3);
-        assertThat(Coord.x(val), equalTo((byte) 2));
-        assertThat(Coord.y(val), equalTo((byte) 3));
+        assertThat(Coord.X(val), equalTo((byte) 2));
+        assertThat(Coord.Y(val), equalTo((byte) 3));
         assertTrue(Coord.isValid(val));
-
-        coord = new Coord();
-        coord.assignXY((byte) 5, (byte) 6);
-        assertThat(coord.x(), equalTo((byte) 5));
-        assertThat(coord.y(), equalTo((byte) 6));
-        assertTrue(coord.isValid());
     }
 
     @Test
@@ -73,6 +71,16 @@ public class CoordTest
     }
 
     @Test
+    public void adjacentToTopRightCorner_Bytes()
+    {
+        Coord.adjacents(adjs, Coord.XY((byte) 18, (byte) 0), size);
+        assertFalse(adjs.isEmpty());
+        assertThat(adjs.readShort(), equalTo(Coord.XY((byte) 18, (byte) 1)));
+        assertThat(adjs.readShort(), equalTo(Coord.XY((byte) 17, (byte) 0)));
+        assertTrue(adjs.isEmpty());
+    }
+
+    @Test
     public void adjacentToBottomRightCorner()
     {
         assertThat(Coord.adjacents(res, Coord.XY((byte) 19, (byte) 19), size), equalTo((byte) 2));
@@ -82,6 +90,16 @@ public class CoordTest
             0,
             0
         }));
+    }
+
+    @Test
+    public void adjacentToBottomRightCorner_Bytes()
+    {
+        Coord.adjacents(adjs, Coord.XY((byte) 19, (byte) 19), size);
+        assertFalse(adjs.isEmpty());
+        assertThat(adjs.readShort(), equalTo(Coord.XY((byte) 19, (byte) 18)));
+        assertThat(adjs.readShort(), equalTo(Coord.XY((byte) 18, (byte) 19)));
+        assertTrue(adjs.isEmpty());
     }
 
     @Test
@@ -152,8 +170,8 @@ public class CoordTest
     @Test
     public void adjacentCentreWithObject()
     {
-        coord.assignXY((byte) 5, (byte) 5);
-        assertThat(coord.adjacents(res, size), equalTo((byte) 4));
+        final short coord = Coord.XY((byte) 5, (byte) 5);
+        assertThat(Coord.adjacents(res, coord, size), equalTo((byte) 4));
         assertThat(res, equalTo(new short[] {
             Coord.XY((byte) 5, (byte) 4),
             Coord.XY((byte) 6, (byte) 5),
@@ -165,17 +183,17 @@ public class CoordTest
     @Test
     public void parse()
     {
-        assertTrue(coord.parse("Z126"));
-        assertThat(coord.x(), equalTo((byte) 24));
-        assertThat(coord.y(), equalTo((byte) 125));
+        short coord = Coord.parseToVal("Z126");
+        assertThat(Coord.X(coord), equalTo((byte) 24));
+        assertThat(Coord.Y(coord), equalTo((byte) 125));
 
-        assertTrue(coord.parse("Aa100"));
-        assertThat(coord.x(), equalTo((byte) 26));
-        assertThat(coord.y(), equalTo((byte) 99));
+        coord = Coord.parseToVal("Aa100");
+        assertThat(Coord.X(coord), equalTo((byte) 26));
+        assertThat(Coord.Y(coord), equalTo((byte) 99));
 
-        assertTrue(coord.parse("j8"));
-        assertThat(coord.x(), equalTo((byte) 8));
-        assertThat(coord.y(), equalTo((byte) 7));
+        coord = Coord.parseToVal("j8");
+        assertThat(Coord.X(coord), equalTo((byte) 8));
+        assertThat(Coord.Y(coord), equalTo((byte) 7));
     }
 
     @Test
@@ -187,60 +205,53 @@ public class CoordTest
     }
 
     @Test
+    public void shortToString()
+    {
+        assertThat(Coord.shortToString(Coord.parseToVal("A1")), equalTo("A1"));
+        assertThat(Coord.shortToString(Coord.parseToVal("B2")), equalTo("B2"));
+        assertThat(Coord.shortToString(Coord.parseToVal("C10")), equalTo("C10"));
+        assertThat(Coord.shortToString(Coord.parseToVal("Z20")), equalTo("Z20"));
+//        assertThat(Coord.shortToString(Coord.parseToVal("AA100")), equalTo("AA100")); //FIXME
+    }
+
+    @Test
     public void parserCanTrim()
     {
-        assertTrue(coord.parse("   D10   "));
-        assertThat(coord.x(), equalTo((byte) 3));
-        assertThat(coord.y(), equalTo((byte) 9));
+        final short parsed = Coord.parseToVal("   D10   ");
+        assertTrue(Coord.isValid(parsed));
+        assertThat(Coord.X(parsed), equalTo((byte) 3));
+        assertThat(Coord.Y(parsed), equalTo((byte) 9));
     }
 
     @Test
     public void parserHandleInvalids()
     {
-        assertFalse(coord.parse("aasdasd"));
-        assertFalse(coord.isValid());
-
-        assertFalse(coord.parse("aas dasd"));
-        assertFalse(coord.isValid());
-
-        assertFalse(coord.parse("123A"));
-        assertFalse(coord.isValid());
-
-        assertFalse(coord.parse("AA1234"));
-        assertFalse(coord.isValid());
-
-        assertFalse(coord.parse("AAA1"));
-        assertFalse(coord.isValid());
-
-        assertFalse(coord.parse("123"));
-        assertFalse(coord.isValid());
-
-        assertFalse(coord.parse(" A 1 "));
-        assertFalse(coord.isValid());
-
-        assertFalse(coord.parse(""));
-        assertFalse(coord.isValid());
-
-        assertFalse(coord.parse("   "));
-        assertFalse(coord.isValid());
-
-        assertFalse(coord.parse(null));
-        assertFalse(coord.isValid());
+        assertFalse(Coord.isValid(Coord.parseToVal("aasdasd")));
+        assertFalse(Coord.isValid(Coord.parseToVal("aas dasd")));
+        assertFalse(Coord.isValid(Coord.parseToVal("123A")));
+        assertFalse(Coord.isValid(Coord.parseToVal("AA1234")));
+        assertFalse(Coord.isValid(Coord.parseToVal("AAA1")));
+        assertFalse(Coord.isValid(Coord.parseToVal("123")));
+        assertFalse(Coord.isValid(Coord.parseToVal(" A 1 ")));
+        assertFalse(Coord.isValid(Coord.parseToVal("")));
+        assertFalse(Coord.isValid(Coord.parseToVal("   ")));
+        assertFalse(Coord.isValid(Coord.parseToVal(null)));
     }
 
     @Test
     public void toStringIsParsed()
     {
-        final Coord coord = new Coord();
-        for (byte x = 0; x < 125; x++)
+        for (byte x = 0; x < 25; x++)
         {
-            for (byte y = 0; y < 125; y++)
+            for (byte y = 0; y < 25; y++)
             {
-                coord.assignXY(x, y);
-                final String toString = coord.toString();
-
-
+                final short original = Coord.XY(x, y);
+                final String toString = Coord.shortToString(original);
+                final short parsed = Coord.parseToVal(toString);
+                assertThat(Coord.X(parsed), equalTo(x));
+                assertThat(Coord.Y(parsed), equalTo(y));
             }
         }
     }
+
 }
