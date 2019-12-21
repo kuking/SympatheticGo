@@ -39,7 +39,7 @@ public class Game
         moves = new short[size * size * 2];
         lastMove = 0;
         Arrays.fill(moves, Move.INVALID);
-        superKos = new int[(size * size) / 2];
+        superKos = new int[size * 2];
         Arrays.fill(superKos, Move.INVALID);
         lastSuperKoP = 0;
         finished = false;
@@ -102,23 +102,27 @@ public class Game
         return recursivePaint(base, coord, color);
     }
 
-
+    // used by markChainAndLiberties, with its optimisations
     private boolean recursivePaint(final Board base, final short coord, final Color color)
     {
-        chainLibertyBoard.set(coord, color);
+        boolean thisChainMarked = false;
         long adjs = Adjacent.asVal(coord, base.size());
         while (Adjacent.iterHasNext(adjs))
         {
-            final short value = Adjacent.iterPosition(adjs);
-            final Color baseAdjColor = base.get(value);
+            final short adjCoord = Adjacent.iterPosition(adjs);
+            final Color baseAdjColor = base.get(adjCoord);
             if (baseAdjColor == Color.EMPTY)
             {
-//                chainLibertyBoard.set(value, Color.MARK);
                 return true;
             }
-            else if (baseAdjColor == color && chainLibertyBoard.get(value) == Color.EMPTY)
+            else if (baseAdjColor == color && chainLibertyBoard.get(adjCoord) == Color.EMPTY)
             {
-                if (recursivePaint(base, value, color))
+                if (!thisChainMarked)
+                {
+                    chainLibertyBoard.set(coord, color);
+                    thisChainMarked = true;
+                }
+                if (recursivePaint(base, adjCoord, color))
                 {
                     return true;
                 }
@@ -200,7 +204,7 @@ public class Game
                     altBoard.copyTo(board);
                     return false;
                 }
-                superKos[lastSuperKoP++] = altBoard.hashCode();
+                superKos[lastSuperKoP++ % superKos.length] = altBoard.hashCode();
             }
             else
             {
@@ -232,7 +236,7 @@ public class Game
 
     private boolean isSuperKo(final int hash)
     {
-        for (int i = 0; i < lastSuperKoP; i++)
+        for (int i = 0; i < lastSuperKoP % superKos.length; i++)
         {
             if (superKos[i] == hash)
             {
