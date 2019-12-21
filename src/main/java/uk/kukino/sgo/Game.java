@@ -36,7 +36,7 @@ public class Game
         chainLibertyBoard = new Board(size);
         blackDeaths = 0;
         whiteDeaths = 0;
-        moves = new short[size * size * 2];
+        moves = new short[(size * size) + (3 * size)]; // based on: https://homepages.cwi.nl/~aeb/go/misc/gostat.html
         lastMove = 0;
         Arrays.fill(moves, Move.INVALID);
         superKos = new int[size * 2];
@@ -246,39 +246,17 @@ public class Game
         int invalidCount = 0;
         while (!finished())
         {
-            short move = Move.INVALID;
-            if (invalidCount < board.size())
+            final short move;
+            if (invalidCount > board.size() / 2 ||
+                blackDeaths > board.size() ||
+                whiteDeaths > board.size() ||
+                lastMove > moves.length - 3)
             {
-                move = Move.random(board.size(), playerToPlay);
+                move = Move.pass(playerToPlay);
             }
             else
             {
-                final int empties = board.count(Color.EMPTY);
-                int npos = 0;
-                if (empties > 0)
-                {
-                    npos = Move.RND.nextInt(empties);
-                }
-                for (byte x = 0; x < board.size() && npos != 0; x++)
-                {
-                    for (byte y = 0; y < board.size() && npos != 0; y++)
-                    {
-                        if (board.get(x, y) == Color.EMPTY)
-                        {
-                            npos--;
-                        }
-                        if (npos == 0)
-                        {
-                            move = Move.move(x, y, playerToPlay);
-                            npos = -1;
-                        }
-                    }
-                }
-            }
-
-            if (move == Move.INVALID || invalidCount > board.size() * 2 || lastMove > board.size() * board.size())
-            {
-                move = Move.pass(playerToPlay);
+                move = randomMove();
             }
 
             if (play(move))
@@ -289,11 +267,40 @@ public class Game
             {
                 invalidCount++;
             }
+//            if (lastMove > moves.length - 6)
+//            {
+//                System.out.println(Coord.shortToString(move));
+//                System.out.println(this);
+//            }
+        }
+//        if (lastMove > moves.length - 6)
+//        {
+//            System.exit(1);
+//        }
+    }
+
+    private short randomMove()
+    {
+        final short coord = board.emptyRandom();
+        if (coord == Move.INVALID)
+        {
+            return Move.pass(playerToPlay);
+        }
+        else
+        {
+            return Move.move(coord, playerToPlay);
         }
     }
 
+    @Override
+    public String toString()
+    {
+        return board.toString() +
+            "move: " + lastMove() + "  next: " + playerToPlay + "\n" +
+            " Blk: " + blackDeaths + " Wht: " + whiteDeaths + "\n";
+    }
 
-    /*
+/*
         Below the typical public methods for a Game
      */
 

@@ -76,7 +76,11 @@ public class Board
 
     public Color get(final byte x, final byte y)
     {
-        final int ofs = ofs(x, y);
+        return getLineal(ofs(x, y));
+    }
+
+    private Color getLineal(final int ofs)
+    {
         return getColorByteOffset(board.readByte(ofs >> 2), (byte) (ofs & 0b11));
     }
 
@@ -100,9 +104,43 @@ public class Board
         return this.size;
     }
 
+    private int linealSize()
+    {
+        return this.size * this.size;
+    }
+
     public void copyTo(final Board toBoard)
     {
         toBoard.board.writePosition(0).write(board.readPosition(0));
+    }
+
+    public short emptyRandom()
+    {
+        final int maxSize = linealSize();
+        final int center = Move.RND.nextInt(maxSize);
+        int delta = 0;
+        boolean inc = true;
+        while (true)
+        {
+            if ((center + delta < maxSize) && (center + delta >= 0) && getLineal(center + delta) == Color.EMPTY)
+            {
+                return Coord.XY((byte) ((center + delta) % size), (byte) ((center + delta) / size));
+            }
+            if (inc)
+            {
+                delta = -delta;
+                delta++;
+                if (delta > maxSize / 2)
+                {
+                    return Move.INVALID;
+                }
+            }
+            else
+            {
+                delta = -delta;
+            }
+            inc = !inc;
+        }
     }
 
 
