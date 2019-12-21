@@ -2,12 +2,6 @@ package uk.kukino.sgo;
 
 public final class Adjacent
 {
-    // And Adjacent is a byte with its first 4 bits turned on or off, depending on clockwise selection of adjacent positions.
-    // the last 3 bits is the counter in the iterator (so it can count up to 5, which signals end of iterator)
-    //          01234567
-    //  a byte: NESW0NNN
-
-
     /*
         Long = 0123456789abcdef0123456789abcdef
                |centre coord. |        NESW0nnn
@@ -23,9 +17,6 @@ public final class Adjacent
             short adj = Adjacent.iterPosition(adjs);
             adjs = Adjacent.iterMoveNext(adjs);
         }
-
-
-
      */
 
     private static final byte ITER_END_VALUE = (byte) 7;
