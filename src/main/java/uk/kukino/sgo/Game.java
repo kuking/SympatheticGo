@@ -105,7 +105,7 @@ public class Game
     // used by markChainAndLiberties, with its optimisations
     private boolean recursivePaint(final Board base, final short coord, final Color color)
     {
-        boolean thisChainMarked = false;
+        chainLibertyBoard.set(coord, color);
         long adjs = Adjacent.asVal(coord, base.size());
         while (Adjacent.iterHasNext(adjs))
         {
@@ -117,11 +117,6 @@ public class Game
             }
             else if (baseAdjColor == color && chainLibertyBoard.get(adjCoord) == Color.EMPTY)
             {
-                if (!thisChainMarked)
-                {
-                    chainLibertyBoard.set(coord, color);
-                    thisChainMarked = true;
-                }
                 if (recursivePaint(base, adjCoord, color))
                 {
                     return true;
