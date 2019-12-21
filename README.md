@@ -60,40 +60,41 @@ Model name:          AMD Ryzen 7 3800X 8-Core Processor
 $ ./gradlew run
 ===================================================================
 Running 1 concurrent threads with 9x9 games ...
-   thrd.  0:  10480ms,  222222 plys,  21204.39 ply/s, 47.160μs/ply
+   thrd.  0:  10879ms,  222222 plys,  20426.69 ply/s, 48.956μs/ply
 ------------- -------- ------------ ----------------- -------------
-Agr. & avg.:  10480ms,  222222 plys,  21204.39 ply/s, 47.160μs/ply
-Effectively:  10694ms,  222222 plys,  20780.06 ply/s, 48.123μs/ply
+Agr. & avg.:  10879ms,  222222 plys,  20426.69 ply/s, 48.956μs/ply
+Effectively:  11089ms,  222222 plys,  20039.86 ply/s, 49.901μs/ply
 ===================================================================
 Running 2 concurrent threads with 9x9 games ...
-   thrd.  0:  10832ms,  222222 plys,  20515.32 ply/s, 48.744μs/ply
-   thrd.  1:  11221ms,  222222 plys,  19804.12 ply/s, 50.495μs/ply
+   thrd.  0:  11029ms,  222222 plys,  20148.88 ply/s, 49.631μs/ply
+   thrd.  1:  11086ms,  222222 plys,  20045.28 ply/s, 49.887μs/ply
 ------------- -------- ------------ ----------------- -------------
-Agr. & avg.:  22053ms,  222222 plys,  20153.45 ply/s, 49.619μs/ply
-Effectively:  11230ms,  444444 plys,  39576.49 ply/s, 25.268μs/ply
+Agr. & avg.:  22115ms,  222222 plys,  20096.95 ply/s, 49.759μs/ply
+Effectively:  11097ms,  444444 plys,  40050.82 ply/s, 24.968μs/ply
 ===================================================================
 [...]
-==================================================================
+===================================================================
 Running 16 concurrent threads with 9x9 games ...
-   thrd.  7:  25041ms,  222222 plys,   8874.33 ply/s, 112.685μs/ply
-   thrd.  9:  25060ms,  222222 plys,   8867.60 ply/s, 112.770μs/ply
-   thrd. 12:  25057ms,  222222 plys,   8868.66 ply/s, 112.757μs/ply
-   thrd. 14:  25051ms,  222222 plys,   8870.78 ply/s, 112.730μs/ply
-   thrd.  2:  25043ms,  222222 plys,   8873.62 ply/s, 112.694μs/ply
-   thrd.  8:  25060ms,  222222 plys,   8867.60 ply/s, 112.770μs/ply
-   thrd.  5:  25050ms,  222222 plys,   8871.14 ply/s, 112.725μs/ply
-   thrd.  1:  25075ms,  222222 plys,   8862.29 ply/s, 112.838μs/ply
-   thrd. 10:  25087ms,  222222 plys,   8858.05 ply/s, 112.892μs/ply
-   thrd.  0:  25061ms,  222222 plys,   8867.24 ply/s, 112.775μs/ply
-   thrd. 11:  25096ms,  222222 plys,   8854.88 ply/s, 112.932μs/ply
-   thrd.  3:  25074ms,  222222 plys,   8862.65 ply/s, 112.833μs/ply
-   thrd. 13:  25113ms,  222222 plys,   8848.88 ply/s, 113.009μs/ply
-   thrd.  6:  25205ms,  222222 plys,   8816.58 ply/s, 113.423μs/ply
-   thrd.  4:  25187ms,  222222 plys,   8822.88 ply/s, 113.342μs/ply
-   thrd. 15:  25305ms,  222222 plys,   8781.74 ply/s, 113.873μs/ply
+   thrd. 10:  17700ms,  222222 plys,  12554.92 ply/s, 79.650μs/ply
+   thrd.  5:  17705ms,  222222 plys,  12551.37 ply/s, 79.673μs/ply
+   thrd. 15:  17705ms,  222222 plys,  12551.37 ply/s, 79.673μs/ply
+   thrd.  8:  17704ms,  222222 plys,  12552.08 ply/s, 79.668μs/ply
+   thrd. 11:  17698ms,  222222 plys,  12556.33 ply/s, 79.641μs/ply
+   thrd.  3:  17730ms,  222222 plys,  12533.67 ply/s, 79.785μs/ply
+   thrd. 12:  17770ms,  222222 plys,  12505.46 ply/s, 79.965μs/ply
+   thrd.  1:  17746ms,  222222 plys,  12522.37 ply/s, 79.857μs/ply
+   thrd.  7:  17780ms,  222222 plys,  12498.43 ply/s, 80.010μs/ply
+   thrd. 14:  17766ms,  222222 plys,  12508.27 ply/s, 79.947μs/ply
+   thrd.  6:  17774ms,  222222 plys,  12502.64 ply/s, 79.983μs/ply
+   thrd.  2:  17772ms,  222222 plys,  12504.05 ply/s, 79.974μs/ply
+   thrd.  4:  17803ms,  222222 plys,  12482.28 ply/s, 80.114μs/ply
+   thrd.  0:  17792ms,  222222 plys,  12490.00 ply/s, 80.064μs/ply
+   thrd.  9:  17785ms,  222222 plys,  12494.91 ply/s, 80.033μs/ply
+   thrd. 13:  17912ms,  222222 plys,  12406.32 ply/s, 80.604μs/ply
 ------------- -------- ------------ ----------------- -------------
-Agr. & avg.: 401565ms,  222222 plys,   8854.24 ply/s, 112.940μs/ply
-Effectively:  25360ms, 3555552 plys, 140203.15 ply/s, 7.133μs/ply
+Agr. & avg.: 284142ms,  222222 plys,  12513.29 ply/s, 79.915μs/ply
+Effectively:  17963ms, 3555552 plys, 197937.54 ply/s, 5.052μs/ply
+
 ```
 
 ## TODO
