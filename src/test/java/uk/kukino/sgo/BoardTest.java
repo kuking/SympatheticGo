@@ -97,56 +97,17 @@ public class BoardTest
         board.set(Move.parseToVal("W C17"));
         board.set(Move.parseToVal("B B18"));
 
-        short[] arr = new short[4];
-        byte res = board.adjacentsWithColor(arr, Coord.parseToVal("B17"), Color.BLACK);
-        assertThat(res, equalTo((byte) 1));
-        assertThat(arr[0], equalTo(Coord.parseToVal("B18")));
+        long adjs = board.adjacentsWithColor(Coord.parseToVal("B17"), Color.BLACK);
+        AdjacentTest.assertPositions(adjs, "B18");
 
-        res = board.adjacentsWithColor(arr, Coord.parseToVal("B17"), Color.WHITE);
-        assertThat(res, equalTo((byte) 1));
-        assertThat(arr[0], equalTo(Coord.parseToVal("C17")));
+        adjs = board.adjacentsWithColor(Coord.parseToVal("B17"), Color.WHITE);
+        AdjacentTest.assertPositions(adjs, "C17");
 
-        res = board.adjacentsWithColor(arr, Coord.parseToVal("B17"), Color.EMPTY);
-        assertThat(res, equalTo((byte) 2));
-        assertThat(arr[0], equalTo(Coord.parseToVal("B16")));
-        assertThat(arr[1], equalTo(Coord.parseToVal("A17")));
+        adjs = board.adjacentsWithColor(Coord.parseToVal("B17"), Color.EMPTY);
+        AdjacentTest.assertPositions(adjs, "B16", "A17");
 
-        res = board.adjacentsWithColor(arr, Coord.parseToVal("K10"), Color.EMPTY);
-        assertThat(res, equalTo((byte) 4));
-        assertThat(arr[0], equalTo(Coord.parseToVal("K9")));
-        assertThat(arr[1], equalTo(Coord.parseToVal("L10")));
-        assertThat(arr[2], equalTo(Coord.parseToVal("K11")));
-        assertThat(arr[3], equalTo(Coord.parseToVal("J10")));
-    }
-
-    @Test
-    public void adjacentsWithColor_bytes()
-    {
-        board = new Board((byte) 19);
-        board.set(Move.parseToVal("W C17"));
-        board.set(Move.parseToVal("B B18"));
-
-        board.adjacentsWithColor(adjs, Coord.parseToVal("B17"), Color.BLACK);
-        assertThat(adjs.readLimit(), equalTo(2L));
-        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("B18")));
-        assertTrue(adjs.isEmpty());
-
-        board.adjacentsWithColor(adjs, Coord.parseToVal("B17"), Color.WHITE);
-        assertThat(adjs.readLimit(), equalTo(2L));
-        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("C17")));
-
-        board.adjacentsWithColor(adjs, Coord.parseToVal("B17"), Color.EMPTY);
-        assertThat(adjs.readLimit(), equalTo(4L));
-        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("B16")));
-        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("A17")));
-
-        board.adjacentsWithColor(adjs, Coord.parseToVal("K10"), Color.EMPTY);
-        assertThat(adjs.readLimit(), equalTo(8L));
-        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("K9")));
-        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("L10")));
-        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("K11")));
-        assertThat(adjs.readShort(), equalTo(Coord.parseToVal("J10")));
-        assertTrue(adjs.isEmpty());
+        adjs = board.adjacentsWithColor(Coord.parseToVal("K10"), Color.EMPTY);
+        AdjacentTest.assertPositions(adjs, "K11", "L10", "K9", "J10");
     }
 
     @Test

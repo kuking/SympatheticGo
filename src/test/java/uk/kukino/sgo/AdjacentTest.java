@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
@@ -158,12 +159,13 @@ public class AdjacentTest
 
     // util
 
-    private long assertPositions(long adjs, String... positions)
+    public static long assertPositions(long adjs, String... positions)
     {
         int posIdx = 0;
         while (Adjacent.iterHasNext(adjs))
         {
 //            System.out.println(Adjacent.valToStr(adjs) + " -> " + Coord.shortToString(Adjacent.iterPosition(adjs)));
+            assertThat("Iterator as more values than expected.", positions.length, greaterThan(posIdx));
             assertThat(Adjacent.iterPosition(adjs), equalTo(Coord.parseToVal(positions[posIdx++])));
             adjs = Adjacent.iterMoveNext(adjs);
         }

@@ -105,56 +105,19 @@ public class Board
         toBoard.board.writePosition(0).write(board.readPosition(0));
     }
 
-    @Deprecated
-    public byte adjacentsWithColor(final short[] arr, final short coord, final Color color)
-    {
-        byte res = Coord.adjacents(arr, coord, size);
-        int i = 0;
-        boolean done = false;
-        while (!done)
-        {
-            done = true;
-            while (i < res && get(arr[i]) == color)
-            {
-                i++;
-            }
-            if (i + 1 < res)
-            {
-                for (int ii = i; ii + 1 < res; ii++)
-                {
-                    arr[ii] = arr[ii + 1];
-                }
-                res--;
-                done = false;
-            }
-            else if (i + 1 == res)
-            {
-                if (get(arr[i]) != color)
-                {
-                    res--;
-                }
-            }
-        }
-        return res;
-    }
 
-    @Deprecated
-    public void adjacentsWithColor(final Bytes<ByteBuffer> adjs, final short coord, final Color color)
+    public long adjacentsWithColor(final short coord, final Color color)
     {
-        Coord.adjacents(adjs, coord, size);
-        adjs.readPosition();
-        long writePosition = 0;
-        while (!adjs.isEmpty())
+        long adjs = Adjacent.asVal(coord, size);
+        while (Adjacent.iterHasNext(adjs))
         {
-            final short read = adjs.readShort();
-            if (get(read) == color)
+            if (get(Adjacent.iterPosition(adjs)) != color)
             {
-                adjs.writeShort(writePosition, read);
-                writePosition += 2;
+                adjs = Adjacent.iterUnset(adjs);
             }
+            adjs = Adjacent.iterMoveNext(adjs);
         }
-        adjs.writePosition(writePosition);
-        adjs.readPosition(0);
+        return Adjacent.iterReset(adjs);
     }
 
     public int count(final Color color)

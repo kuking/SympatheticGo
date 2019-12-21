@@ -1,8 +1,5 @@
 package uk.kukino.sgo;
 
-import net.openhft.chronicle.bytes.Bytes;
-
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class Game
@@ -24,7 +21,6 @@ public class Game
     // workplace
     private final Board altBoard;
     private final Board chainLibertyBoard;
-    private final Buffers<Bytes<ByteBuffer>> adjacentBuffers;
 
 
     private static short[] HANDICAP_19 = new short[] {
@@ -38,7 +34,6 @@ public class Game
         board = new Board(size);
         altBoard = new Board(size);
         chainLibertyBoard = new Board(size);
-        adjacentBuffers = new Buffers<>(size * size / 2, () -> Bytes.elasticByteBuffer(2 * 4));
         blackDeaths = 0;
         whiteDeaths = 0;
         moves = new short[size * size * 2];
@@ -111,31 +106,24 @@ public class Game
     private boolean recursivePaint(final Board base, final short coord, final Color color)
     {
         chainLibertyBoard.set(coord, color);
-        final Bytes<ByteBuffer> adj = adjacentBuffers.lease();
-        try
+        long adjs = Adjacent.asVal(coord, base.size());
+        while (Adjacent.iterHasNext(adjs))
         {
-            Coord.adjacents(adj, coord, base.size());
-            while (!adj.isEmpty())
+            final short value = Adjacent.iterPosition(adjs);
+            final Color baseAdjColor = base.get(value);
+            if (baseAdjColor == Color.EMPTY)
             {
-                final short value = adj.readShort();
-                final Color baseAdjColor = base.get(value);
-                if (baseAdjColor == Color.EMPTY)
+//                chainLibertyBoard.set(value, Color.MARK);
+                return true;
+            }
+            else if (baseAdjColor == color && chainLibertyBoard.get(value) == Color.EMPTY)
+            {
+                if (recursivePaint(base, value, color))
                 {
-                    // chainLibertyBoard.set(adj[i], Color.MARK);
                     return true;
                 }
-                else if (baseAdjColor == color && chainLibertyBoard.get(value) == Color.EMPTY)
-                {
-                    if (recursivePaint(base, value, color))
-                    {
-                        return true;
-                    }
-                }
             }
-        }
-        finally
-        {
-            adjacentBuffers.ret(adj);
+            adjs = Adjacent.iterMoveNext(adjs);
         }
         return false;
     }
@@ -188,59 +176,51 @@ public class Game
             int moveKills = 0;
             board.set(move);
 
-            final Bytes<ByteBuffer> adjs = adjacentBuffers.lease();
-            try
+            long adjs = board.adjacentsWithColor(move, playerToPlay.opposite());
+            while (Adjacent.iterHasNext(adjs))
             {
-                board.adjacentsWithColor(adjs, move, playerToPlay.opposite());
-                while (!adjs.isEmpty())
+                final short adj = Adjacent.iterPosition(adjs);
+                if (!markChainAndLiberties(board, adj)) //killed
                 {
-                    final short adj = adjs.readShort();
-                    if (!markChainAndLiberties(board, adj)) //killed
+                    if (!killsOccured)
                     {
-                        if (!killsOccured)
-                        {
-                            board.copyTo(altBoard); // lazy makes a copy of the board, just in case it has to be rollback for a superKo
-                            altBoard.set(Move.X(move), Move.Y(move), Color.EMPTY);
-                            killsOccured = true;
-                        }
-                        moveKills += board.extract(chainLibertyBoard);
+                        board.copyTo(altBoard); // lazy makes a copy of the board, just in case it has to be rollback for a superKo
+                        altBoard.set(Move.X(move), Move.Y(move), Color.EMPTY);
+                        killsOccured = true;
                     }
+                    moveKills += board.extract(chainLibertyBoard);
                 }
+                adjs = Adjacent.iterMoveNext(adjs);
+            }
 
-                if (killsOccured)
+            if (killsOccured)
+            {
+                if (isSuperKo(board.hashCode()))
                 {
-                    if (isSuperKo(board.hashCode()))
+                    altBoard.copyTo(board);
+                    return false;
+                }
+                superKos[lastSuperKoP++] = altBoard.hashCode();
+            }
+            else
+            {
+                if (!Adjacent.iterHasNext(board.adjacentsWithColor(move, Color.EMPTY)))
+                {
+                    if (!markChainAndLiberties(board, move)) // suicide?
                     {
-                        altBoard.copyTo(board);
+                        board.set(Move.X(move), Move.Y(move), Color.EMPTY); //undo
                         return false;
                     }
-                    superKos[lastSuperKoP++] = altBoard.hashCode();
-                }
-                else
-                {
-                    board.adjacentsWithColor(adjs, move, Color.EMPTY);
-                    if (adjs.isEmpty())
-                    {
-                        if (!markChainAndLiberties(board, move)) // suicide?
-                        {
-                            board.set(Move.X(move), Move.Y(move), Color.EMPTY); //undo
-                            return false;
-                        }
-                    }
-                }
-                // latest accounts and moves
-                if (playerToPlay == Color.WHITE)
-                {
-                    blackDeaths += moveKills;
-                }
-                else
-                {
-                    whiteDeaths = moveKills;
                 }
             }
-            finally
+            // latest accounts and moves
+            if (playerToPlay == Color.WHITE)
             {
-                adjacentBuffers.ret(adjs);
+                blackDeaths += moveKills;
+            }
+            else
+            {
+                whiteDeaths = moveKills;
             }
         }
 
