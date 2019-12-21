@@ -140,7 +140,12 @@ public final class Adjacent
 
     public static long iterReset(final long adjs)
     {
-        return (adjs & 0xffff0000) + (adjs & 0b11110000);
+        long adjs2 = (adjs & 0xffff0000) + (adjs & 0b11110000);
+        if (!readIterFlag(adjs2, (byte) 0))  // first position unset?
+        {
+            adjs2 = iterMoveNext(adjs2);
+        }
+        return adjs2;
     }
 
     public static short iterPosition(final long adjs)
@@ -169,4 +174,10 @@ public final class Adjacent
         return Coord.INVALID;
     }
 
+    public static long iterUnset(final long adjs)
+    {
+        final byte pos = readIterPosition(adjs);
+        final byte flags = (byte) (adjs & 0b11110000 ^ (0b1 << (7 - pos)));
+        return (adjs & 0xffff0000) + (flags & 0b11110000) + pos;
+    }
 }
