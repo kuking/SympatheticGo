@@ -114,6 +114,7 @@ public final class Coord
      * @param boardSize
      * @return
      */
+    @Deprecated
     public static byte adjacents(final short[] result, final short coord, final byte boardSize)
     {
         int c = 0;

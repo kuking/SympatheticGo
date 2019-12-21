@@ -105,6 +105,7 @@ public class Board
         toBoard.board.writePosition(0).write(board.readPosition(0));
     }
 
+    @Deprecated
     public byte adjacentsWithColor(final short[] arr, final short coord, final Color color)
     {
         byte res = Coord.adjacents(arr, coord, size);
@@ -137,6 +138,7 @@ public class Board
         return res;
     }
 
+    @Deprecated
     public void adjacentsWithColor(final Bytes<ByteBuffer> adjs, final short coord, final Color color)
     {
         Coord.adjacents(adjs, coord, size);
