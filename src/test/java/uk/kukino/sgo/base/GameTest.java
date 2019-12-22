@@ -1,4 +1,4 @@
-package uk.kukino.sgo;
+package uk.kukino.sgo.base;
 
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;

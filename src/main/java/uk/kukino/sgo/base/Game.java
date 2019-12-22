@@ -1,4 +1,4 @@
-package uk.kukino.sgo;
+package uk.kukino.sgo.base;
 
 import java.util.Arrays;
 
@@ -89,8 +89,8 @@ public class Game
 
     /***
      *
-     * @param base
-     * @param coord
+     * @param base base board
+     * @param coord coordinate to start
      * @return true if alive (and partially marked)
      */
     private boolean markChainAndLiberties(final Board base, final short coord)
@@ -220,7 +220,7 @@ public class Game
             while (Adjacent.iterHasNext(adjs))
             {
                 final short adj = Adjacent.iterPosition(adjs);
-                if (!nonRecursiveMarkChainAndLiberties(board, adj)) //killed
+                if (!markChainAndLiberties(board, adj)) //killed
                 {
                     if (!killsOccured)
                     {
@@ -246,7 +246,7 @@ public class Game
             {
                 if (!Adjacent.iterHasNext(board.adjacentsWithColor(move, Color.EMPTY)))
                 {
-                    if (!nonRecursiveMarkChainAndLiberties(board, move)) // suicide?
+                    if (!markChainAndLiberties(board, move)) // suicide?
                     {
                         board.set(Move.X(move), Move.Y(move), Color.EMPTY); //undo
                         return false;
@@ -378,7 +378,7 @@ public class Game
         throw new IllegalArgumentException("I don't count dead stones for: " + color);
     }
 
-    boolean finished()
+    public boolean finished()
     {
         return finished;
     }

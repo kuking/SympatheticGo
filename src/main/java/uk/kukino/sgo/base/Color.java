@@ -1,11 +1,11 @@
-package uk.kukino.sgo;
+package uk.kukino.sgo.base;
 
 public enum Color
 {
     EMPTY((byte) 0, '.'), BLACK((byte) 1, 'X'), WHITE((byte) 2, 'O'), MARK((byte) 3, '*');
 
-    final byte b;
-    final char symbol;
+    public final byte b;
+    public final char symbol;
 
     Color(final byte value, final char sym)
     {

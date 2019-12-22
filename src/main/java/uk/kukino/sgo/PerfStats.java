@@ -1,6 +1,7 @@
 package uk.kukino.sgo;
 
 import net.openhft.affinity.AffinityLock;
+import uk.kukino.sgo.base.Game;
 
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;

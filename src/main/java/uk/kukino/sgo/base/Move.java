@@ -1,4 +1,6 @@
-package uk.kukino.sgo;
+package uk.kukino.sgo.base;
+
+import uk.kukino.sgo.util.Parsing;
 
 import java.util.SplittableRandom;
 
@@ -10,9 +12,11 @@ public final class Move
     //         1111111111111111 = Invalid
     //         CC00000000000000 = Pass
 
-    static final short INVALID = 0xffffffff;
+    public static final short INVALID = 0xffffffff;
+    public static final SplittableRandom RND = new SplittableRandom(System.currentTimeMillis());
 
-    static final SplittableRandom RND = new SplittableRandom(System.currentTimeMillis());
+    private static final short BLACK_PASS = move((byte) 127, (byte) 127, Color.BLACK);
+    private static final short WHITE_PASS = move((byte) 127, (byte) 127, Color.WHITE);
 
     private Move()
     {
@@ -118,7 +122,15 @@ public final class Move
 
     public static short pass(final Color color)
     {
-        return move((byte) 127, (byte) 127, color);
+        if (color == Color.WHITE)
+        {
+            return WHITE_PASS;
+        }
+        else if (color == Color.BLACK)
+        {
+            return BLACK_PASS;
+        }
+        throw new IllegalArgumentException("Can't build a pass move with color" + color);
     }
 
     public static byte X(final short value)
@@ -138,9 +150,7 @@ public final class Move
 
     public static boolean isPass(final short value)
     {
-        return color(value) != Color.EMPTY &&
-            Move.X(value) == (short) 127 &&
-            Move.Y(value) == (short) 127;
+        return value == WHITE_PASS || value == BLACK_PASS;
     }
 
     public static short random(final byte size, final Color color)

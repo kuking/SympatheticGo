@@ -1,6 +1,7 @@
-package uk.kukino.sgo;
+package uk.kukino.sgo.base;
 
 import net.openhft.chronicle.bytes.Bytes;
+import uk.kukino.sgo.util.Parsing;
 
 import java.nio.ByteBuffer;
 
@@ -12,7 +13,7 @@ public final class Coord
     //         1111111111111111 = Invalid
     //         CC00000000000000 = Pass
 
-    static final short INVALID = 0xffffffff;
+    public static final short INVALID = 0xffffffff;
 
     private Coord()
     {

@@ -1,4 +1,4 @@
-package uk.kukino.sgo;
+package uk.kukino.sgo.base;
 
 import net.openhft.chronicle.bytes.Bytes;
 import org.junit.jupiter.api.Test;

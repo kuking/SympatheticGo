@@ -1,4 +1,4 @@
-package uk.kukino.sgo;
+package uk.kukino.sgo.util;
 
 public class Parsing
 {

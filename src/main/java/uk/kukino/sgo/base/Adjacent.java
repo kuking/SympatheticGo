@@ -1,4 +1,4 @@
-package uk.kukino.sgo;
+package uk.kukino.sgo.base;
 
 public final class Adjacent
 {
