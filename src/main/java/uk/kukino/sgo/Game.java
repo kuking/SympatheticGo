@@ -14,6 +14,7 @@ public class Game
     private int blackDeaths;
     private int whiteDeaths;
     private short[] moves;
+    private long[] paintBuf;
     private int[] superKos;
     private int lastSuperKoP;
     private boolean finished;
@@ -42,6 +43,7 @@ public class Game
         superKos = new int[size * 2];
         Arrays.fill(superKos, Move.INVALID);
         lastSuperKoP = 0;
+        paintBuf = new long[size * size];
         finished = false;
 
         komi = komiX10;
@@ -102,7 +104,6 @@ public class Game
         return recursivePaint(base, coord, color);
     }
 
-    // used by markChainAndLiberties, with its optimisations
     private boolean recursivePaint(final Board base, final short coord, final Color color)
     {
         chainLibertyBoard.set(coord, color);
@@ -125,6 +126,46 @@ public class Game
             adjs = Adjacent.iterMoveNext(adjs);
         }
         return false;
+    }
+
+    private boolean nonRecursiveMarkChainAndLiberties(final Board base, final short firstCoord)
+    {
+        final Color color = base.get(firstCoord);
+        if (color == Color.EMPTY)
+        {
+            return true;
+        }
+        chainLibertyBoard.clear();
+
+        int paintBufIdx = 0;
+        chainLibertyBoard.set(firstCoord, color);
+        paintBuf[paintBufIdx] = Adjacent.asVal(firstCoord, base.size());
+
+        while (paintBufIdx != -1) // points to the last usable position, easier so no constant maths
+        {
+            if (Adjacent.iterHasNext(paintBuf[paintBufIdx]))
+            {
+                final short adjCoord = Adjacent.iterPosition(paintBuf[paintBufIdx]);
+                paintBuf[paintBufIdx] = Adjacent.iterMoveNext(paintBuf[paintBufIdx]);
+                final Color baseAdjColor = base.get(adjCoord);
+                if (baseAdjColor == Color.EMPTY)
+                {
+                    return true;
+                }
+                else if (baseAdjColor == color && chainLibertyBoard.get(adjCoord) == Color.EMPTY)
+                {
+                    paintBufIdx++;
+                    chainLibertyBoard.set(adjCoord, color);
+                    paintBuf[paintBufIdx] = Adjacent.asVal(adjCoord, base.size());
+                }
+            }
+            else
+            {
+                paintBufIdx -= 1;
+            }
+
+        }
+        return false; // all painted without finding an empty border in the base board, dead
     }
 
     private boolean isOKMove(final short move)
@@ -179,7 +220,7 @@ public class Game
             while (Adjacent.iterHasNext(adjs))
             {
                 final short adj = Adjacent.iterPosition(adjs);
-                if (!markChainAndLiberties(board, adj)) //killed
+                if (!nonRecursiveMarkChainAndLiberties(board, adj)) //killed
                 {
                     if (!killsOccured)
                     {
@@ -205,7 +246,7 @@ public class Game
             {
                 if (!Adjacent.iterHasNext(board.adjacentsWithColor(move, Color.EMPTY)))
                 {
-                    if (!markChainAndLiberties(board, move)) // suicide?
+                    if (!nonRecursiveMarkChainAndLiberties(board, move)) // suicide?
                     {
                         board.set(Move.X(move), Move.Y(move), Color.EMPTY); //undo
                         return false;
