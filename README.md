@@ -5,19 +5,6 @@ This aims to be hardware symphatetic, allocation & GC free, and run in L1.
 
 Some ideas from http://mechanical-sympathy.blogspot.com and some libraries from https://github.com/OpenHFT.
 
-Stats so far:
-
-| Size| Processor     | # Threads  | Ply/s | 1 Ply (avg)   |
-|-----|---------------|------------|-------|---------------|
-| 9x9 | i7-8559U      | 1          | 20k   | 50.769μs      |
-| 9x9 | i7-8559U      | 4 (=cores) | 64k   | 15.442μs      |
-| 9x9 | i7-8559U      | 8          | 82k   | 12.146μs      |
-| 9x9 | Ryzen 7 3800X | 1          | 21k   | 47.160μs      |  
-| 9x9 | Ryzen 7 3800X | 8 (=cores) | 101k  | 9.816μs       |               
-| 9x9 | Ryzen 7 3800X | 16         | 140k  | 7.133μs       |
-
-The fact we get more processing from using hyper-threads needs further investigation.
-
 ```
 $ sysctl -n machdep.cpu.brand_string
 Intel(R) Core(TM) i7-8559U CPU @ 2.70GHz
