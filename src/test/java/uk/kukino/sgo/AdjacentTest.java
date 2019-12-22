@@ -157,6 +157,12 @@ public class AdjacentTest
         assertPositions(adjs, "A6", "B5", "A4");
     }
 
+    @Test
+    public void canonicalEmptyIterator()
+    {
+        assertFalse(Adjacent.iterHasNext(Adjacent.EMPTY_ITERATOR));
+        assertThat(Adjacent.iterPosition(Adjacent.EMPTY_ITERATOR), equalTo(Coord.INVALID));
+    }
     // util
 
     public static long assertPositions(long adjs, String... positions)

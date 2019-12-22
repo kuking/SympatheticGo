@@ -20,6 +20,7 @@ public final class Adjacent
      */
 
     private static final byte ITER_END_VALUE = (byte) 7;
+    public static final byte EMPTY_ITERATOR = ITER_END_VALUE;
 
     private Adjacent()
     {
