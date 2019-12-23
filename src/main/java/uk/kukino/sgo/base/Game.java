@@ -14,7 +14,7 @@ public class Game
     private int blackDeaths;
     private int whiteDeaths;
     private short[] moves;
-    private long[] paintBuf;
+    private int[] paintBuf;
     private int[] superKos;
     private int lastSuperKoP;
     private boolean finished;
@@ -43,7 +43,7 @@ public class Game
         superKos = new int[size * 2];
         Arrays.fill(superKos, Move.INVALID);
         lastSuperKoP = 0;
-        paintBuf = new long[size * size];
+        paintBuf = new int[size * size];
         finished = false;
 
         komi = komiX10;
@@ -107,7 +107,7 @@ public class Game
     private boolean recursivePaint(final Board base, final short coord, final Color color)
     {
         chainLibertyBoard.set(coord, color);
-        long adjs = Adjacent.asVal(coord, base.size());
+        int adjs = Adjacent.asVal(coord, base.size());
         while (Adjacent.iterHasNext(adjs))
         {
             final short adjCoord = Adjacent.iterPosition(adjs);
@@ -216,7 +216,7 @@ public class Game
             int moveKills = 0;
             board.set(move);
 
-            long adjs = board.adjacentsWithColor(move, playerToPlay.opposite());
+            int adjs = board.adjacentsWithColor(move, playerToPlay.opposite());
             while (Adjacent.iterHasNext(adjs))
             {
                 final short adj = Adjacent.iterPosition(adjs);

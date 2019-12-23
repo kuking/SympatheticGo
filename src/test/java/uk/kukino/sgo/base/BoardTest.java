@@ -96,7 +96,7 @@ public class BoardTest
         board.set(Move.parseToVal("W C17"));
         board.set(Move.parseToVal("B B18"));
 
-        long adjs = board.adjacentsWithColor(Coord.parseToVal("B17"), Color.BLACK);
+        int adjs = board.adjacentsWithColor(Coord.parseToVal("B17"), Color.BLACK);
         AdjacentTest.assertPositions(adjs, "B18");
 
         adjs = board.adjacentsWithColor(Coord.parseToVal("B17"), Color.WHITE);

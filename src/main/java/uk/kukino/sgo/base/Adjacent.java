@@ -3,7 +3,7 @@ package uk.kukino.sgo.base;
 public final class Adjacent
 {
     /*
-        Long = 0123456789abcdef0123456789abcdef
+         Int = 0123456789abcdef0123456789abcdef
                |centre coord. |        NESW0nnn
 
         N|E|S|W = bit determining if that position 'exist' in the Adjacents iterator
@@ -11,7 +11,7 @@ public final class Adjacent
 
         Semantics like this:
 
-        long adjs = Adjacent.asVal(Coord.parseToVal("E5"), (byte) 9);
+        int adjs = Adjacent.asVal(Coord.parseToVal("E5"), (byte) 9);
         while (Adjacent.iterHasNext(adjs))
         {
             short adj = Adjacent.iterPosition(adjs);
@@ -26,7 +26,7 @@ public final class Adjacent
     {
     }
 
-    private static long build(final short coord, final boolean N, final boolean E, final boolean S, final boolean W, final byte iterPos)
+    private static int build(final short coord, final boolean N, final boolean E, final boolean S, final boolean W, final byte iterPos)
     {
         byte result = 0;
         if (N)
@@ -48,7 +48,7 @@ public final class Adjacent
         return (coord << 16) + (result & 0b11110000) + iterPos;
     }
 
-    public static long asVal(short coord, byte size)
+    public static int asVal(short coord, byte size)
     {
         final byte x = Coord.X(coord);
         final byte y = Coord.Y(coord);
@@ -82,7 +82,7 @@ public final class Adjacent
         return build(coord, N, E, S, W, iterPos);
     }
 
-    public static String valToStr(final long adjs)
+    public static String valToStr(final int adjs)
     {
         return "{" + Coord.shortToString(readIterCentre(adjs)) + " " +
             (readIterFlag(adjs, (byte) 0) ? 'N' : '.') +
@@ -96,27 +96,27 @@ public final class Adjacent
 
     // Iterator impl
 
-    private static byte readIterPosition(final long adjs)
+    private static byte readIterPosition(final int adjs)
     {
         return (byte) (adjs & 0b111);
     }
 
-    private static boolean readIterFlag(final long adjs, final byte flag)
+    private static boolean readIterFlag(final int adjs, final byte flag)
     {
         return (((adjs & 0b11110000) >> (7 - flag)) & 0b1) == 0b1;
     }
 
-    private static short readIterCentre(final long adjs)
+    private static short readIterCentre(final int adjs)
     {
         return (short) ((adjs >> 16) & 0xffff);
     }
 
-    public static boolean iterHasNext(final long adjs)
+    public static boolean iterHasNext(final int adjs)
     {
         return readIterPosition(adjs) != ITER_END_VALUE;
     }
 
-    public static long iterMoveNext(final long adjs)
+    public static int iterMoveNext(final int adjs)
     {
         byte pos = (byte) (readIterPosition(adjs) + 1);
         while (pos < 5 && !readIterFlag(adjs, pos))
@@ -130,9 +130,9 @@ public final class Adjacent
         return (adjs & 0xffff0000) + (adjs & 0b11110000) + pos;
     }
 
-    public static long iterReset(final long adjs)
+    public static int iterReset(final int adjs)
     {
-        long adjs2 = (adjs & 0xffff0000) + (adjs & 0b11110000);
+        int adjs2 = (adjs & 0xffff0000) + (adjs & 0b11110000);
         if (!readIterFlag(adjs2, (byte) 0))  // first position unset?
         {
             adjs2 = iterMoveNext(adjs2);
@@ -140,7 +140,7 @@ public final class Adjacent
         return adjs2;
     }
 
-    public static short iterPosition(final long adjs)
+    public static short iterPosition(final int adjs)
     {
         final byte pos = readIterPosition(adjs);
         final short centre = (short) (adjs >>> 16);
@@ -166,7 +166,7 @@ public final class Adjacent
         return Coord.INVALID;
     }
 
-    public static long iterUnset(final long adjs)
+    public static int iterUnset(final int adjs)
     {
         final byte pos = readIterPosition(adjs);
         final byte flags = (byte) (adjs & 0b11110000 ^ (0b1 << (7 - pos)));

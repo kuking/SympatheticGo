@@ -144,9 +144,9 @@ public class Board
     }
 
 
-    public long adjacentsWithColor(final short coord, final Color color)
+    public int adjacentsWithColor(final short coord, final Color color)
     {
-        long adjs = Adjacent.asVal(coord, size);
+        int adjs = Adjacent.asVal(coord, size);
         while (Adjacent.iterHasNext(adjs))
         {
             if (get(Adjacent.iterPosition(adjs)) != color)
