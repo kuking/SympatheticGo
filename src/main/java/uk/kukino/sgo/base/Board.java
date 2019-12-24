@@ -116,13 +116,13 @@ public class Board
 
     public short emptyRandom()
     {
-        final int maxSize = linealSize();
-        final int center = Move.RND.nextInt(maxSize);
+        final int linealSize = linealSize();
+        final int center = Move.RND.nextInt(linealSize);
         int delta = 0;
         boolean inc = true;
         while (true)
         {
-            if ((center + delta < maxSize) && (center + delta >= 0) && getLineal(center + delta) == Color.EMPTY)
+            if ((center + delta < linealSize) && (center + delta >= 0) && getLineal(center + delta) == Color.EMPTY)
             {
                 return Coord.XY((byte) ((center + delta) % size), (byte) ((center + delta) / size));
             }
@@ -130,7 +130,7 @@ public class Board
             {
                 delta = -delta;
                 delta++;
-                if (delta > maxSize / 2)
+                if (delta > linealSize / 2)
                 {
                     return Move.INVALID;
                 }
@@ -297,7 +297,7 @@ public class Board
             a = (a + board.readByte()) % modAdler;
             b = (b + a) % modAdler;
         }
-        return (b << 16) | a;
+        return (b << 16) | (a & 0xffff);
     }
 
     @Override
