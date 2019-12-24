@@ -202,7 +202,13 @@ public class Board
     public void clear()
     {
         board.writePosition(0);
-        for (int i = 0; i < boardSize; i++)
+        int s = boardSize;
+        while (s > 8)
+        {
+            board.writeLong(0);
+            s -= 8;
+        }
+        while (s-- > 0)
         {
             board.writeByte((byte) 0);
         }
