@@ -217,6 +217,33 @@ public class GameTest
         assertSame(game.getBoard().get("j9"), Color.EMPTY);
         assertSame(game.getBoard().get("j10"), Color.WHITE);
         assertSame(game.getBoard().get("k9"), Color.WHITE);
+        assertThat(game.deadStones(Color.BLACK), equalTo(6));
+        assertThat(game.deadStones(Color.WHITE), equalTo(0));
+    }
+
+    @Test
+    public void simplestKillThenDoubleKillInverted()
+    {
+        //    A B C D E F G H J K L M N O P Q R S T
+        //  1 X . . . . . . . . . . . . . . . . . . 1
+        // ....
+        //  7 . . . . . . . . . . . . . . . . . . . 7
+        //  8 . . . O . . . . X X . . . . . . . . . 8
+        //  9 . . . O . . . X . X X . . . . . . . . 9
+        // 10 . . . O . . . X X . X . . . . . . . . 0
+        // 11 . . . O . . . . X X . . . . . . . . . 1
+        // 12 . . . . . . . . . . . . . . . . . . . 2
+
+        game = given19x19Game();
+        assertAllValid(game, Lists.newArrayList("b a1", "w k10", "b l10", "w k9", "b l9", "w j10", "b k11", "w j9",
+            "b j11", "w d10", "b h10", "w d9", "b h9", "w d8", "b j8", "w d11", "b k8"/* eat 4 */, "w k10",
+            "b j10", "w j9", "b k9" /* eat 2 different groups */));
+        assertSame(game.getBoard().get("k10"), Color.EMPTY);
+        assertSame(game.getBoard().get("j9"), Color.EMPTY);
+        assertSame(game.getBoard().get("j10"), Color.BLACK);
+        assertSame(game.getBoard().get("k9"), Color.BLACK);
+        assertThat(game.deadStones(Color.BLACK), equalTo(0));
+        assertThat(game.deadStones(Color.WHITE), equalTo(6));
     }
 
     @Test

@@ -258,7 +258,7 @@ public class Game
             }
             else
             {
-                whiteDeaths = moveKills;
+                whiteDeaths += moveKills;
             }
         }
 
