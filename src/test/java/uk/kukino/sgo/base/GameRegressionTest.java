@@ -1,5 +1,6 @@
 package uk.kukino.sgo.base;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import uk.kukino.sgo.sgf.SGFReader;
 
@@ -69,9 +70,11 @@ public class GameRegressionTest
     }
 
     @Test
-    public void test_5_ea922d76bfb7d7c376ed05b4af1561bf1f949221() throws IOException
+    @Disabled
+    public void test_5_ea922d76bfb7d7c376ed05b4af1561bf1f949221_a_real_superKO() throws IOException
     {
-        // src: ea922d76bfb7d7c376ed05b4af1561bf1f949221  kgs/KGS2004/2004-09-21-24.sgf
+        // src: ea922d76bfb7d7c376ed05b4af1561bf1f949221  KGS2004/2004-09-21-24.sgf
+        // move 317 is really a superKO! Looks like KGS was not implementing it property back in 2004.
         assertAllMovesAreValid("(;GM[1]FF[4]SZ[19]KM[6.50] ; B[pd];W[dc];B[pp];W[cp];B[de];W[qn];B[ec];W[eb];B[ed];W[fc];B[fb];W[gb]" +
             ";B[db];W[fa];B[cc];W[nq];B[np];W[mp];B[no];W[oq];B[pq];W[pm];B[qo];W[ro];B[pn];W[rn];B[rp];W[nm];B[mn];W[kq];B[pr];W[qi]" +
             ";B[fd];W[gd];B[ge];W[he];B[hd];W[gc];B[id];W[ie];B[jd];W[je];B[kd];W[ib];B[ke];W[ig];B[kg];W[kb];B[qg];W[gf];B[fe];W[qc]" +
@@ -92,6 +95,25 @@ public class GameRegressionTest
             ";B[om];W[qp];B[jo];W[qa];B[rp];W[rs];B[ap];W[pa];B[ss];W[on];B[jn];W[ob];B[om];W[qp];B[pb];W[rs];B[rp];W[ob];B[ss];W[on]" +
             ";B[pb];W[pj];B[ob];W[al];B[kf];W[];B[om];W[qp];B[jm];W[];B[rp];W[rs];B[ho];W[];B[ss];W[on];B[jp];W[];B[om];W[qp];B[ic];" +
             "W[];B[rp];W[rs];B[];W[])");
+    }
+
+    @Test
+    @Disabled
+    public void test_6_b4344ab70911bd4a3a90fa17d1bae61209298b7e_another_real_superKO() throws IOException
+    {
+        // it does not seems KGO implements SuperKO.
+        // src: b4344ab70911bd4a3a90fa17d1bae61209298b7e  kgs-19-2019-01-new/2019-01-01-1.sgf
+        assertAllMovesAreValid("(;GM[1]FF[4]SZ[19]KM[0.50] ; B[pd];W[dp];B[pp];W[dd];B[fq];W[cn];B[fc];W[ec];B[fd];W[df];B[jc];W[qn]" +
+            ";B[nq];W[mp];B[np];W[mn];B[mo];W[lo];B[no];W[ln];B[dq];W[cq];B[cr];W[eq];B[dr];W[ep];B[er];W[nn];B[qi];W[bq];B[hq];W[qc]" +
+            ";B[qd];W[pc];B[oc];W[ob];B[nb];W[nc];B[od];W[mb];B[pb];W[na];B[qb];W[hc];B[hd];W[ph];B[pi];W[rc];B[rb];W[rf];B[re];W[oh]" +
+            ";B[oi];W[nh];B[ni];W[mh];B[lj];W[ic];B[id];W[jb];B[kb];W[kc];B[jd];W[hb];B[kh];W[me];B[mf];W[ne];B[md];W[le];B[nd];W[kd]" +
+            ";B[ke];W[kf];B[je];W[ld];B[lf];W[jg];B[nf];W[oe];B[of];W[pe];B[kg];W[qe];B[rd];W[jf];B[ih];W[hg];B[jh];W[gf];B[qg];W[qf]" +
+            ";B[dc];W[cc];B[db];W[ed];B[eb];W[cb];B[ef];W[eg];B[cd];W[ce];B[fe];W[ff];B[ee];W[de];B[dg];W[cg];B[fg];W[dh];B[eh];W[dg]" +
+            ";B[gg];W[gh];B[hf];W[fh];B[ig];W[qh];B[rg];W[rh];B[bd];W[bc];B[qp];W[ri];B[qk];W[ho];B[go];W[gp];B[hp];W[gn];B[io];W[fo]" +
+            ";B[in];W[ql];B[rj];W[lk];B[rl];W[kj];B[li];W[jk];B[hm];W[mk];B[hk];W[rm];B[pl];W[pm];B[qm];W[he];B[ie];W[ql];B[ja];W[ol]" +
+            ";B[qm];W[if];B[hf];W[ql];B[lb];W[ia];B[ib];W[sl];B[qm];W[sj];B[ql];W[ro];B[pg];W[rp];B[rq];W[rr];B[sq];W[sg];B[pn];W[po]" +
+            ";B[on];W[oo];B[om];W[nm];B[pm];W[qq];B[qo];W[pq];B[rn];W[sn];B[sm];W[jb];B[mc];W[rm];B[sk];W[rk];B[sm];W[lc];B[nb];W[rm]" +
+            ";B[sk];W[nc];B[ib];W[rk];B[sm];W[jb];B[nb];W[rm];B[sk];W[nc];B[ib];W[rk];B[sm];W[jb])");
     }
 
     private void assertAllMovesAreValid(String sgf) throws IOException
