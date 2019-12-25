@@ -202,8 +202,6 @@ public class Game
         {
             return false;
         }
-        boolean killsOccured = false;
-
         if (Move.isPass(move))
         {
             if (lastMove > 0 && Move.isPass(moves[lastMove - 1]))
@@ -222,25 +220,25 @@ public class Game
                 final short adj = Adjacent.iterPosition(adjs);
                 if (!nonRecursiveMarkChainAndLiberties(board, adj)) //killed
                 {
-                    if (!killsOccured)
+                    if (moveKills == 0)
                     {
-                        board.copyTo(stashBoard); // lazy makes a copy of the board, just in case it has to be rollback for a superKo
+                        // lazily makes a copy of the board, just in case it has to be rollback due to a superKo
+                        board.copyTo(stashBoard);
                         stashBoard.set(Move.X(move), Move.Y(move), Color.EMPTY);
-                        killsOccured = true;
                     }
                     moveKills += board.extract(chainLibertyBoard);
                 }
                 adjs = Adjacent.iterMoveNext(adjs);
             }
 
-            if (killsOccured)
+            if (moveKills > 0)
             {
                 if (isSuperKo(board.hashCode()))
                 {
                     stashBoard.copyTo(board);
                     return false;
                 }
-                superKos[lastSuperKoP++ % superKos.length] = board.hashCode();
+                superKos[lastSuperKoP++ % superKos.length] = stashBoard.hashCode();
             }
             else
             {
@@ -272,7 +270,7 @@ public class Game
 
     private boolean isSuperKo(final int hash)
     {
-        for (int i = 0; i < lastSuperKoP % superKos.length; i++)
+        for (int i = 0; i < Math.min(lastSuperKoP, superKos.length); i++)
         {
             if (superKos[i] == hash)
             {
