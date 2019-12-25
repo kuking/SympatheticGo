@@ -16,10 +16,11 @@ import java.util.concurrent.ForkJoinTask;
 public class TranspositionTable
 {
     private static final int BOARD_SIZE = 9;
+    private static final byte KOMI = 45;
     private static final int THREADS = Runtime.getRuntime().availableProcessors();
 
     private final ForkJoinPool POOL = new ForkJoinPool(THREADS);
-    private Buffers<Game> buffers = new Buffers<>(THREADS * 8, () -> new Game((byte) BOARD_SIZE, (byte) 0, (byte) 45));
+    private Buffers<Game> buffers = new Buffers<>(THREADS * 8, () -> new Game((byte) BOARD_SIZE, (byte) 0, KOMI));
 
     public static class Stats
     {
@@ -80,7 +81,7 @@ public class TranspositionTable
             {
                 for (byte y = 0; y < BOARD_SIZE; y++)
                 {
-                    if (game.getBoard().get(x, y) == Color.EMPTY) //XXX: do better than just empty
+                    if (game.getBoard().get(x, y) == Color.EMPTY && played < games)
                     {
                         final Game startGame = buffers.lease();
                         game.copyTo(startGame);
@@ -170,7 +171,7 @@ public class TranspositionTable
     public static void main(final String[] args)
     {
         TranspositionTable table = new TranspositionTable();
-        final Game game = new Game((byte) BOARD_SIZE, (byte) 0, (byte) 55);
+        final Game game = new Game((byte) BOARD_SIZE, (byte) 0, KOMI);
 
 //        game.play(Move.parseToVal("Black E5"));
 //        game.play(Move.parseToVal("White A1"));
