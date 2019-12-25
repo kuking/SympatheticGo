@@ -61,7 +61,7 @@ public class SGFReaderTest
                 assertThat(header.blackName, equalTo("Black"));
                 assertThat(header.whiteName, equalTo("White"));
                 assertThat(header.handicap, equalTo((byte) 0));
-                assertThat(header.komiX10, equalTo((byte) 55));
+                assertThat(header.komi, equalTo(5.5f));
                 assertThat(header.dateTime, equalTo(LocalDateTime.parse("1999-07-21T12:00")));
                 assertThat(header.timeLimitSecs, equalTo(1800));
                 assertThat(header.rules, equalTo(Rule.Japanese));
@@ -91,7 +91,7 @@ public class SGFReaderTest
                 assertThat(header.blackRank.toString(), equalTo("15k"));
                 assertThat(header.whiteRank.toString(), equalTo("9d"));
                 assertThat(header.handicap, equalTo((byte) 0)); // default
-                assertThat(header.komiX10, equalTo((byte) 55));
+                assertThat(header.komi, equalTo(5.5f));
                 assertThat(header.dateTime, nullValue());
                 assertThat(header.timeLimitSecs, equalTo(0));
                 assertThat(header.rules, equalTo(Rule.Japanese));
@@ -185,6 +185,25 @@ public class SGFReaderTest
         );
         assertThat(headers, hasSize(2));
         assertThat(nodes, hasSize(4));
+    }
+
+    @Test
+    public void odditiesFoundInSGFDB() throws IOException
+    {
+        var sgfR = new StringReader(
+            "(;KM[-50.00];B[]W[])");
+        underTest.parse(sgfR, header ->
+            {
+                assertThat(header.komi, equalTo(-50.0f));
+                headers.add(header.clone());
+            },
+            node ->
+            {
+                nodes.add(node.clone());
+            }
+        );
+        assertThat(headers, hasSize(1));
+        assertThat(nodes, hasSize(1));
     }
 
     private void assertMoves(final String... moves)

@@ -127,8 +127,7 @@ public class SGFReader
                 header.handicap = (byte) readIntegerValue();
                 break;
             case Komi:
-                final var fval = readFloatValue();
-                header.komiX10 = (byte) (fval * 10f);
+                header.komi = readFloatValue();
                 break;
             case Date:
                 final var dateTimeCs = readCharSequenceValue();
@@ -138,7 +137,14 @@ public class SGFReader
                 }
                 catch (final DateTimeParseException e)
                 {
-                    header.dateTime = LocalDateTime.of(LocalDate.parse(dateTimeCs), LocalTime.NOON); // here it should throw
+                    try
+                    {
+                        header.dateTime = LocalDateTime.of(LocalDate.parse(dateTimeCs), LocalTime.NOON); // here it should throw
+                    }
+                    catch (final DateTimeParseException e2)
+                    {
+                        throwWithDetails("Can't parse date: '" + dateTimeCs + "'");
+                    }
                 }
                 break;
             case TimeLimit:
@@ -162,9 +168,21 @@ public class SGFReader
             case Result:
                 header.result = Result.fromCs(readCharSequenceValue());
                 break;
+            case Round:
+            case Event:
             case OverTime:
+            case BlackTeam:
+            case WhiteTeam:
+                // Round, Event, Overtime, BlackTeam, WhiteTeam : ignored.
                 readCharSequenceValue();
-                // just ignored
+                break;
+            case AddBlack:
+            case AddWhite:
+                readCharSequenceValue();
+                while ((char) peek() == '[')
+                {
+                    readCharSequenceValue();
+                }
                 break;
             case Comment:
                 if (headerConsumed)
@@ -241,8 +259,14 @@ public class SGFReader
     private float readFloatValue() throws IOException
     {
         skipNonPrintable();
+        boolean negative = false;
         long value = 0;
         int decimalPlaces = 0;
+        if ((char) peek() == '-')
+        {
+            read();
+            negative = true;
+        }
         while ((peek() >= '0' && peek() <= '9') || peek() == '.')
         {
             if (decimalPlaces > 0)
@@ -263,6 +287,10 @@ public class SGFReader
         if (read() != ']')
         {
             throwWithDetails("Property does not seems to be a floating point number.");
+        }
+        if (negative)
+        {
+            value = -value;
         }
         return (float) value / (float) decimalPlaces;
     }

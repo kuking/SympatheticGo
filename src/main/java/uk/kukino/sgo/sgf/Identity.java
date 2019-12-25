@@ -4,9 +4,9 @@ public enum Identity
 {
     FileFormat("FF"), Charset("CA"), Application("AP"), Game("GM"), VariationFormat("ST"),
     GameName("GN"), Size("SZ"), Handicap("HA"), Komi("KM"), Date("DT"), TimeLimit("TM"), Rules("RU"), Place("PC"), Result("RE"),
-    OverTime("OT"),
-    BlackName("PB"), WhiteName("PW"), WhiteRank("WR"), BlackRank("BR"),
-    Comment("C"), Black("B"), White("W"),
+    OverTime("OT"), Event("EV"), Round("RO"),
+    BlackName("PB"), WhiteName("PW"), WhiteRank("WR"), BlackRank("BR"), BlackTeam("BT"), WhiteTeam("WT"),
+    Comment("C"), Black("B"), White("W"), AddBlack("AB"), AddWhite("AW"),
     Unknown("??");
 
     int idUp, idLo;

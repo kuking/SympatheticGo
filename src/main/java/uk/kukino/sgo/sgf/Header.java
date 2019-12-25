@@ -20,7 +20,7 @@ public class Header
     int timeLimitSecs; //TM
     Rule rules; //RU
     byte handicap; //HA
-    byte komiX10; //KM
+    float komi; //KM
     Rank blackRank; //BR
     Rank whiteRank; //WR
     CharSequence place; //PC
@@ -59,7 +59,7 @@ public class Header
         timeLimitSecs = 0;
         handicap = 0;
         rules = null;
-        komiX10 = -1;
+        komi = Float.NaN;
         blackRank = null;
         whiteRank = null;
         place = null;
@@ -83,7 +83,7 @@ public class Header
         clone.timeLimitSecs = timeLimitSecs;
         clone.handicap = handicap;
         clone.rules = rules;
-        clone.komiX10 = komiX10;
+        clone.komi = komi;
         clone.blackRank = blackRank == null ? null : blackRank.clone();
         clone.whiteRank = whiteRank == null ? null : whiteRank.clone();
         clone.place = place;
@@ -108,7 +108,7 @@ public class Header
             timeLimitSecs == 0 &&
             rules == null &&
             handicap == 0 &&
-            komiX10 == -1 &&
+            Float.isNaN(komi) &&
             blackRank == null &&
             whiteRank == null &&
             place == null &&

@@ -6,7 +6,7 @@ public class Result
 
     public static final Result fromCs(final CharSequence cs)
     {
-        System.out.println("RE is " + cs);
+//        System.out.println("RE is " + cs);
         return new Result();
     }
 
