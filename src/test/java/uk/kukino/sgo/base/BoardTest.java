@@ -210,7 +210,7 @@ public class BoardTest
         final Board board = new Board((byte) 19);
         board.set(Move.parseToVal("B C12"));
         assertThat(board.toString(), equalTo(
-            "hash: 8519682\n" +
+            "hash: 839910262\n" +
                 "   A B C D E F G H J K L M N O P Q R S T \n" +
                 "19 . . . . . . . . . . . . . . . . . . . 19\n" +
                 "18 . . . . . . . . . . . . . . . . . . . 18\n" +
