@@ -12,32 +12,32 @@ Intel(R) Core(TM) i7-8559U CPU @ 2.70GHz
 $ ./gradlew run
 ===================================================================
 Running 1 concurrent threads with 9x9 games ...
-   thrd.  0:  10942ms,  222222 plys,  20309.08 ply/s, 49.239μs/ply
+   thrd.  0:  10707ms,  222222 plys,  20754.83 ply/s, 48.182μs/ply
 ------------- -------- ------------ ----------------- -------------
-Agr. & avg.:  10942ms,  222222 plys,  20309.08 ply/s, 49.239μs/ply
-Effectively:  11282ms,  222222 plys,  19697.04 ply/s, 50.769μs/ply
+Agr. & avg.:  10707ms,  222222 plys,  20754.83 ply/s, 48.182μs/ply
+Effectively:  10774ms,  222222 plys,  20625.77 ply/s, 48.483μs/ply
 ===================================================================
 Running 2 concurrent threads with 9x9 games ...
-   thrd.  1:  11384ms,  222222 plys,  19520.56 ply/s, 51.228μs/ply
-   thrd.  0:  11393ms,  222222 plys,  19505.13 ply/s, 51.269μs/ply
+   thrd.  1:  10894ms,  222222 plys,  20398.57 ply/s, 49.023μs/ply
+   thrd.  0:  10909ms,  222222 plys,  20370.52 ply/s, 49.091μs/ply
 ------------- -------- ------------ ----------------- -------------
-Agr. & avg.:  22777ms,  222222 plys,  19512.84 ply/s, 51.248μs/ply
-Effectively:  11395ms,  444444 plys,  39003.42 ply/s, 25.639μs/ply
+Agr. & avg.:  21803ms,  222222 plys,  20384.53 ply/s, 49.057μs/ply
+Effectively:  10911ms,  444444 plys,  40733.57 ply/s, 24.550μs/ply
 ===================================================================
 [...]
 ===================================================================
 Running 8 concurrent threads with 9x9 games ...
-   thrd.  2:  21409ms,  222222 plys,  10379.84 ply/s, 96.341μs/ply
-   thrd.  3:  21452ms,  222222 plys,  10359.03 ply/s, 96.534μs/ply
-   thrd.  1:  21483ms,  222222 plys,  10344.09 ply/s, 96.674μs/ply
-   thrd.  5:  21484ms,  222222 plys,  10343.60 ply/s, 96.678μs/ply
-   thrd.  4:  21485ms,  222222 plys,  10343.12 ply/s, 96.683μs/ply
-   thrd.  6:  21482ms,  222222 plys,  10344.57 ply/s, 96.669μs/ply
-   thrd.  7:  21502ms,  222222 plys,  10334.95 ply/s, 96.759μs/ply
-   thrd.  0:  21592ms,  222222 plys,  10291.87 ply/s, 97.164μs/ply
+   thrd.  4:  19501ms,  222222 plys,  11395.42 ply/s, 87.755μs/ply
+   thrd.  5:  19514ms,  222222 plys,  11387.82 ply/s, 87.813μs/ply
+   thrd.  2:  19521ms,  222222 plys,  11383.74 ply/s, 87.845μs/ply
+   thrd.  7:  19539ms,  222222 plys,  11373.25 ply/s, 87.926μs/ply
+   thrd.  1:  19572ms,  222222 plys,  11354.08 ply/s, 88.074μs/ply
+   thrd.  0:  19582ms,  222222 plys,  11348.28 ply/s, 88.119μs/ply
+   thrd.  3:  19642ms,  222222 plys,  11313.61 ply/s, 88.389μs/ply
+   thrd.  6:  19761ms,  222222 plys,  11245.48 ply/s, 88.925μs/ply
 ------------- -------- ------------ ----------------- -------------
-Agr. & avg.: 171889ms,  222222 plys,  10342.58 ply/s, 96.688μs/ply
-Effectively:  21592ms, 1777776 plys,  82334.94 ply/s, 12.146μs/ply
+Agr. & avg.: 156632ms,  222222 plys,  11350.02 ply/s, 88.106μs/ply
+Effectively:  19762ms, 1777776 plys,  89959.32 ply/s, 11.116μs/ply
 ```
 
 ```
