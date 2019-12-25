@@ -110,13 +110,13 @@ public class SGFReader
                 break;
 
             case FileFormat:
-                header.fileFormat = (byte) readIntegerValue(false);
+                header.fileFormat = (byte) readIntegerValue();
                 break;
             case Game:
-                header.gameType = GameType.byId(readIntegerValue(false));
+                header.gameType = GameType.byId(readIntegerValue());
                 break;
             case Size:
-                header.size = (byte) readIntegerValue(false);
+                header.size = (byte) readIntegerValue();
                 break;
             case GameName:
                 header.name = readCharSequenceValue();
@@ -128,7 +128,7 @@ public class SGFReader
                 header.whiteName = readCharSequenceValue();
                 break;
             case Handicap:
-                header.handicap = (byte) readIntegerValue(false);
+                header.handicap = (byte) readIntegerValue();
                 break;
             case Komi:
                 header.komi = readFloatValue();
@@ -147,12 +147,12 @@ public class SGFReader
                     }
                     catch (final DateTimeParseException e2)
                     {
-                        throwWithDetails("Can't parse date: '" + dateTimeCs + "'");
+                        header.dateTime = null; //throwWithDetails("Can't parse date: '" + dateTimeCs + "'");
                     }
                 }
                 break;
             case TimeLimit:
-                header.timeLimitSecs = readIntegerValue(true);
+                header.timeLimitSecs = readTimeInSeconds();
                 break;
             case Rules:
                 header.rules = Rule.fromCs(readCharSequenceValue());
@@ -164,7 +164,7 @@ public class SGFReader
                 header.application = readCharSequenceValue();
                 break;
             case VariationFormat:
-                header.variationsFormat = (byte) readIntegerValue(false);
+                header.variationsFormat = (byte) readIntegerValue();
                 break;
             case Place:
                 header.place = readCharSequenceValue();
@@ -180,6 +180,7 @@ public class SGFReader
             case Copyright:
             case PlayerToPlay:
             case Identifier:
+            case GeneralComment:
             case BlackTeam:
             case WhiteTeam:
             case BlackTimeLeft:
@@ -190,7 +191,11 @@ public class SGFReader
                 // (B/W)Team, (B/W)TimeLeft, (B/W)MovesLeft in Byo-yomi : ignored.
                 readCharSequenceValue();
                 break;
-            case Circle:
+            case Circles:
+            case Triangles:
+            case Squares:
+            case SelectedPoints:
+            case Marks:
             case ViewOnly:
             case AddBlack:
             case AddWhite:
@@ -199,9 +204,11 @@ public class SGFReader
                 // list of points ignored for: Circle, ViewOnly, AddBlack, AddWhite
                 // (last two are redundant due to Handicap.. at least in our user case)
                 readCharSequenceValue();
+                skipNonPrintable();
                 while ((char) peek() == '[')
                 {
                     readCharSequenceValue();
+                    skipNonPrintable();
                 }
                 break;
             case Comment:
@@ -221,10 +228,10 @@ public class SGFReader
                 header.whiteRank = Rank.fromCs(readCharSequenceValue());
                 break;
             case BlackSpecies:
-                header.blackSpecies = Species.fromInt(readIntegerValue(false));
+                header.blackSpecies = Species.fromInt(readIntegerValue());
                 break;
             case WhiteSpecies:
-                header.whiteSpecies = Species.fromInt(readIntegerValue(false));
+                header.whiteSpecies = Species.fromInt(readIntegerValue());
                 break;
 
             default:
@@ -277,15 +284,9 @@ public class SGFReader
     }
 
 
-    private int readIntegerValue(final boolean allowDefault) throws IOException
+    private int readIntegerValue() throws IOException
     {
         skipNonPrintable();
-        if (allowDefault && (char) peek() == ']')
-        {
-            read();
-            return 0;
-        }
-
         int value = 0;
         while (peek() >= '0' && peek() <= '9')
         {
@@ -299,12 +300,45 @@ public class SGFReader
         return value;
     }
 
+    private int readTimeInSeconds() throws IOException
+    {
+        skipNonPrintable();
+        if ((char) peek() == ']')
+        {
+            read();
+            return 0;
+        }
+        int value = 0;
+        while (peek() >= '0' && peek() <= '9')
+        {
+            value = value * 10 + read() - '0';
+        }
+        if (peek() == 'h' || peek() == 'H')
+        {
+            read();
+            value = value * 60 * 60;
+        }
+        if (peek() == 'm' || peek() == 'M')
+        {
+            read();
+            value = value * 60;
+        }
+        skipNonPrintable();
+        if (read() != ']')
+        {
+            throwWithDetails("Property does not seems to be a number.");
+        }
+        return value;
+
+    }
+
     private float readFloatValue() throws IOException
     {
         skipNonPrintable();
         boolean negative = false;
         long value = 0;
-        int decimalPlaces = 0;
+        boolean decimalSeparatorFound = false;
+        int decimalPlaces = 1;
         if ((char) peek() == '-')
         {
             read();
@@ -312,14 +346,14 @@ public class SGFReader
         }
         while ((peek() >= '0' && peek() <= '9') || peek() == '.')
         {
-            if (decimalPlaces > 0)
+            if (decimalSeparatorFound)
             {
                 decimalPlaces *= 10;
             }
             if (peek() == '.')
             {
                 read();
-                decimalPlaces = 1;
+                decimalSeparatorFound = true;
             }
             else
             {

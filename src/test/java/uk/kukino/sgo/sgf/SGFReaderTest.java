@@ -210,6 +210,26 @@ public class SGFReaderTest
         assertThat(nodes, hasSize(1));
     }
 
+    @Test
+    public void odditiesFoundInSGFDB2() throws IOException
+    {
+        var sgfR = new StringReader(
+            "(;KM[5]TM[10h];B[]W[];)"); // a colon at the end should work
+        underTest.parse(sgfR, header ->
+            {
+                assertThat(header.komi, equalTo(5f));
+                assertThat(header.timeLimitSecs, equalTo(10 * 60 * 60));
+                headers.add(header.clone());
+            },
+            node ->
+            {
+                nodes.add(node.clone());
+            }
+        );
+        assertThat(headers, hasSize(1));
+        assertThat(nodes, hasSize(1));
+    }
+
     private void assertMoves(final String... moves)
     {
         assertThat(moves.length, equalTo(nodes.size()));
