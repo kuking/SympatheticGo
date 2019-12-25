@@ -263,6 +263,12 @@ public class Game
         }
 
         playerToPlay = playerToPlay.opposite();
+        if (lastMove == moves.length) //resize, expensive but exceptional
+        {
+            final short[] oldMoves = moves;
+            moves = new short[oldMoves.length * 2];
+            System.arraycopy(oldMoves, 0, moves, 0, oldMoves.length);
+        }
         moves[lastMove++] = move;
 
         return true;
