@@ -23,11 +23,7 @@ public class Benchmark
                 try
                 {
                     final Reader r = new InputStreamReader(new FileInputStream(p.toFile()));
-                    sgfReader.parse(r, header -> {
-                        headers[0]++;
-                    }, node -> {
-                        nodes[0]++;
-                    });
+                    sgfReader.parse(r, header -> headers[0]++, node -> nodes[0]++);
                 }
                 catch (final IOException e)
                 {
@@ -43,7 +39,7 @@ public class Benchmark
         // Total: 165373 tried, headers: 159784, nodes: 33233633
         // Total: 394222 tried, headers: 388633, nodes: 78106488 // after added all KGS
         // Total: 394222 tried, headers: 388882, nodes: 78158569
-        // Total: 394222 tried, headers: 393363, nodes: 79123151 // after fixing TM[] & TM[1h]
+        // Total: 394222 tried, headers: 393363, nodes: 79123151 // after fixing TM[] & TM[1h] -- 22 secs to run
 
     }
 }

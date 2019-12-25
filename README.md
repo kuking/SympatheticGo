@@ -84,7 +84,5 @@ Effectively:  14659ms, 3555552 plys, 242550.79 ply/s, 4.123μs/ply
 ```
 
 ## TODO
-- Try to make adjacent crosses calculation to be a bitset instead of a list of coords.
-- MCTS implementation
-- Use agrona instead of openhft
+- Better MCTS implementation
 

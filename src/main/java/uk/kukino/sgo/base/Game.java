@@ -20,7 +20,7 @@ public class Game
     private boolean finished;
 
     // workplace
-    private final Board altBoard;
+    private final Board stashBoard;
     private final Board chainLibertyBoard;
 
 
@@ -33,7 +33,7 @@ public class Game
     public Game(final byte size, final byte handicap, final byte komiX10)
     {
         board = new Board(size);
-        altBoard = new Board(size);
+        stashBoard = new Board(size);
         chainLibertyBoard = new Board(size);
         blackDeaths = 0;
         whiteDeaths = 0;
@@ -154,8 +154,8 @@ public class Game
                 }
                 else if (baseAdjColor == color && chainLibertyBoard.get(adjCoord) == Color.EMPTY)
                 {
-                    paintBufIdx++;
                     chainLibertyBoard.set(adjCoord, color);
+                    paintBufIdx++;
                     paintBuf[paintBufIdx] = Adjacent.asVal(adjCoord, base.size());
                 }
             }
@@ -220,12 +220,12 @@ public class Game
             while (Adjacent.iterHasNext(adjs))
             {
                 final short adj = Adjacent.iterPosition(adjs);
-                if (!markChainAndLiberties(board, adj)) //killed
+                if (!nonRecursiveMarkChainAndLiberties(board, adj)) //killed
                 {
                     if (!killsOccured)
                     {
-                        board.copyTo(altBoard); // lazy makes a copy of the board, just in case it has to be rollback for a superKo
-                        altBoard.set(Move.X(move), Move.Y(move), Color.EMPTY);
+                        board.copyTo(stashBoard); // lazy makes a copy of the board, just in case it has to be rollback for a superKo
+                        stashBoard.set(Move.X(move), Move.Y(move), Color.EMPTY);
                         killsOccured = true;
                     }
                     moveKills += board.extract(chainLibertyBoard);
@@ -237,16 +237,16 @@ public class Game
             {
                 if (isSuperKo(board.hashCode()))
                 {
-                    altBoard.copyTo(board);
+                    stashBoard.copyTo(board);
                     return false;
                 }
-                superKos[lastSuperKoP++ % superKos.length] = altBoard.hashCode();
+                superKos[lastSuperKoP++ % superKos.length] = stashBoard.hashCode();
             }
             else
             {
                 if (!Adjacent.iterHasNext(board.adjacentsWithColor(move, Color.EMPTY)))
                 {
-                    if (!markChainAndLiberties(board, move)) // suicide?
+                    if (!nonRecursiveMarkChainAndLiberties(board, move)) // suicide?
                     {
                         board.set(Move.X(move), Move.Y(move), Color.EMPTY); //undo
                         return false;
@@ -332,6 +332,22 @@ public class Game
             return Move.move(coord, playerToPlay);
         }
     }
+
+    public Color simpletonWinnerUsingChineseRules()
+    {
+        final int black = ((board.count(Color.BLACK) + whiteDeaths) * 10);
+        final int white = ((board.count(Color.WHITE) + blackDeaths) * 10) + komi;
+//        System.out.println(black + " - " + white + " = " + (black-white));
+        if (black > white)
+        {
+            return Color.BLACK;
+        }
+        else
+        {
+            return Color.WHITE;
+        }
+    }
+
 
     @Override
     public String toString()
