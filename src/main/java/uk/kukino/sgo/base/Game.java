@@ -24,12 +24,6 @@ public class Game
     private final Board chainLibertyBoard;
 
 
-    private static short[] HANDICAP_19 = new short[] {
-        Move.parseToVal("B D4"), Move.parseToVal("B Q16"), Move.parseToVal("B D16"),
-        Move.parseToVal("B Q4"), Move.parseToVal("B D10"), Move.parseToVal("B Q10"),
-        Move.parseToVal("B K4"), Move.parseToVal("B K16"), Move.parseToVal("B K10")
-    };
-
     public Game(final byte size, final byte handicap, final byte komiX10)
     {
         board = new Board(size);
@@ -69,23 +63,68 @@ public class Game
 
     private void initializeHandicap()
     {
+        if (handicap == 1 || handicap > 9)
+        {
+            throw new IllegalArgumentException("Invalid Handicap, must satisfy: 1 < handicap < 10");
+        }
         if (handicap == (byte) 0)
         {
             this.playerToPlay = Color.BLACK;
         }
         else
         {
-            if (board.size() != 19)
+            if (board.size() == 9)
             {
-                throw new IllegalArgumentException("I am sorry, I know only to deal handicap for 19x19 boards.");
+                setHighlightsAsHandicap(Coord.HIGHLIGHTS_9X9, handicap);
             }
-            for (int i = 0; i < handicap; i++)
+            else if (board.size() == 13)
             {
-                board.set(HANDICAP_19[i]);
+                setHighlightsAsHandicap(Coord.HIGHLIGHTS_13X13, handicap);
+            }
+            else if (board.size() == 19)
+            {
+                setHighlightsAsHandicap(Coord.HIGHLIGHTS_19X19, handicap);
+            }
+            else
+            {
+                throw new IllegalArgumentException("I don't know how do initialise the handicap board for board size: " + board.size());
             }
             this.playerToPlay = Color.WHITE;
         }
     }
+
+    private void setHighlightsAsHandicap(final short[] highlights, final byte handicap)
+    {
+        if (handicap >= 2)
+        {
+            board.set(highlights[Coord.NE], Color.BLACK);
+            board.set(highlights[Coord.SW], Color.BLACK);
+        }
+        if (handicap >= 3)
+        {
+            board.set(highlights[Coord.SE], Color.BLACK);
+        }
+        if (handicap >= 4)
+        {
+            board.set(highlights[Coord.NW], Color.BLACK);
+        }
+        if (handicap == 5 | handicap == 7 | handicap == 9)
+        {
+            board.set(highlights[Coord.C], Color.BLACK);
+        }
+        if (handicap >= 6)
+        {
+            board.set(highlights[Coord.W], Color.BLACK);
+            board.set(highlights[Coord.E], Color.BLACK);
+        }
+        if (handicap >= 8)
+        {
+            board.set(highlights[Coord.N], Color.BLACK);
+            board.set(highlights[Coord.S], Color.BLACK);
+        }
+
+    }
+
 
     /***
      *
@@ -414,3 +453,4 @@ public class Game
     }
 
 }
+

@@ -15,6 +15,37 @@ public final class Coord
 
     public static final short INVALID = 0xffffffff;
 
+    public static final short[] HIGHLIGHTS_9X9 = new short[]
+        {
+            parseToVal("C7"), parseToVal("E7"), parseToVal("G7"),
+            parseToVal("C5"), parseToVal("E5"), parseToVal("G5"),
+            parseToVal("C3"), parseToVal("E3"), parseToVal("G3")
+        };
+
+    public static final short[] HIGHLIGHTS_13X13 = new short[]
+        {
+            parseToVal("D10"), parseToVal("G10"), parseToVal("K10"),
+            parseToVal("D7"), parseToVal("G7"), parseToVal("K7"),
+            parseToVal("D4"), parseToVal("G4"), parseToVal("K4")
+        };
+
+    public static final short[] HIGHLIGHTS_19X19 = new short[]
+        {
+            parseToVal("D16"), parseToVal("K16"), parseToVal("Q16"),
+            parseToVal("D10"), parseToVal("K10"), parseToVal("Q10"),
+            parseToVal("D4"), parseToVal("K4"), parseToVal("Q4")
+        };
+
+    public static final int NW = 0;
+    public static final int N = 1;
+    public static final int NE = 2;
+    public static final int W = 3;
+    public static final int C = 4;
+    public static final int E = 5;
+    public static final int SW = 6;
+    public static final int S = 7;
+    public static final int SE = 8;
+
     private Coord()
     {
     }

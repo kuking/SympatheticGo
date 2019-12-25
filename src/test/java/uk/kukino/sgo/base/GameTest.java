@@ -328,7 +328,142 @@ public class GameTest
         assertTrue(game.finished());
     }
 
+
+    @Test
+    public void invalidHandicaps()
+    {
+        for (byte size = 3; size < (byte) 30; size++)
+        {
+            final byte sizeToUse = size;
+            assertThrows(IllegalArgumentException.class, () -> new Game(sizeToUse, (byte) 1, (byte) 55));
+            for (byte handicap = 10; handicap < 20; handicap++)
+            {
+                final byte handicapToUse = handicap;
+                assertThrows(IllegalArgumentException.class, () -> new Game(sizeToUse, handicapToUse, (byte) 55));
+            }
+        }
+    }
+
+    @Test
+    public void validHandicapsFor9x9()
+    {
+        game = new Game((byte) 9, (byte) 2, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B C3", "B G7");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 9, (byte) 3, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B C3", "B G7", "B G3");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 9, (byte) 4, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B C3", "B G7", "B G3", "B C7");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 9, (byte) 5, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B C3", "B G7", "B G3", "B C7", "B E5");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 9, (byte) 6, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B C3", "B G7", "B G3", "B C7", "B C5", "B G5");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 9, (byte) 7, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B C3", "B G7", "B G3", "B C7", "B C5", "B G5", "B E5");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 9, (byte) 8, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B C3", "B G7", "B G3", "B C7", "B C5", "B G5", "B E7", "B E3");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 9, (byte) 9, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B C3", "B G7", "B G3", "B C7", "B C5", "B G5", "B E7", "B E3", "B E5");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+    }
+
+    @Test
+    public void validHandicapsFor13x13()
+    {
+        game = new Game((byte) 13, (byte) 2, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B K10");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 13, (byte) 3, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B K10", "B D4");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 13, (byte) 4, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B K10", "B D4", "B D10");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 13, (byte) 5, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B K10", "B D4", "B D10", "B G7");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 13, (byte) 6, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B K10", "B D4", "B D10", "B D7", "B K7");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 13, (byte) 7, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B K10", "B D4", "B D10", "B D7", "B K7", "B G7");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 13, (byte) 8, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B K10", "B D4", "B D10", "B D7", "B K7", "B G4", "B G10");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 13, (byte) 9, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B K10", "B D4", "B D10", "B D7", "B K7", "B G4", "B G10", "B G7");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+    }
+
+    @Test
+    public void validHandicapsFor19x19()
+    {
+        game = new Game((byte) 19, (byte) 2, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B Q16");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 19, (byte) 3, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B Q16", "B Q4");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 19, (byte) 4, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B Q16", "B Q4", "B D16");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 19, (byte) 5, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B Q16", "B Q4", "B D16", "B K10");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 19, (byte) 6, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B Q16", "B Q4", "B D16", "B D10", "B Q10");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 19, (byte) 7, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B Q16", "B Q4", "B D16", "B D10", "B Q10", "B K10");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 19, (byte) 8, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B Q16", "B Q4", "B D16", "B D10", "B Q10", "B K4", "B K16");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+
+        game = new Game((byte) 19, (byte) 9, (byte) 55);
+        assertBoardOnlyContains(game.getBoard(), "B D4", "B Q16", "B Q4", "B D16", "B D10", "B Q10", "B K4", "B K16", "B K10");
+        assertThat(game.playerToPlay(), equalTo(Color.WHITE));
+    }
+
+
     /* --------------------------------------------------------------------------------------------------------------------------------- */
+
+    private void assertBoardOnlyContains(final Board board, String... coords)
+    {
+        for (int i = 0; i < coords.length; i++)
+        {
+            final short move = Move.parseToVal(coords[i]);
+            assertThat(board.get(move), equalTo(Move.color(move)));
+        }
+        assertThat(board.count(Color.WHITE) + board.count(Color.BLACK), equalTo(coords.length));
+    }
 
     private void assertAllValid(final Game game, Collection<String> moves)
     {
