@@ -15,9 +15,12 @@ import java.util.function.Consumer;
 public class SGFReader
 {
     private Header header = new Header();
-    private boolean headerConsumed = false;
+    private boolean headerConsumed;
     private Node node = new Node();
     private Reader buffer;
+
+    private int readPosition;
+    private int peeked;
 
     private Consumer<Header> headerConsumer;
     private Consumer<Node> nodeConsumer;
@@ -27,8 +30,11 @@ public class SGFReader
         header.reset();
         node.reset();
         buffer = buf;
+        headerConsumed = false;
         this.headerConsumer = headerConsumer;
         this.nodeConsumer = nodeConsumer;
+        readPosition = 0;
+        peeked = Integer.MIN_VALUE;
 
         mainCollection();
         onNewNode();
@@ -150,6 +156,16 @@ public class SGFReader
             case VariationFormat:
                 header.variationsFormat = (byte) readIntegerValue();
                 break;
+            case Place:
+                header.place = readCharSequenceValue();
+                break;
+            case Result:
+                header.result = Result.fromCs(readCharSequenceValue());
+                break;
+            case OverTime:
+                readCharSequenceValue();
+                // just ignored
+                break;
             case Comment:
                 if (headerConsumed)
                 {
@@ -160,6 +176,13 @@ public class SGFReader
                     header.comment = readCharSequenceValue();
                 }
                 break;
+            case BlackRank:
+                header.blackRank = Rank.fromCs(readCharSequenceValue());
+                break;
+            case WhiteRank:
+                header.whiteRank = Rank.fromCs(readCharSequenceValue());
+                break;
+
             default:
                 throwWithDetails("I don't know how to parse identity " + (char) (identity >> 8) + (char) (identity & 0xff));
         }
@@ -179,6 +202,11 @@ public class SGFReader
     private short readMoveValue(final Color color) throws IOException
     {
         skipNonPrintable();
+        if ((char) peek() == ']')
+        {
+            read();
+            return Move.pass(color);
+        }
         final int a = read();
         final int b = read();
         if (a == -1 | b == -1)
@@ -243,7 +271,7 @@ public class SGFReader
     {
         skipNonPrintable();
         final var point1 = read();
-        if ((char)point1  == '(')
+        if ((char) point1 == '(')
         {
             throwWithDetails("Variants not implemented in this SGF reader.");
         }
@@ -271,11 +299,7 @@ public class SGFReader
         }
     }
 
-
     // reader/peeker api
-
-    private int readPosition = 0;
-    private int peeked = Integer.MIN_VALUE;
 
     private int read() throws IOException
     {

@@ -21,12 +21,14 @@ public class Header
     Rule rules; //RU
     byte handicap; //HA
     byte komiX10; //KM
+    Rank blackRank; //BR
+    Rank whiteRank; //WR
+    CharSequence place; //PC
+    Result result; //RE
 
 //    List<Short> blackTerritory;  //TB
 //    List<Short> whiteTerritory;  //TW
 //    CharSequence commentatorName; //AN
-//    Rank blackRank; //BR
-//    Rank whiteRank; //WR
 //    CharSequence blackTeam; //BT
 //    CharSequence whiteTeam; //WT
 //    CharSequence copyRight; //CP
@@ -34,7 +36,6 @@ public class Header
 //    CharSequence summary; //GC
 //    CharSequence openning; //ON
 //    CharSequence overtime; //OT
-//    CharSequence place; //PC
 //    Score result; //RE
 //    CharSequence round; //RO
 //    CharSequence source; //SO
@@ -58,8 +59,11 @@ public class Header
         timeLimitSecs = 0;
         handicap = 0;
         rules = null;
-
         komiX10 = -1;
+        blackRank = null;
+        whiteRank = null;
+        place = null;
+        result = null;
     }
 
     public Header clone()
@@ -77,9 +81,14 @@ public class Header
         clone.whiteName = whiteName;
         clone.dateTime = dateTime;
         clone.timeLimitSecs = timeLimitSecs;
-        clone.rules = rules;
         clone.handicap = handicap;
+        clone.rules = rules;
         clone.komiX10 = komiX10;
+        clone.blackRank = blackRank == null ? null : blackRank.clone();
+        clone.whiteRank = whiteRank == null ? null : whiteRank.clone();
+        clone.place = place;
+        clone.result = result == null ? null : result.clone();
+
         return clone;
     }
 
@@ -92,14 +101,18 @@ public class Header
             variationsFormat == 0 &&
             size == -1 &&
             name == null &&
-            comment == comment &&
+            comment == null &&
             blackName == null &&
             whiteName == null &&
             dateTime == null &&
             timeLimitSecs == 0 &&
             rules == null &&
             handicap == 0 &&
-            komiX10 == -1;
+            komiX10 == -1 &&
+            blackRank == null &&
+            whiteRank == null &&
+            place == null &&
+            result == null;
     }
 
 }
