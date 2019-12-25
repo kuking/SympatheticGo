@@ -191,10 +191,14 @@ public class SGFReaderTest
     public void odditiesFoundInSGFDB() throws IOException
     {
         var sgfR = new StringReader(
-            "(;KM[-50.00];B[]W[])");
+            "(;KM[-50.00]PB[Name With \\] \\) escaped !\"£$ chars]TM[]BS[1]WS[0];B[]W[];)"); // a colon at the end should work
         underTest.parse(sgfR, header ->
             {
                 assertThat(header.komi, equalTo(-50.0f));
+                assertThat(header.blackName, equalTo("Name With ] ) escaped !\"£$ chars"));
+                assertThat(header.timeLimitSecs, equalTo(0));
+                assertThat(header.whiteSpecies, equalTo(Species.Human));
+                assertThat(header.blackSpecies, equalTo(Species.Computer));
                 headers.add(header.clone());
             },
             node ->

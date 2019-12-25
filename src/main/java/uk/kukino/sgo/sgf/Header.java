@@ -25,23 +25,8 @@ public class Header
     Rank whiteRank; //WR
     CharSequence place; //PC
     Result result; //RE
-
-//    List<Short> blackTerritory;  //TB
-//    List<Short> whiteTerritory;  //TW
-//    CharSequence commentatorName; //AN
-//    CharSequence blackTeam; //BT
-//    CharSequence whiteTeam; //WT
-//    CharSequence copyRight; //CP
-//    CharSequence event; //EV
-//    CharSequence summary; //GC
-//    CharSequence openning; //ON
-//    CharSequence overtime; //OT
-//    Score result; //RE
-//    CharSequence round; //RO
-//    CharSequence source; //SO
-
-//    CharSequence userOrProgramName; //US
-
+    Species blackSpecies; //BS
+    Species whiteSpecies; //WS
 
     public void reset()
     {
@@ -64,6 +49,8 @@ public class Header
         whiteRank = null;
         place = null;
         result = null;
+        blackSpecies = null;
+        whiteSpecies = null;
     }
 
     public Header clone()
@@ -88,7 +75,8 @@ public class Header
         clone.whiteRank = whiteRank == null ? null : whiteRank.clone();
         clone.place = place;
         clone.result = result == null ? null : result.clone();
-
+        clone.blackSpecies = blackSpecies;
+        clone.whiteSpecies = whiteSpecies;
         return clone;
     }
 
@@ -112,7 +100,9 @@ public class Header
             blackRank == null &&
             whiteRank == null &&
             place == null &&
-            result == null;
+            result == null &&
+            blackSpecies == null &&
+            whiteSpecies == null;
     }
 
 }

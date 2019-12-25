@@ -84,6 +84,10 @@ public class SGFReader
             read();
             onNewNode();
             skipNonPrintable();
+            if ((char) peek() == ')')
+            {
+                return;
+            }
         }
         handleProperty(readIdentity());
     }
@@ -106,13 +110,13 @@ public class SGFReader
                 break;
 
             case FileFormat:
-                header.fileFormat = (byte) readIntegerValue();
+                header.fileFormat = (byte) readIntegerValue(false);
                 break;
             case Game:
-                header.gameType = GameType.byId(readIntegerValue());
+                header.gameType = GameType.byId(readIntegerValue(false));
                 break;
             case Size:
-                header.size = (byte) readIntegerValue();
+                header.size = (byte) readIntegerValue(false);
                 break;
             case GameName:
                 header.name = readCharSequenceValue();
@@ -124,7 +128,7 @@ public class SGFReader
                 header.whiteName = readCharSequenceValue();
                 break;
             case Handicap:
-                header.handicap = (byte) readIntegerValue();
+                header.handicap = (byte) readIntegerValue(false);
                 break;
             case Komi:
                 header.komi = readFloatValue();
@@ -148,7 +152,7 @@ public class SGFReader
                 }
                 break;
             case TimeLimit:
-                header.timeLimitSecs = readIntegerValue();
+                header.timeLimitSecs = readIntegerValue(true);
                 break;
             case Rules:
                 header.rules = Rule.fromCs(readCharSequenceValue());
@@ -160,7 +164,7 @@ public class SGFReader
                 header.application = readCharSequenceValue();
                 break;
             case VariationFormat:
-                header.variationsFormat = (byte) readIntegerValue();
+                header.variationsFormat = (byte) readIntegerValue(false);
                 break;
             case Place:
                 header.place = readCharSequenceValue();
@@ -168,16 +172,32 @@ public class SGFReader
             case Result:
                 header.result = Result.fromCs(readCharSequenceValue());
                 break;
+            case Username:
             case Round:
             case Event:
             case OverTime:
+            case Source:
+            case Copyright:
+            case PlayerToPlay:
+            case Identifier:
             case BlackTeam:
             case WhiteTeam:
-                // Round, Event, Overtime, BlackTeam, WhiteTeam : ignored.
+            case BlackTimeLeft:
+            case WhiteTimeLeft:
+            case BlackMovesLeft:
+            case WhiteMovesLeft:
+                // Username, Round, Event, etc...
+                // (B/W)Team, (B/W)TimeLeft, (B/W)MovesLeft in Byo-yomi : ignored.
                 readCharSequenceValue();
                 break;
+            case Circle:
+            case ViewOnly:
             case AddBlack:
             case AddWhite:
+            case BlackTerritory:
+            case WhiteTerritory:
+                // list of points ignored for: Circle, ViewOnly, AddBlack, AddWhite
+                // (last two are redundant due to Handicap.. at least in our user case)
                 readCharSequenceValue();
                 while ((char) peek() == '[')
                 {
@@ -200,6 +220,12 @@ public class SGFReader
             case WhiteRank:
                 header.whiteRank = Rank.fromCs(readCharSequenceValue());
                 break;
+            case BlackSpecies:
+                header.blackSpecies = Species.fromInt(readIntegerValue(false));
+                break;
+            case WhiteSpecies:
+                header.whiteSpecies = Species.fromInt(readIntegerValue(false));
+                break;
 
             default:
                 throwWithDetails("I don't know how to parse identity " + (char) (identity >> 8) + (char) (identity & 0xff));
@@ -209,9 +235,20 @@ public class SGFReader
     private CharSequence readCharSequenceValue() throws IOException
     {
         final var buffer = new StringBuilder(); // FIXME: maybe we want to reuse buffers here, and encode property
-        while ((char) peek() != ']' && peek() != -1)
+        boolean nextIsEscaped = false;
+        while ((nextIsEscaped || (char) peek() != ']') && peek() != -1)
         {
-            buffer.append((char) read());
+            final int point = read();
+            if ((char) point == '\\')
+            {
+                nextIsEscaped = true;
+            }
+            else
+            {
+                nextIsEscaped = false;
+                buffer.append((char) point);
+            }
+
         }
         read(); // the last ]
         return buffer.toString();
@@ -240,9 +277,15 @@ public class SGFReader
     }
 
 
-    private int readIntegerValue() throws IOException
+    private int readIntegerValue(final boolean allowDefault) throws IOException
     {
         skipNonPrintable();
+        if (allowDefault && (char) peek() == ']')
+        {
+            read();
+            return 0;
+        }
+
         int value = 0;
         while (peek() >= '0' && peek() <= '9')
         {

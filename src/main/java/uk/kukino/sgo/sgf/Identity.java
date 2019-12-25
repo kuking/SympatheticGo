@@ -2,11 +2,19 @@ package uk.kukino.sgo.sgf;
 
 public enum Identity
 {
-    FileFormat("FF"), Charset("CA"), Application("AP"), Game("GM"), VariationFormat("ST"),
+    // Headers
+    FileFormat("FF"), Charset("CA"), Application("AP"), Game("GM"), VariationFormat("ST"), Identifier("ID"),
     GameName("GN"), Size("SZ"), Handicap("HA"), Komi("KM"), Date("DT"), TimeLimit("TM"), Rules("RU"), Place("PC"), Result("RE"),
-    OverTime("OT"), Event("EV"), Round("RO"),
-    BlackName("PB"), WhiteName("PW"), WhiteRank("WR"), BlackRank("BR"), BlackTeam("BT"), WhiteTeam("WT"),
-    Comment("C"), Black("B"), White("W"), AddBlack("AB"), AddWhite("AW"),
+    OverTime("OT"), Event("EV"), Round("RO"), Username("US"), ViewOnly("VW"), Source("SO"), Copyright("CP"),
+
+    BlackName("PB"), BlackRank("BR"), BlackTeam("BT"), BlackTimeLeft("BL"), BlackSpecies("BS"),
+    WhiteName("PW"), WhiteRank("WR"), WhiteTeam("WT"), WhiteTimeLeft("WL"), WhiteSpecies("WS"),
+
+    // Nodes
+    Comment("C"), Black("B"), White("W"), AddBlack("AB"), AddWhite("AW"), Circle("CR"), PlayerToPlay("PL"),
+    BlackTerritory("TB"), WhiteTerritory("TW"), BlackMovesLeft("OB"), WhiteMovesLeft("OW"),
+
+    // Unknown?
     Unknown("??");
 
     int idUp, idLo;
