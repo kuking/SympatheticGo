@@ -240,7 +240,7 @@ public class Game
                     stashBoard.copyTo(board);
                     return false;
                 }
-                superKos[lastSuperKoP++ % superKos.length] = stashBoard.hashCode();
+                superKos[lastSuperKoP++ % superKos.length] = board.hashCode();
             }
             else
             {

@@ -4,8 +4,8 @@ import uk.kukino.sgo.base.Move;
 
 public class Node
 {
-    CharSequence comment; // C
-    short move; // B | W
+    public CharSequence comment; // C
+    public short move; // B | W
 
     //    String text;
 //    String name;

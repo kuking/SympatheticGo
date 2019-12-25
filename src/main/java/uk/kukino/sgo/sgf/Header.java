@@ -6,27 +6,27 @@ import java.time.LocalDateTime;
 
 public class Header
 {
-    Charset charset; //CA
-    byte fileFormat; //FF
-    GameType gameType; //GM
-    CharSequence application; //AP
-    byte variationsFormat; //ST
-    byte size; //SZ
-    CharSequence name; //GN
-    CharSequence comment; //C
-    CharSequence blackName; //PB
-    CharSequence whiteName; //WP
-    LocalDateTime dateTime; //DT
-    int timeLimitSecs; //TM
-    Rule rules; //RU
-    byte handicap; //HA
-    float komi; //KM
-    Rank blackRank; //BR
-    Rank whiteRank; //WR
-    CharSequence place; //PC
-    Result result; //RE
-    Species blackSpecies; //BS
-    Species whiteSpecies; //WS
+    public Charset charset; //CA
+    public byte fileFormat; //FF
+    public GameType gameType; //GM
+    public CharSequence application; //AP
+    public byte variationsFormat; //ST
+    public byte size; //SZ
+    public CharSequence name; //GN
+    public CharSequence comment; //C
+    public CharSequence blackName; //PB
+    public CharSequence whiteName; //WP
+    public LocalDateTime dateTime; //DT
+    public int timeLimitSecs; //TM
+    public Rule rules; //RU
+    public byte handicap; //HA
+    public float komi; //KM
+    public Rank blackRank; //BR
+    public Rank whiteRank; //WR
+    public CharSequence place; //PC
+    public Result result; //RE
+    public Species blackSpecies; //BS
+    public Species whiteSpecies; //WS
 
     public void reset()
     {
