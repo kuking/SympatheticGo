@@ -24,9 +24,8 @@ public class Benchmark
             .filter(p -> p.toString().toUpperCase().endsWith(".SGF"))
             .forEach(p -> {
                 count[0]++;
-                try
+                try (final Reader r = new InputStreamReader(new FileInputStream(p.toFile())))
                 {
-                    final Reader r = new InputStreamReader(new FileInputStream(p.toFile()));
                     sgfReader.parse(r, header -> headers[0]++, node -> nodes[0]++);
                 }
                 catch (final IOException e)
@@ -43,13 +42,12 @@ public class Benchmark
     {
         final SGFReader sgfReader = new SGFReader();
         final Game[] game = new Game[1];
-        Files.walk(Paths.get("data/kgs/"))
+        Files.walk(Paths.get("data/KGS/"))
             .filter(Files::isRegularFile)
             .filter(p -> p.toString().toUpperCase().endsWith(".SGF"))
             .forEach(p -> {
-                try
+                try (final Reader r = new InputStreamReader(new FileInputStream(p.toFile())))
                 {
-                    final Reader r = new InputStreamReader(new FileInputStream(p.toFile()));
                     sgfReader.parse(r, header -> {
                         if (header.size == (byte) 9 || header.handicap == 0)
                         {
@@ -76,7 +74,7 @@ public class Benchmark
                 catch (final IOException e)
                 {
                     System.out.println("Parsing ... " + p.getParent() + "/" + p.getFileName());
-                    System.out.println(e.getMessage().substring(0, e.getMessage().indexOf('\n') + 20));
+                    System.out.println(e.getMessage());
                 }
 
 
