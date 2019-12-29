@@ -94,3 +94,7 @@ Effectively:  14659ms, 3555552 plys, 242550.79 ply/s, 4.123μs/ply
   - Simple Remote Service, so it can be distributed
 
 - Aim: fun, practice Sympathetic coding in Java, implement > 1D at 19x19 
+
+- Check about SuperKO rules here, we might need to revisit current impl: http://www.weddslist.com/kgs/past/superko.html
+- Check "Mastering the game of Go without Human Knowledge" https://www.nature.com/articles/nature24270.epdf
+- https://github.com/leela-zero/leela-zero
