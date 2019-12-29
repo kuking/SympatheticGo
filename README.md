@@ -83,6 +83,14 @@ Agr. & avg.: 228491ms,  222222 plys,  15561.02 ply/s, 64.263μs/ply
 Effectively:  14659ms, 3555552 plys, 242550.79 ply/s, 4.123μs/ply
 ```
 
-## TODO
+## Mini-Roadmap 
 - Better MCTS implementation
+  - implement Go Text Protocol, so it can play against itself, GNUGO and in KGS. Helps to define the Engine API.
+  - Basic Complete engine
+  - Better implementation with MTCS (UCT)
+  - Side-channel stats, i.e. current top-10 exploration trees, its odds, maybe visuals.
+  - Time Management
+  - Introduce a NN to prune exploration tree (i.e. to pre-populate UCT tree) 
+  - Simple Remote Service, so it can be distributed
 
+- Aim: fun, practice Sympathetic coding in Java, implement > 1D at 19x19 
