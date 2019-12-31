@@ -8,10 +8,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 
 public class GameRegressionTest
 {
@@ -61,12 +58,12 @@ public class GameRegressionTest
     public void test_4_filling_eyes_2() throws IOException
     {
         assertAllMovesAreValid("(;GM[1]FF[4]" + "SZ[9]KM[0.00] ; B[ia];W[ib];B[id];W[hb];B[hd];W[gb];B[gd];W[fb];B[ga];W[ea];B[ha])");
-        assertTrue(game[0].play(Move.parseToVal("WHITE F9")));
-        assertThat(game[0].deadStones(Color.BLACK), equalTo(3));
+        assertThat(game[0].play(Move.parseToVal("WHITE F9"))).isTrue();
+        assertThat(game[0].deadStones(Color.BLACK)).isEqualTo(3);
 
         assertAllMovesAreValid("(;GM[1]FF[4]" + "SZ[9]KM[0.00] ; B[ia];W[ib];B[id];W[hb];B[hd];W[gb];B[gd];W[fb];B[ga];W[ea];B[ha])");
-        assertTrue(game[0].play(Move.parseToVal("WHITE E8")));
-        assertFalse(game[0].play(Move.parseToVal("BLACK F9")));
+        assertThat(game[0].play(Move.parseToVal("WHITE E8"))).isTrue();
+        assertThat(game[0].play(Move.parseToVal("BLACK F9"))).isFalse();
     }
 
     @Test
@@ -124,7 +121,7 @@ public class GameRegressionTest
             game[0] = new Game(header.size, header.handicap, (byte) (header.komi * 10));
         }, node ->
         {
-            assertTrue(game[0].play(node.move), () -> "Invalid Move?! " + Coord.shortToString(node.move) + "\n" + game[0]);
+            assertThat(game[0].play(node.move)).isTrue();
         });
 
     }

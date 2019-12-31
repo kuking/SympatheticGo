@@ -11,8 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class SGFReaderTest
@@ -37,14 +36,14 @@ public class SGFReaderTest
         var sgfR = new StringReader("  (  ;   FF[4]   GM[1] \n \r \t  SZ[19]   ) \n");
         underTest.parse(sgfR, header ->
             {
-                assertThat(header.fileFormat, equalTo((byte) 4));
-                assertThat(header.gameType, equalTo(GameType.Go));
-                assertThat(header.size, equalTo((byte) 19));
+                assertThat(header.fileFormat).isEqualTo((byte) 4);
+                assertThat(header.gameType).isEqualTo(GameType.Go);
+                assertThat(header.size).isEqualTo((byte) 19);
                 headers.add(header.clone());
             },
             node -> fail("No nodes in this SGF, this should have not been called.")
         );
-        assertThat(headers, hasSize(1));
+        assertThat(headers).hasSize(1);
     }
 
     @Test
@@ -53,23 +52,23 @@ public class SGFReaderTest
         var sgfR = new StringReader("(;FF[4]GM[1]SZ[19]GN[LeName]PB[Black]HA[0]PW[White]KM[5.5]DT[1999-07-21]TM[1800]RU[Japanese])");
         underTest.parse(sgfR, header ->
             {
-                assertThat(header.fileFormat, equalTo((byte) 4));
-                assertThat(header.gameType, equalTo(GameType.Go));
-                assertThat(header.charset, equalTo(Charsets.UTF_8)); // default
-                assertThat(header.size, equalTo((byte) 19));
-                assertThat(header.name, equalTo("LeName"));
-                assertThat(header.blackName, equalTo("Black"));
-                assertThat(header.whiteName, equalTo("White"));
-                assertThat(header.handicap, equalTo((byte) 0));
-                assertThat(header.komi, equalTo(5.5f));
-                assertThat(header.dateTime, equalTo(LocalDateTime.parse("1999-07-21T12:00")));
-                assertThat(header.timeLimitSecs, equalTo(1800));
-                assertThat(header.rules, equalTo(Rule.Japanese));
+                assertThat(header.fileFormat).isEqualTo((byte) 4);
+                assertThat(header.gameType).isEqualTo(GameType.Go);
+                assertThat(header.charset).isEqualTo(Charsets.UTF_8); // default
+                assertThat(header.size).isEqualTo((byte) 19);
+                assertThat(header.name).isEqualTo("LeName");
+                assertThat(header.blackName).isEqualTo("Black");
+                assertThat(header.whiteName).isEqualTo("White");
+                assertThat(header.handicap).isEqualTo((byte) 0);
+                assertThat(header.komi).isEqualTo(5.5f);
+                assertThat(header.dateTime).isEqualTo(LocalDateTime.parse("1999-07-21T12:00"));
+                assertThat(header.timeLimitSecs).isEqualTo(1800);
+                assertThat(header.rules).isEqualTo(Rule.Japanese);
                 headers.add(header.clone());
             },
             node -> fail("No nodes in this SGF, this should have not been called.")
         );
-        assertThat(headers, hasSize(1));
+        assertThat(headers).hasSize(1);
     }
 
     @Test
@@ -81,32 +80,32 @@ public class SGFReaderTest
                 "PC[Somewhere]PW[Player White]PB[Player Black]C[Game Comment]WR[9d]BR[15k];B[dp])");
         underTest.parse(sgfR, header ->
             {
-                assertThat(header.fileFormat, equalTo((byte) 4));
-                assertThat(header.gameType, equalTo(GameType.Go));
-                assertThat(header.charset, equalTo(Charsets.US_ASCII));
-                assertThat(header.size, equalTo((byte) 19));
-                assertThat(header.application, equalTo("CGoban:2"));
-                assertThat(header.blackName, equalTo("Player Black"));
-                assertThat(header.whiteName, equalTo("Player White"));
-                assertThat(header.blackRank.toString(), equalTo("15k"));
-                assertThat(header.whiteRank.toString(), equalTo("9d"));
-                assertThat(header.handicap, equalTo((byte) 0)); // default
-                assertThat(header.komi, equalTo(5.5f));
-                assertThat(header.dateTime, nullValue());
-                assertThat(header.timeLimitSecs, equalTo(0));
-                assertThat(header.rules, equalTo(Rule.Japanese));
-                assertThat(header.comment, equalTo("Game Comment"));
-                assertThat(header.place, equalTo("Somewhere"));
+                assertThat(header.fileFormat).isEqualTo((byte) 4);
+                assertThat(header.gameType).isEqualTo(GameType.Go);
+                assertThat(header.charset).isEqualTo(Charsets.US_ASCII);
+                assertThat(header.size).isEqualTo((byte) 19);
+                assertThat(header.application).isEqualTo("CGoban:2");
+                assertThat(header.blackName).isEqualTo("Player Black");
+                assertThat(header.whiteName).isEqualTo("Player White");
+                assertThat(header.blackRank.toString()).isEqualTo("15k");
+                assertThat(header.whiteRank.toString()).isEqualTo("9d");
+                assertThat(header.handicap).isEqualTo((byte) 0); // default
+                assertThat(header.komi).isEqualTo(5.5f);
+                assertThat(header.dateTime).isNull();
+                assertThat(header.timeLimitSecs).isEqualTo(0);
+                assertThat(header.rules).isEqualTo(Rule.Japanese);
+                assertThat(header.comment).isEqualTo("Game Comment");
+                assertThat(header.place).isEqualTo("Somewhere");
                 headers.add(header.clone());
             },
             node ->
             {
-                assertThat(node.move, equalTo(Move.parseToVal("BLACK D4")));
+                assertThat(node.move).isEqualTo(Move.parseToVal("BLACK D4"));
                 nodes.add(node.clone());
             }
         );
-        assertThat(headers, hasSize(1));
-        assertThat(nodes, hasSize(1));
+        assertThat(headers).hasSize(1);
+        assertThat(nodes).hasSize(1);
     }
 
     @Test
@@ -120,7 +119,7 @@ public class SGFReaderTest
                 ";B[ad];W[be];B[ac];W[bb];B[ab];W[aa];B[ae];W[af];B[];W[])\n");
         underTest.parse(sgfR, header ->
             {
-                assertThat(header.size, equalTo((byte) 9));
+                assertThat(header.size).isEqualTo((byte) 9);
                 headers.add(header.clone());
             },
             node ->
@@ -128,7 +127,7 @@ public class SGFReaderTest
                 nodes.add(node.clone());
             }
         );
-        assertThat(headers, hasSize(1));
+        assertThat(headers).hasSize(1);
         assertMoves("B C7", "W C8", "B D7", "W D8", "B E7", "W E8", "B F7", "W F8", "B F6", "W G7", "B E6", "W G6", "B D6", "W F5",
             "B C6", "W E5", "B B7", "W D5", "B B6", "W C5", "B A6", "W B5", "B A7", "W B8", "B A8", "W A9", "B A5", "W A4",
             "B PASS", "W PASS");
@@ -152,7 +151,7 @@ public class SGFReaderTest
         }
         catch (final ParseException e)
         {
-            assertThat(e.getMessage(), startsWith("Variants not implemented in this SGF reader."));
+            assertThat(e.getMessage()).startsWith("Variants not implemented in this SGF reader.");
         }
     }
 
@@ -162,7 +161,7 @@ public class SGFReaderTest
         var sgfR = new StringReader("(;FF[4]GM[1]SZ[13];B[cc];W[cb])");
         underTest.parse(sgfR, header ->
             {
-                assertThat(header.size, equalTo((byte) 13));
+                assertThat(header.size).isEqualTo((byte) 13);
                 headers.add(header.clone());
             },
             node ->
@@ -170,12 +169,12 @@ public class SGFReaderTest
                 nodes.add(node.clone());
             }
         );
-        assertThat(headers, hasSize(1));
+        assertThat(headers).hasSize(1);
 
         sgfR = new StringReader("(;FF[4]GM[1]SZ[19];B[cc];W[cb])");
         underTest.parse(sgfR, header ->
             {
-                assertThat(header.size, equalTo((byte) 19));
+                assertThat(header.size).isEqualTo((byte) 19);
                 headers.add(header.clone());
             },
             node ->
@@ -183,8 +182,8 @@ public class SGFReaderTest
                 nodes.add(node.clone());
             }
         );
-        assertThat(headers, hasSize(2));
-        assertThat(nodes, hasSize(4));
+        assertThat(headers).hasSize(2);
+        assertThat(nodes).hasSize(4);
     }
 
     @Test
@@ -194,11 +193,11 @@ public class SGFReaderTest
             "(;KM[-50.00]PB[Name With \\] \\) escaped !\"£$ chars]TM[]BS[1]WS[0];B[]W[];)"); // a colon at the end should work
         underTest.parse(sgfR, header ->
             {
-                assertThat(header.komi, equalTo(-50.0f));
-                assertThat(header.blackName, equalTo("Name With ] ) escaped !\"£$ chars"));
-                assertThat(header.timeLimitSecs, equalTo(0));
-                assertThat(header.whiteSpecies, equalTo(Species.Human));
-                assertThat(header.blackSpecies, equalTo(Species.Computer));
+                assertThat(header.komi).isEqualTo(-50.0f);
+                assertThat(header.blackName).isEqualTo("Name With ] ) escaped !\"£$ chars");
+                assertThat(header.timeLimitSecs).isEqualTo(0);
+                assertThat(header.whiteSpecies).isEqualTo(Species.Human);
+                assertThat(header.blackSpecies).isEqualTo(Species.Computer);
                 headers.add(header.clone());
             },
             node ->
@@ -206,8 +205,8 @@ public class SGFReaderTest
                 nodes.add(node.clone());
             }
         );
-        assertThat(headers, hasSize(1));
-        assertThat(nodes, hasSize(1));
+        assertThat(headers).hasSize(1);
+        assertThat(nodes).hasSize(1);
     }
 
     @Test
@@ -217,8 +216,8 @@ public class SGFReaderTest
             "(;KM[5]TM[10h];B[]W[];)"); // a colon at the end should work
         underTest.parse(sgfR, header ->
             {
-                assertThat(header.komi, equalTo(5f));
-                assertThat(header.timeLimitSecs, equalTo(10 * 60 * 60));
+                assertThat(header.komi).isEqualTo(5f);
+                assertThat(header.timeLimitSecs).isEqualTo(10 * 60 * 60);
                 headers.add(header.clone());
             },
             node ->
@@ -226,16 +225,16 @@ public class SGFReaderTest
                 nodes.add(node.clone());
             }
         );
-        assertThat(headers, hasSize(1));
-        assertThat(nodes, hasSize(1));
+        assertThat(headers).hasSize(1);
+        assertThat(nodes).hasSize(1);
     }
 
     private void assertMoves(final String... moves)
     {
-        assertThat(moves.length, equalTo(nodes.size()));
+        assertThat(moves.length).isEqualTo(nodes.size());
         for (int i = 0; i < moves.length; i++)
         {
-            assertThat("Expected " + moves[i] + " at pos " + i, nodes.get(i).move, equalTo(Move.parseToVal(moves[i])));
+            assertThat(nodes.get(i).move).isEqualTo(Move.parseToVal(moves[i]));
         }
 
     }

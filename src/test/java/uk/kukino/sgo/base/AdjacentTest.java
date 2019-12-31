@@ -2,10 +2,7 @@ package uk.kukino.sgo.base;
 
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static com.google.common.truth.Truth.assertThat;
 
 
 public class AdjacentTest
@@ -20,8 +17,8 @@ public class AdjacentTest
         short coord = Coord.parseToVal("A1");
         int adjs = Adjacent.asVal(coord, (byte) 1);
 
-        assertFalse(Adjacent.iterHasNext(adjs));
-        assertThat(Adjacent.iterPosition(adjs), equalTo(Coord.INVALID));
+        assertThat(Adjacent.iterHasNext(adjs)).isFalse();
+        assertThat(Adjacent.iterPosition(adjs)).isEqualTo(Coord.INVALID);
     }
 
     @Test
@@ -29,19 +26,19 @@ public class AdjacentTest
     {
         int adjs = Adjacent.asVal(c_E5, boardSize);
 
-        assertThat(Adjacent.iterPosition(adjs), equalTo(Coord.parseToVal("E6")));
+        assertThat(Adjacent.iterPosition(adjs)).isEqualTo(Coord.parseToVal("E6"));
 
         adjs = Adjacent.iterMoveNext(adjs);
-        assertThat(Adjacent.iterPosition(adjs), equalTo(Coord.parseToVal("F5")));
+        assertThat(Adjacent.iterPosition(adjs)).isEqualTo(Coord.parseToVal("F5"));
 
         adjs = Adjacent.iterMoveNext(adjs);
-        assertThat(Adjacent.iterPosition(adjs), equalTo(Coord.parseToVal("E4")));
+        assertThat(Adjacent.iterPosition(adjs)).isEqualTo(Coord.parseToVal("E4"));
 
         adjs = Adjacent.iterMoveNext(adjs);
-        assertThat(Adjacent.iterPosition(adjs), equalTo(Coord.parseToVal("D5")));
+        assertThat(Adjacent.iterPosition(adjs)).isEqualTo(Coord.parseToVal("D5"));
 
         adjs = Adjacent.iterMoveNext(adjs);
-        assertThat(Adjacent.iterPosition(adjs), equalTo(Coord.INVALID));
+        assertThat(Adjacent.iterPosition(adjs)).isEqualTo(Coord.INVALID);
     }
 
     @Test
@@ -56,8 +53,8 @@ public class AdjacentTest
             adjs = Adjacent.iterMoveNext(adjs);
         }
 
-        assertThat(count, equalTo(4));
-        assertThat(Adjacent.iterMoveNext(adjs), equalTo(adjs)); // and does not changes anymore
+        assertThat(count).isEqualTo(4);
+        assertThat(Adjacent.iterMoveNext(adjs)).isEqualTo(adjs); // and does not changes anymore
     }
 
     @Test
@@ -66,11 +63,11 @@ public class AdjacentTest
         int adjs = Adjacent.asVal(c_E5, boardSize);
 
         adjs = assertPositions(adjs, "E6", "F5", "E4", "D5");
-        assertThat(Adjacent.iterPosition(adjs), equalTo(Coord.INVALID));
+        assertThat(Adjacent.iterPosition(adjs)).isEqualTo(Coord.INVALID);
 
         adjs = Adjacent.iterReset(adjs);
         adjs = assertPositions(adjs, "E6", "F5", "E4", "D5");
-        assertThat(Adjacent.iterPosition(adjs), equalTo(Coord.INVALID));
+        assertThat(Adjacent.iterPosition(adjs)).isEqualTo(Coord.INVALID);
     }
 
     @Test
@@ -95,10 +92,10 @@ public class AdjacentTest
     {
         // we don't want to do two operations in one
         int adjs = Adjacent.asVal(c_E5, boardSize);
-        assertThat(Adjacent.valToStr(adjs), equalTo("{E5 NESW #0->E6}"));
+        assertThat(Adjacent.valToStr(adjs)).isEqualTo("{E5 NESW #0->E6}");
 
         adjs = Adjacent.iterUnset(adjs);
-        assertThat(Adjacent.valToStr(adjs), equalTo("{E5 .ESW #0->E6}"));
+        assertThat(Adjacent.valToStr(adjs)).isEqualTo("{E5 .ESW #0->E6}");
     }
 
     @Test
@@ -160,8 +157,8 @@ public class AdjacentTest
     @Test
     public void canonicalEmptyIterator()
     {
-        assertFalse(Adjacent.iterHasNext(Adjacent.EMPTY_ITERATOR));
-        assertThat(Adjacent.iterPosition(Adjacent.EMPTY_ITERATOR), equalTo(Coord.INVALID));
+        assertThat(Adjacent.iterHasNext(Adjacent.EMPTY_ITERATOR)).isFalse();
+        assertThat(Adjacent.iterPosition(Adjacent.EMPTY_ITERATOR)).isEqualTo(Coord.INVALID);
     }
     // util
 
@@ -171,11 +168,11 @@ public class AdjacentTest
         while (Adjacent.iterHasNext(adjs))
         {
 //            System.out.println(Adjacent.valToStr(adjs) + " -> " + Coord.shortToString(Adjacent.iterPosition(adjs)));
-            assertThat("Iterator as more values than expected.", positions.length, greaterThan(posIdx));
-            assertThat(Adjacent.iterPosition(adjs), equalTo(Coord.parseToVal(positions[posIdx++])));
+            assertThat(positions.length).isGreaterThan(posIdx);
+            assertThat(Adjacent.iterPosition(adjs)).isEqualTo(Coord.parseToVal(positions[posIdx++]));
             adjs = Adjacent.iterMoveNext(adjs);
         }
-        assertThat(positions.length, equalTo(posIdx));
+        assertThat(positions.length).isEqualTo(posIdx);
         return adjs;
     }
 

@@ -1,9 +1,6 @@
 package uk.kukino.sgo.base;
 
-import net.openhft.chronicle.bytes.Bytes;
 import uk.kukino.sgo.util.Parsing;
-
-import java.nio.ByteBuffer;
 
 public final class Coord
 {
@@ -136,63 +133,6 @@ public final class Coord
     public static boolean isValid(final short val)
     {
         return val != INVALID;
-    }
-
-    /***
-     * Adjacent cells are returned in wall clock order, if the coordinate does not have four adjacent, it will return
-     * the number of adjacent interceptions, and the array will be filled up to four elements of invalid coordinates.
-     * @param result
-     * @param coord
-     * @param boardSize
-     * @return
-     */
-    @Deprecated
-    public static byte adjacents(final short[] result, final short coord, final byte boardSize)
-    {
-        int c = 0;
-        final byte x = Coord.X(coord);
-        final byte y = Coord.Y(coord);
-        if (y - 1 >= 0)
-        {
-            result[c++] = Coord.XY(x, (byte) (y - 1));
-        }
-        if (x + 1 < boardSize)
-        {
-            result[c++] = Coord.XY((byte) (x + 1), y);
-        }
-        if (y + 1 < boardSize)
-        {
-            result[c++] = Coord.XY(x, (byte) (y + 1));
-        }
-        if (x - 1 >= 0)
-        {
-            result[c++] = Coord.XY((byte) (x - 1), y);
-        }
-        return (byte) c;
-    }
-
-
-    public static void adjacents(final Bytes<ByteBuffer> result, final short coord, final byte boardSize)
-    {
-        result.clear();
-        final byte x = Coord.X(coord);
-        final byte y = Coord.Y(coord);
-        if (y - 1 >= 0)
-        {
-            result.writeShort(Coord.XY(x, (byte) (y - 1)));
-        }
-        if (x + 1 < boardSize)
-        {
-            result.writeShort(Coord.XY((byte) (x + 1), y));
-        }
-        if (y + 1 < boardSize)
-        {
-            result.writeShort(Coord.XY(x, (byte) (y + 1)));
-        }
-        if (x - 1 >= 0)
-        {
-            result.writeShort(Coord.XY((byte) (x - 1), y));
-        }
     }
 
 }

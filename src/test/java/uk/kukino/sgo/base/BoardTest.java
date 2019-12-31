@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static com.google.common.truth.Truth.assertThat;
 
 public class BoardTest
 {
@@ -24,7 +22,7 @@ public class BoardTest
     {
         board = new Board((byte) 19);
         board.set((byte) 4, (byte) 8, Color.BLACK);
-        assertThat(board.get((byte) 4, (byte) 8), equalTo(Color.BLACK));
+        assertThat(board.get((byte) 4, (byte) 8)).isEqualTo(Color.BLACK);
     }
 
     @Test
@@ -37,7 +35,7 @@ public class BoardTest
             for (byte y = 0; y < board.size(); y++)
             {
                 board.set(x, y, Color.WHITE);
-                assertThat(board.get(x, y), equalTo(Color.WHITE));
+                assertThat(board.get(x, y)).isEqualTo(Color.WHITE);
             }
         }
 
@@ -45,7 +43,7 @@ public class BoardTest
         {
             for (byte y = 0; y < board.size(); y++)
             {
-                assertThat(board.get(x, y), equalTo(Color.WHITE));
+                assertThat(board.get(x, y)).isEqualTo(Color.WHITE);
             }
         }
     }
@@ -70,7 +68,7 @@ public class BoardTest
             for (byte y = 0; y < 19; y++)
             {
                 Color color = colors.remove(0);
-                assertThat(board.get(x, y), equalTo(color));
+                assertThat(board.get(x, y)).isEqualTo(color);
             }
         }
     }
@@ -82,11 +80,11 @@ public class BoardTest
         Board boardCopy = new Board((byte) 19);
 
         board.set((byte) 4, (byte) 8, Color.BLACK);
-        assertThat(board.get((byte) 4, (byte) 8), equalTo(Color.BLACK));
-        assertThat(boardCopy.get((byte) 4, (byte) 8), equalTo(Color.EMPTY));
+        assertThat(board.get((byte) 4, (byte) 8)).isEqualTo(Color.BLACK);
+        assertThat(boardCopy.get((byte) 4, (byte) 8)).isEqualTo(Color.EMPTY);
 
         board.copyTo(boardCopy);
-        assertThat(boardCopy.get((byte) 4, (byte) 8), equalTo(Color.BLACK));
+        assertThat(boardCopy.get((byte) 4, (byte) 8)).isEqualTo(Color.BLACK);
     }
 
     @Test
@@ -128,7 +126,7 @@ public class BoardTest
         {
             for (byte y = 0; y < board.size(); y++)
             {
-                assertThat(board.get(x, y), equalTo(Color.EMPTY));
+                assertThat(board.get(x, y)).isEqualTo(Color.EMPTY);
             }
         }
     }
@@ -151,15 +149,15 @@ public class BoardTest
             for (byte y = 0; y < board.size(); y++)
             {
                 board.set(x, y, Color.WHITE);
-                assertThat(board.hashCode(), not(equalTo(hashOrig)));
+                assertThat(board.hashCode()).isNotEqualTo(hashOrig);
                 int hashForWhite = board.hashCode();
 
                 board.set(x, y, Color.BLACK);
-                assertThat(board.hashCode(), not(equalTo(hashOrig)));
-                assertThat(board.hashCode(), not(equalTo(hashForWhite)));
+                assertThat(board.hashCode()).isNotEqualTo(hashOrig);
+                assertThat(board.hashCode()).isNotEqualTo(hashForWhite);
 
                 board.set(x, y, Color.EMPTY);
-                assertThat(board.hashCode(), equalTo(hashOrig));
+                assertThat(board.hashCode()).isEqualTo(hashOrig);
             }
         }
 
@@ -187,16 +185,16 @@ public class BoardTest
                             {
                                 if (xx == x && yy == y)
                                 {
-                                    assertThat(board.get(xx, yy), equalTo(Color.fromByte(c)));
+                                    assertThat(board.get(xx, yy)).isEqualTo(Color.fromByte(c));
                                 }
                                 else
                                 {
-                                    assertThat(board.get(xx, yy), equalTo(Color.EMPTY));
+                                    assertThat(board.get(xx, yy)).isEqualTo(Color.EMPTY);
                                 }
                             }
                         }
-                        assertThat(board.count(Color.fromByte(c)), equalTo(1));
-                        assertThat(board.count(Color.EMPTY), equalTo((size * size) - 1));
+                        assertThat(board.count(Color.fromByte(c))).isEqualTo(1);
+                        assertThat(board.count(Color.EMPTY)).isEqualTo((size * size) - 1);
                         board.set(x, y, Color.EMPTY);
                     }
                 }
@@ -209,7 +207,7 @@ public class BoardTest
     {
         final Board board = new Board((byte) 19);
         board.set(Move.parseToVal("B C12"));
-        assertThat(board.toString(), equalTo(
+        assertThat(board.toString()).isEqualTo(
             "hash: 839910262\n" +
                 "   A B C D E F G H J K L M N O P Q R S T \n" +
                 "19 . . . . . . . . . . . . . . . . . . . 19\n" +
@@ -231,7 +229,7 @@ public class BoardTest
                 " 3 . . . . . . . . . . . . . . . . . . . 3\n" +
                 " 2 . . . . . . . . . . . . . . . . . . . 2\n" +
                 " 1 . . . . . . . . . . . . . . . . . . . 1\n" +
-                "   A B C D E F G H J K L M N O P Q R S T \n"));
+                "   A B C D E F G H J K L M N O P Q R S T \n");
     }
 
 }
