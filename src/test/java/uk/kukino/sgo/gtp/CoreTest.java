@@ -162,6 +162,15 @@ public class CoreTest
         assertGTP("22 boardsize  some   ").isEqualTo("?22 boardsize not an integer");
     }
 
+    @Test
+    public void clearBoard()
+    {
+        assertGTP("clear_board").isEqualTo("= ");
+        assertGTP("123 clear_board").isEqualTo("=123 ");
+        assertGTP("clear_board wtf").isEqualTo("= ");
+        verify(engine, times(3)).clearBoard();
+    }
+
     // ----------------------------------------------------------------------------------------------------------------------------------
 
 
