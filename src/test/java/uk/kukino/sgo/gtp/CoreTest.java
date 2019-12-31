@@ -49,14 +49,22 @@ public class CoreTest
     public void comment()
     {
         assertGTP("  # ").isEqualTo("");
+        assertGTP("123 # ").isEqualTo("");
         assertGTP("# ").isEqualTo("");
         assertGTP("# Hello Comment ").isEqualTo("");
+    }
+
+    @Test
+    public void idWithoutCommandIsOK()
+    {
+        assertGTP("123  ").isEqualTo("");
     }
 
     @Test
     public void unknownCommand()
     {
         assertGTP("wtf").isEqualTo("? unknown command");
+        assertGTP("0123 wtf").isEqualTo("?123 unknown command");
         assertNotClosed();
     }
 
@@ -64,6 +72,7 @@ public class CoreTest
     public void protocolVersion()
     {
         assertGTP("protocol_version").isEqualTo("= 2");
+        assertGTP("34 protocol_version").isEqualTo("=34 2");
     }
 
     @Test
@@ -87,9 +96,12 @@ public class CoreTest
     {
         when(engine.name()).thenReturn("EngineName");
         when(engine.version()).thenReturn("v1.2.3.4");
-        assertGTP(" \t\t\r   name   \r\r  ").isEqualTo("= EngineName");
-        assertGTP(" \t\r   version  \r\r  ").isEqualTo("= v1.2.3.4");
-        assertGTP(" \r\r protocol_version ").isEqualTo("= 2");
+        assertGTP("\t\r 1 \t\t\r   name   \r\r  ").isEqualTo("=1 EngineName");
+        assertGTP(" \r  2 \t\r   version  \r\r  ").isEqualTo("=2 v1.2.3.4");
+        assertGTP("3 \r\r protocol_version    \r").isEqualTo("=3 2");
+        assertGTP("\t\t\r   name   \r\r  ").isEqualTo("= EngineName");
+        assertGTP("\t\r   version  \r\r  ").isEqualTo("= v1.2.3.4");
+        assertGTP("protocol_version    \r").isEqualTo("= 2");
     }
 
     @Test
@@ -113,12 +125,20 @@ public class CoreTest
         assertGTP("known_command     version    ").isEqualTo("= true");
         assertGTP("known_command").isEqualTo("= false");
         assertGTP("known_command invalid").isEqualTo("= false");
+        assertGTP("565 known_command invalid").isEqualTo("=565 false");
     }
 
     @Test
     public void quit()
     {
         assertGTP("quit").isEqualTo("= ");
+        assertClosed();
+    }
+
+    @Test
+    public void quitWithId()
+    {
+        assertGTP("938 quit").isEqualTo("=938 ");
         assertClosed();
     }
 
@@ -134,11 +154,12 @@ public class CoreTest
         assertGTP("boardsize 35").isEqualTo("? unacceptable size");
         verify(engine, times(1)).setBoardSize((byte) 35);
 
-        assertGTP("boardsize").isEqualTo("? unacceptable size");
-        assertGTP("boardsize         ").isEqualTo("? unacceptable size");
+        assertGTP("boardsize").isEqualTo("? boardsize not an integer");
+        assertGTP("boardsize         ").isEqualTo("? boardsize not an integer");
         assertGTP("boardsize  -123   ").isEqualTo("? unacceptable size");
-        assertGTP("boardsize  19x19  ").isEqualTo("? unacceptable size");
-        assertGTP("boardsize  some   ").isEqualTo("? unacceptable size");
+        assertGTP("boardsize  19x19  ").isEqualTo("? boardsize not an integer");
+        assertGTP("boardsize  some   ").isEqualTo("? boardsize not an integer");
+        assertGTP("22 boardsize  some   ").isEqualTo("?22 boardsize not an integer");
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------

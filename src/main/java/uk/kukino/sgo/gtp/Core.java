@@ -10,6 +10,7 @@ public class Core
     private final StringBuilder out;
     private CharSequence input;
 
+    private int id;
     private boolean closed;
 
     public Core(final Engine engine)
@@ -38,12 +39,18 @@ public class Core
             return out;
         }
 
-        final int s = skipSpaces(0);
+        int s = skipSpaces(0);
+        int t = skipNonSpaces(s);
+        this.id = parsePositiveNumber(s, t);
+        if (this.id != Integer.MIN_VALUE)
+        {
+            s = skipSpaces(t);
+            t = skipNonSpaces(s);
+        }
         if (s == input.length() || input.charAt(s) == '#')
         {
             return out;
         }
-        final int t = skipNonSpaces(s);
 
         final boolean done = doName(s, t) || doProtocolVersion(s, t) || doVersion(s, t) ||
             doBoardSize(s, t) || doClearBoard(s, t) ||
@@ -66,7 +73,11 @@ public class Core
             final int t2 = skipNonSpaces(s2);
 
             final int size = parsePositiveNumber(s2, t2);
-            if (size > 0 && engine.setBoardSize((byte) size))
+            if (size == Integer.MIN_VALUE)
+            {
+                failure().append("boardsize not an integer");
+            }
+            else if (engine.setBoardSize((byte) size))
             {
                 success();
             }
@@ -181,12 +192,22 @@ public class Core
     @NotNull
     private StringBuilder success()
     {
-        return out.append("= "); //FIXME should include ID
+        out.append("=");
+        if (id != Integer.MIN_VALUE)
+        {
+            out.append(id);
+        }
+        return out.append(' ');
     }
 
     private StringBuilder failure()
     {
-        return out.append("? "); //FIXME should include ID
+        out.append("?");
+        if (id != Integer.MIN_VALUE)
+        {
+            out.append(id);
+        }
+        return out.append(' ');
     }
 
     private int skipNonSpaces(final int i)
@@ -213,7 +234,13 @@ public class Core
     {
         int j = s;
         int value = 0;
+        boolean negative = false;
 
+        if (j < t && input.charAt(j) == '-')
+        {
+            j++;
+            negative = true;
+        }
         while (j < t && input.charAt(j) >= '0' && input.charAt(j) <= '9')
         {
             value = value * 10 + (input.charAt(j) - '0');
@@ -222,6 +249,10 @@ public class Core
         if (j != t || s == t)
         {
             return Integer.MIN_VALUE;
+        }
+        else if (negative)
+        {
+            return -value;
         }
         else
         {
