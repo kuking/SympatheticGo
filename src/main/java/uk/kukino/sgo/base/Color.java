@@ -87,4 +87,21 @@ public enum Color
         return null;
     }
 
+    public void write(final StringBuilder sb, final boolean camelCase)
+    {
+        if (this == Color.WHITE)
+        {
+            sb.append(camelCase ? "White" : "WHITE");
+        }
+        if (this == Color.BLACK)
+        {
+            sb.append(camelCase ? "Black" : "BLACK");
+        }
+    }
+
+    public void write(final StringBuilder sb)
+    {
+        write(sb, true);
+    }
+
 }

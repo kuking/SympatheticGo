@@ -25,4 +25,25 @@ public class ColorTest
         assertThat(Color.parse(null)).isNull();
     }
 
+    @Test
+    public void writes()
+    {
+        final StringBuilder sb = new StringBuilder();
+
+        Color.WHITE.write(sb);
+        assertThat(sb.toString()).isEqualTo("White");
+
+        sb.delete(0, sb.length());
+        Color.BLACK.write(sb);
+        assertThat(sb.toString()).isEqualTo("Black");
+
+        sb.delete(0, sb.length());
+        Color.WHITE.write(sb, false);
+        assertThat(sb.toString()).isEqualTo("WHITE");
+
+        sb.delete(0, sb.length());
+        Color.BLACK.write(sb, false);
+        assertThat(sb.toString()).isEqualTo("BLACK");
+    }
+
 }

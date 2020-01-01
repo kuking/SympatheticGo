@@ -168,4 +168,46 @@ public final class Move
         return isValid(value) && !isPass(value);
     }
 
+    public static String shortToString(short value)
+    {
+        final StringBuilder sb = new StringBuilder();
+        write(sb, value);
+        return sb.toString();
+    }
+
+    public static void write(final StringBuilder sb, final short value, final boolean includeColor, final boolean camelCase)
+    {
+        if (!isValid(value))
+        {
+            sb.append("Invalid");
+            return;
+        }
+
+        if (includeColor && color(value) != null)
+        {
+            color(value).write(sb);
+            sb.append(' ');
+        }
+        if (isPass(value))
+        {
+            if (camelCase)
+            {
+                sb.append("Pass");
+            }
+            else
+            {
+                sb.append("PASS");
+            }
+        }
+        if (isStone(value))
+        {
+            Coord.write(sb, value);
+        }
+    }
+
+    public static void write(final StringBuilder sb, final short value)
+    {
+        write(sb, value, true, true);
+    }
+
 }

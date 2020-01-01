@@ -49,13 +49,20 @@ public final class Coord
 
     public static String shortToString(final short value)
     {
+        final StringBuilder sb = new StringBuilder();
+        write(sb, value);
+        return sb.toString();
+    }
+
+    public static void write(final StringBuilder sb, final short value)
+    {
         final byte x = Coord.X(value);
         final byte y = Coord.Y(value);
 
         final char symb = (x <= 'I' - 'A' - 1) ? (char) (65 + x) : (char) (65 + 1 + x);
         final int yToUse = y + 1; //FIXME: size - y;
 
-        return String.valueOf(symb) + yToUse;
+        sb.append(symb).append(yToUse);
     }
 
     public static short parseToVal(final CharSequence seq)

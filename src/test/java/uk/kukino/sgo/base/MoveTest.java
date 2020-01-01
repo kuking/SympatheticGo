@@ -100,4 +100,22 @@ public class MoveTest
         assertThat(Move.isValid(Move.parseToVal(""))).isFalse();
         assertThat(Move.isValid(Move.parseToVal(null))).isFalse();
     }
+
+    @Test
+    public void doesToString()
+    {
+        assertThat(Move.shortToString(Move.parseToVal("Black B10"))).isEqualTo("Black B10");
+        assertThat(Move.shortToString(Move.parseToVal("w Q12"))).isEqualTo("White Q12");
+        assertThat(Move.shortToString(Move.parseToVal("w pass"))).isEqualTo("White Pass");
+        assertThat(Move.shortToString(Move.INVALID)).isEqualTo("Invalid");
+    }
+
+    @Test
+    public void writeNotColor()
+    {
+        final StringBuilder sb = new StringBuilder();
+        Move.write(sb, Move.parseToVal("Black B10"), false, false);
+        assertThat(sb.toString()).isEqualTo("B10");
+    }
+
 }
