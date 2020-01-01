@@ -46,4 +46,45 @@ public enum Color
         throw new IllegalArgumentException("This needs further implementation, missing opposite Color configuration");
     }
 
+    public static Color parse(final CharSequence cs)
+    {
+        if (cs == null)
+        {
+            return null;
+        }
+        if (cs.length() == 1)
+        {
+            if (Character.toUpperCase(cs.charAt(0)) == 'W')
+            {
+                return WHITE;
+            }
+
+            else if (Character.toUpperCase(cs.charAt(0)) == 'B')
+            {
+                return BLACK;
+
+            }
+        }
+        else if (cs.length() == 5)
+        {
+            if (Character.toUpperCase(cs.charAt(0)) == 'B' &&
+                Character.toUpperCase(cs.charAt(1)) == 'L' &&
+                Character.toUpperCase(cs.charAt(2)) == 'A' &&
+                Character.toUpperCase(cs.charAt(3)) == 'C' &&
+                Character.toUpperCase(cs.charAt(4)) == 'K')
+            {
+                return BLACK;
+            }
+            if (Character.toUpperCase(cs.charAt(0)) == 'W' &&
+                Character.toUpperCase(cs.charAt(1)) == 'H' &&
+                Character.toUpperCase(cs.charAt(2)) == 'I' &&
+                Character.toUpperCase(cs.charAt(3)) == 'T' &&
+                Character.toUpperCase(cs.charAt(4)) == 'E')
+            {
+                return WHITE;
+            }
+        }
+        return null;
+    }
+
 }
