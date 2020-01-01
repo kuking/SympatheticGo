@@ -25,7 +25,7 @@ public class Parsing
         return j;
     }
 
-    public static int parsePositiveNumber(final CharSequence input, final int start, final int end)
+    public static int parseInteger(final CharSequence input, final int start, final int end)
     {
         int j = start;
         int value = 0;

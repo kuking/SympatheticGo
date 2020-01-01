@@ -8,6 +8,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.kukino.sgo.base.Color;
+import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Move;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -26,7 +27,7 @@ public class CoreTest
     Engine engine;
 
     ArgumentCaptor<Float> floatCapt = ArgumentCaptor.forClass(Float.class);
-    ArgumentCaptor<Short> shortCapt = ArgumentCaptor.forClass(Short.class);
+    ArgumentCaptor<Integer> intCapt = ArgumentCaptor.forClass(Integer.class);
 
     Core underTest;
 
@@ -231,7 +232,18 @@ public class CoreTest
     @Test
     public void fixedHandicap()
     {
-        fail("Implement");
+
+        when(engine.fixedHandicap(2))
+            .thenReturn(new short[] {Coord.parseToVal("D4"), Coord.parseToVal("Q16")})
+            .thenReturn(null);
+
+        assertGTP("fixed_handicap 2").isEqualTo("= D4 Q16 ");
+        assertGTP("fixed_handicap 2").isEqualTo("? board not empty");
+        verify(engine, times(2)).fixedHandicap(2);
+
+        assertGTP("fixed_handicap").isEqualTo("? handicap not an integer");
+        assertGTP("fixed_handicap 10").isEqualTo("? invalid handicap");
+        assertGTP("123 fixed_handicap 10").isEqualTo("?123 invalid handicap");
     }
 
     @Test
@@ -243,13 +255,28 @@ public class CoreTest
     @Test
     public void undo()
     {
-        fail("Implement");
+        when(engine.undo()).thenReturn(true).thenReturn(false);
+
+        assertGTP("undo").isEqualTo("= ");
+        assertGTP("undo").isEqualTo("? cannot undo");
+        verify(engine, times(2)).undo();
+
+        assertGTP("123 undo").isEqualTo("?123 cannot undo");
     }
 
     @Test
     public void timeSettings()
     {
-        fail("Implement");
+        when(engine.timeSettings(anyInt(), anyInt(), anyInt())).thenReturn(true).thenReturn(false);
+
+        assertGTP("time_settings 1 2 3").isEqualTo("= ");
+        assertGTP("time_settings 4 5 6").isEqualTo("? time not accepted");
+        verify(engine, times(2)).timeSettings(intCapt.capture(), intCapt.capture(), intCapt.capture());
+        assertThat(intCapt.getAllValues()).containsExactly(1, 2, 3, 4, 5, 6);
+
+        assertGTP("time_settings").isEqualTo("? not three integers");
+        assertGTP("time_settings -1 -2 -3").isEqualTo("? invalid positive integer");
+        assertGTP("123 time_settings 1 2").isEqualTo("?123 not three integers");
     }
 
     @Test
@@ -273,7 +300,11 @@ public class CoreTest
     @Test
     public void showboard()
     {
-        fail("Implement");
+        when(engine.displayableBoard()).thenReturn("board-printout\nmultiline");
+        assertGTP("showboard").isEqualTo("= \nboard-printout\nmultiline");
+        assertGTP("123 showboard").isEqualTo("=123 \nboard-printout\nmultiline");
+
+        verify(engine, times(2)).displayableBoard();
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------

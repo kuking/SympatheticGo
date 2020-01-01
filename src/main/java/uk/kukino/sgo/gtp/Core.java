@@ -2,6 +2,7 @@ package uk.kukino.sgo.gtp;
 
 import org.jetbrains.annotations.NotNull;
 import uk.kukino.sgo.base.Color;
+import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Move;
 import uk.kukino.sgo.util.Parsing;
 
@@ -45,7 +46,7 @@ public class Core
 
         cmdIdxStart = skipSpaces(0);
         cmdIdxEnd = skipNonSpaces(cmdIdxStart);
-        this.id = Parsing.parsePositiveNumber(input, cmdIdxStart, cmdIdxEnd);
+        this.id = Parsing.parseInteger(input, cmdIdxStart, cmdIdxEnd);
         if (this.id != Integer.MIN_VALUE)
         {
             cmdIdxStart = skipSpaces(cmdIdxEnd);
@@ -56,11 +57,12 @@ public class Core
             return out;
         }
 
-        final boolean done = doPlay() || doGenmove() ||
+        final boolean done = doPlay() || doGenMove() || doUndo() ||
 
             doName() || doProtocolVersion() || doVersion() ||
-            doBoardSize() || doClearBoard() || doKomi() ||
-            doListCommands() || doKnownCommand() || doQuit();
+            doBoardSize() || doClearBoard() || doKomi() || doTimeSettings() ||
+            doListCommands() || doKnownCommand() || doShowBoard() || doFixedHandicap() ||
+            doQuit();
 
         if (!done)
         {
@@ -98,7 +100,7 @@ public class Core
         return false;
     }
 
-    private boolean doGenmove()
+    private boolean doGenMove()
     {
         if (GENMOVE.matches(input, cmdIdxStart, cmdIdxEnd))
         {
@@ -121,6 +123,23 @@ public class Core
         return false;
     }
 
+    private boolean doUndo()
+    {
+        if (UNDO.matches(input, cmdIdxStart, cmdIdxEnd))
+        {
+            if (engine.undo())
+            {
+                success();
+            }
+            else
+            {
+                failure().append("cannot undo");
+            }
+            return true;
+        }
+        return false;
+    }
+
     private boolean doBoardSize()
     {
         if (BOARDSIZE.matches(input, cmdIdxStart, cmdIdxEnd))
@@ -128,7 +147,7 @@ public class Core
             final int start = skipSpaces(cmdIdxEnd);
             final int end = skipNonSpaces(start);
 
-            final int size = Parsing.parsePositiveNumber(input, start, end);
+            final int size = Parsing.parseInteger(input, start, end);
             if (size == Integer.MIN_VALUE)
             {
                 failure().append("boardsize not an integer");
@@ -256,6 +275,88 @@ public class Core
         return false;
     }
 
+
+    private boolean doShowBoard()
+    {
+        if (SHOWBOARD.matches(input, cmdIdxStart, cmdIdxEnd))
+        {
+            success().append('\n').append(engine.displayableBoard());
+            return true;
+        }
+        return false;
+    }
+
+    private boolean doTimeSettings()
+    {
+        if (TIME_SETTINGS.matches(input, cmdIdxStart, cmdIdxEnd))
+        {
+            int start = skipSpaces(cmdIdxEnd);
+            int end = skipNonSpaces(start);
+            final int mainSecs = Parsing.parseInteger(input, start, end);
+            start = skipSpaces(end);
+            end = skipNonSpaces(start);
+            final int byoYomiSecs = Parsing.parseInteger(input, start, end);
+            start = skipSpaces(end);
+            end = skipNonSpaces(start);
+            final int byoYomiStones = Parsing.parseInteger(input, start, end);
+
+            if (mainSecs == Integer.MIN_VALUE || byoYomiSecs == Integer.MIN_VALUE || byoYomiStones == Integer.MIN_VALUE)
+            {
+                failure().append("not three integers");
+            }
+            else if (mainSecs < 0 || byoYomiSecs < 0 || byoYomiStones < 0)
+            {
+                failure().append("invalid positive integer");
+            }
+            else if (engine.timeSettings(mainSecs, byoYomiSecs, byoYomiStones))
+            {
+                success();
+            }
+            else
+            {
+                failure().append("time not accepted");
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean doFixedHandicap()
+    {
+        if (FIXED_HANDICAP.matches(input, cmdIdxStart, cmdIdxEnd))
+        {
+            int start = skipSpaces(cmdIdxEnd);
+            int end = skipNonSpaces(start);
+            final int handicap = Parsing.parseInteger(input, start, end);
+            if (handicap == Integer.MIN_VALUE)
+            {
+                failure().append("handicap not an integer");
+            }
+            else if (handicap < 0 || handicap > 9)
+            {
+                failure().append("invalid handicap");
+            }
+            else
+            {
+                short[] coords = engine.fixedHandicap(handicap);
+                if (coords == null)
+                {
+                    failure().append("board not empty");
+                }
+                else
+                {
+                    success();
+                    for (final short coord : coords)
+                    {
+                        Coord.write(out, coord);
+                        out.append(' ');
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 
     private boolean doUnknownCommand()
     {

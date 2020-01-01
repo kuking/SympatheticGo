@@ -18,4 +18,16 @@ public interface Engine
 
     short genMove(Color color);
 
+    boolean undo();
+
+    CharSequence displayableBoard();
+
+    boolean timeSettings(int mainTimeSecs, int byoYomiSecs, int byoYomiStones);
+
+    /***
+     *
+     * @param stones black handicap
+     * @return null if board is not empty or handicap can't be set, or the list of stones placed in the board.
+     */
+    short[] fixedHandicap(int stones);
 }
