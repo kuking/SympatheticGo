@@ -1,5 +1,7 @@
 package uk.kukino.sgo.gtp;
 
+import uk.kukino.sgo.base.Color;
+
 public interface Engine
 {
     CharSequence name();
@@ -9,5 +11,11 @@ public interface Engine
     boolean setBoardSize(byte size);
 
     void clearBoard();
+
+    void setKomi(float komi);
+
+    boolean play(short move);
+
+    short genMove(Color color);
 
 }

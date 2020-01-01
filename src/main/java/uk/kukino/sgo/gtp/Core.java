@@ -1,6 +1,9 @@
 package uk.kukino.sgo.gtp;
 
 import org.jetbrains.annotations.NotNull;
+import uk.kukino.sgo.base.Color;
+import uk.kukino.sgo.base.Move;
+import uk.kukino.sgo.util.Parsing;
 
 import static uk.kukino.sgo.gtp.Command.*;
 
@@ -9,6 +12,7 @@ public class Core
     private final Engine engine;
     private final StringBuilder out;
     private CharSequence input;
+    private int cmdIdxStart, cmdIdxEnd;
 
     private int id;
     private boolean closed;
@@ -39,22 +43,24 @@ public class Core
             return out;
         }
 
-        int s = skipSpaces(0);
-        int t = skipNonSpaces(s);
-        this.id = parsePositiveNumber(s, t);
+        cmdIdxStart = skipSpaces(0);
+        cmdIdxEnd = skipNonSpaces(cmdIdxStart);
+        this.id = Parsing.parsePositiveNumber(input, cmdIdxStart, cmdIdxEnd);
         if (this.id != Integer.MIN_VALUE)
         {
-            s = skipSpaces(t);
-            t = skipNonSpaces(s);
+            cmdIdxStart = skipSpaces(cmdIdxEnd);
+            cmdIdxEnd = skipNonSpaces(cmdIdxStart);
         }
-        if (s == input.length() || input.charAt(s) == '#')
+        if (cmdIdxStart == input.length() || input.charAt(cmdIdxStart) == '#')
         {
             return out;
         }
 
-        final boolean done = doName(s, t) || doProtocolVersion(s, t) || doVersion(s, t) ||
-            doBoardSize(s, t) || doClearBoard(s, t) ||
-            doListCommands(s, t) || doKnownCommand(s, t) || doQuit(s, t);
+        final boolean done = doPlay() || doGenmove() ||
+
+            doName() || doProtocolVersion() || doVersion() ||
+            doBoardSize() || doClearBoard() || doKomi() ||
+            doListCommands() || doKnownCommand() || doQuit();
 
         if (!done)
         {
@@ -65,14 +71,64 @@ public class Core
         return out;
     }
 
-    private boolean doBoardSize(final int s, final int t)
+    private boolean doPlay()
     {
-        if (BOARDSIZE.matches(input, s, t))
+        if (PLAY.matches(input, cmdIdxStart, cmdIdxEnd))
         {
-            final int s2 = skipSpaces(t);
-            final int t2 = skipNonSpaces(s2);
+            final int start = skipSpaces(cmdIdxEnd);
+            final int end = skipNonSpaces(skipSpaces(skipNonSpaces(start))); // So two words
+            final short move = Move.parseToVal(input.subSequence(start, end));
+            if (Move.isValid(move))
+            {
+                if (engine.play(move))
+                {
+                    success();
+                }
+                else
+                {
+                    failure().append("illegal move");
+                }
+            }
+            else
+            {
+                failure().append("invalid color or coordinate");
+            }
+            return true;
+        }
+        return false;
+    }
 
-            final int size = parsePositiveNumber(s2, t2);
+    private boolean doGenmove()
+    {
+        if (GENMOVE.matches(input, cmdIdxStart, cmdIdxEnd))
+        {
+            final int start = skipSpaces(cmdIdxEnd);
+            final int end = skipNonSpaces(start);
+            final Color color = Color.parse(input.subSequence(start, end));
+
+            if (color == null)
+            {
+                failure().append("invalid color");
+            }
+            else
+            {
+                final short move = engine.genMove(color);
+                success();
+                Move.write(out, move, false, false);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean doBoardSize()
+    {
+        if (BOARDSIZE.matches(input, cmdIdxStart, cmdIdxEnd))
+        {
+            final int start = skipSpaces(cmdIdxEnd);
+            final int end = skipNonSpaces(start);
+
+            final int size = Parsing.parsePositiveNumber(input, start, end);
             if (size == Integer.MIN_VALUE)
             {
                 failure().append("boardsize not an integer");
@@ -90,9 +146,9 @@ public class Core
         return false;
     }
 
-    private boolean doClearBoard(final int s, final int t)
+    private boolean doClearBoard()
     {
-        if (CLEAR_BOARD.matches(input, s, t))
+        if (CLEAR_BOARD.matches(input, cmdIdxStart, cmdIdxEnd))
         {
             engine.clearBoard();
             success();
@@ -101,16 +157,37 @@ public class Core
         return false;
     }
 
-    private boolean doKnownCommand(int s, int t)
+    private boolean doKomi()
     {
-        if (KNOWN_COMMAND.matches(input, s, t))
+        if (KOMI.matches(input, cmdIdxStart, cmdIdxEnd))
         {
-            final int s2 = skipSpaces(t);
-            final int t2 = skipNonSpaces(s2);
+            final int start = skipSpaces(cmdIdxEnd);
+            final int end = skipNonSpaces(start);
+            final float komi = parseFloat(start, end);
+            if (Float.isNaN(komi))
+            {
+                failure().append("komi not a float");
+            }
+            else
+            {
+                engine.setKomi(komi);
+                success();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean doKnownCommand()
+    {
+        if (KNOWN_COMMAND.matches(input, cmdIdxStart, cmdIdxEnd))
+        {
+            final int start = skipSpaces(cmdIdxEnd);
+            final int end = skipNonSpaces(start);
             boolean found = false;
             for (final Command cmd : Command.values())
             {
-                if (cmd.matches(input, s2, t2))
+                if (cmd.matches(input, start, end))
                 {
                     found = true;
                     break;
@@ -122,9 +199,9 @@ public class Core
         return false;
     }
 
-    private boolean doName(final int s, final int t)
+    private boolean doName()
     {
-        if (NAME.matches(input, s, t))
+        if (NAME.matches(input, cmdIdxStart, cmdIdxEnd))
         {
             success().append(engine.name());
             return true;
@@ -132,9 +209,9 @@ public class Core
         return false;
     }
 
-    private boolean doProtocolVersion(final int s, final int t)
+    private boolean doProtocolVersion()
     {
-        if (PROTOCOL_VERSION.matches(input, s, t))
+        if (PROTOCOL_VERSION.matches(input, cmdIdxStart, cmdIdxEnd))
         {
             success().append(2);
             return true;
@@ -142,9 +219,9 @@ public class Core
         return false;
     }
 
-    private boolean doVersion(final int s, final int t)
+    private boolean doVersion()
     {
-        if (VERSION.matches(input, s, t))
+        if (VERSION.matches(input, cmdIdxStart, cmdIdxEnd))
         {
             success().append(engine.version());
             return true;
@@ -152,10 +229,10 @@ public class Core
         return false;
     }
 
-    private boolean doListCommands(final int s, final int t)
+    private boolean doListCommands()
     {
         // maybe sorted ..
-        if (LIST_COMMANDS.matches(input, s, t))
+        if (LIST_COMMANDS.matches(input, cmdIdxStart, cmdIdxEnd))
         {
             success();
             for (final Command cmd : Command.values())
@@ -168,9 +245,9 @@ public class Core
         return false;
     }
 
-    private boolean doQuit(final int s, final int t)
+    private boolean doQuit()
     {
-        if (QUIT.matches(input, s, t))
+        if (QUIT.matches(input, cmdIdxStart, cmdIdxEnd))
         {
             success();
             closed = true;
@@ -230,33 +307,15 @@ public class Core
         return j;
     }
 
-    private int parsePositiveNumber(final int s, final int t)
+    private float parseFloat(final int start, final int end)
     {
-        int j = s;
-        int value = 0;
-        boolean negative = false;
-
-        if (j < t && input.charAt(j) == '-')
+        try
         {
-            j++;
-            negative = true;
+            return Float.parseFloat(input.subSequence(start, end).toString()); // allocates, but only used for Komi at setup time
         }
-        while (j < t && input.charAt(j) >= '0' && input.charAt(j) <= '9')
+        catch (final NumberFormatException e)
         {
-            value = value * 10 + (input.charAt(j) - '0');
-            j++;
-        }
-        if (j != t || s == t)
-        {
-            return Integer.MIN_VALUE;
-        }
-        else if (negative)
-        {
-            return -value;
-        }
-        else
-        {
-            return value;
+            return Float.NaN;
         }
     }
 

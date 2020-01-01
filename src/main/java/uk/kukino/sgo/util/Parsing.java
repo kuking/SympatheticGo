@@ -24,4 +24,35 @@ public class Parsing
         }
         return j;
     }
+
+    public static int parsePositiveNumber(final CharSequence input, final int start, final int end)
+    {
+        int j = start;
+        int value = 0;
+        boolean negative = false;
+
+        if (j < end && input.charAt(j) == '-')
+        {
+            j++;
+            negative = true;
+        }
+        while (j < end && input.charAt(j) >= '0' && input.charAt(j) <= '9')
+        {
+            value = value * 10 + (input.charAt(j) - '0');
+            j++;
+        }
+        if (j != end || start == end)
+        {
+            return Integer.MIN_VALUE;
+        }
+        else if (negative)
+        {
+            return -value;
+        }
+        else
+        {
+            return value;
+        }
+    }
+
 }
