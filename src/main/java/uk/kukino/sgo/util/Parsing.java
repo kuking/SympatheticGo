@@ -3,9 +3,9 @@ package uk.kukino.sgo.util;
 public class Parsing
 {
 
-    public static int scanSpaces(final CharSequence seq, final int i)
+    public static int scanSpaces(final CharSequence seq, final int start)
     {
-        int j = i;
+        int j = start;
         while (j < seq.length() && seq.charAt(j) == ' ')
         {
             j++;
@@ -13,9 +13,9 @@ public class Parsing
         return j;
     }
 
-    public static int scanAlphas(final CharSequence seq, final int i)
+    public static int scanAlphas(final CharSequence seq, final int start)
     {
-        int j = i;
+        int j = start;
         while (j < seq.length() &&
             Character.toUpperCase(seq.charAt(j)) >= 'A' &&
             Character.toUpperCase(seq.charAt(j)) <= 'Z')
@@ -23,6 +23,33 @@ public class Parsing
             j++;
         }
         return j;
+    }
+
+    public static int scanToChar(final CharSequence seq, final char ch, final int start)
+    {
+        int j = start;
+        while (j < seq.length() && ch != seq.charAt(j))
+        {
+            j++;
+        }
+        return j;
+    }
+
+    public static boolean sameIgnoreCase(final CharSequence left, final CharSequence right)
+    {
+        if (left == null || right == null || left.length() != right.length())
+        {
+            return false;
+        }
+
+        for (int i = 0; i < left.length(); i++)
+        {
+            if (Character.toUpperCase(left.charAt(i)) != Character.toUpperCase(right.charAt(i)))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static int parseInteger(final CharSequence input, final int start, final int end)

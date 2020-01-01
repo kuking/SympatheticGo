@@ -1,5 +1,7 @@
 package uk.kukino.sgo.base;
 
+import uk.kukino.sgo.util.Parsing;
+
 public enum Color
 {
     EMPTY((byte) 0, '.'), BLACK((byte) 1, 'X'), WHITE((byte) 2, 'O'), MARK((byte) 3, '*');
@@ -67,19 +69,11 @@ public enum Color
         }
         else if (cs.length() == 5)
         {
-            if (Character.toUpperCase(cs.charAt(0)) == 'B' &&
-                Character.toUpperCase(cs.charAt(1)) == 'L' &&
-                Character.toUpperCase(cs.charAt(2)) == 'A' &&
-                Character.toUpperCase(cs.charAt(3)) == 'C' &&
-                Character.toUpperCase(cs.charAt(4)) == 'K')
+            if (Parsing.sameIgnoreCase(cs, "BLACK"))
             {
                 return BLACK;
             }
-            if (Character.toUpperCase(cs.charAt(0)) == 'W' &&
-                Character.toUpperCase(cs.charAt(1)) == 'H' &&
-                Character.toUpperCase(cs.charAt(2)) == 'I' &&
-                Character.toUpperCase(cs.charAt(3)) == 'T' &&
-                Character.toUpperCase(cs.charAt(4)) == 'E')
+            if (Parsing.sameIgnoreCase(cs, "WHITE"))
             {
                 return WHITE;
             }
