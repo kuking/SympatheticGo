@@ -40,6 +40,7 @@ public class Benchmark
 
     private static void replayKgsForRegression() throws IOException
     {
+        final int[] counters = new int[] {0, 0, 0};
         final SGFReader sgfReader = new SGFReader();
         final Game[] game = new Game[1];
         Files.walk(Paths.get("data/KGS/"))
@@ -49,13 +50,15 @@ public class Benchmark
                 try (final Reader r = new InputStreamReader(new FileInputStream(p.toFile())))
                 {
                     sgfReader.parse(r, header -> {
-                        if (header.size == (byte) 9 || header.handicap == 0)
+                        if (header.handicap <= 9)
                         {
                             game[0] = new Game(header.size, header.handicap, (byte) (header.komi * 10));
+                            counters[0]++;
                         }
                         else
                         {
                             game[0] = null;
+                            counters[1]++;
                         }
                     }, node ->
                     {
@@ -67,6 +70,7 @@ public class Benchmark
                                 System.out.println("UPS! Invalid move? " + Coord.shortToString(node.move));
                                 System.out.println(game[0].toString());
                                 game[0] = null;
+                                counters[2]++;
                             }
                         }
                     });
@@ -76,9 +80,8 @@ public class Benchmark
                     System.out.println("Parsing ... " + p.getParent() + "/" + p.getFileName());
                     System.out.println(e.getMessage());
                 }
-
-
             });
+        System.out.println("Total replayed: " + counters[0] + " skipped: " + counters[1] + " - with issues:" + counters[2]);
     }
 
     public static void main(String[] args) throws IOException
