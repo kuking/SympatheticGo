@@ -182,7 +182,7 @@ public class Core
         {
             final int start = skipSpaces(cmdIdxEnd);
             final int end = skipNonSpaces(start);
-            final float komi = parseFloat(start, end);
+            final float komi = Parsing.parseFloat(input, start, end);
             if (Float.isNaN(komi))
             {
                 failure().append("komi not a float");
@@ -407,18 +407,6 @@ public class Core
             j++;
         }
         return j;
-    }
-
-    private float parseFloat(final int start, final int end)
-    {
-        try
-        {
-            return Float.parseFloat(input.subSequence(start, end).toString()); // allocates, but only used for Komi at setup time
-        }
-        catch (final NumberFormatException e)
-        {
-            return Float.NaN;
-        }
     }
 
 }

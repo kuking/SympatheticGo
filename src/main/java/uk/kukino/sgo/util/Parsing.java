@@ -82,4 +82,53 @@ public class Parsing
         }
     }
 
+    public static float parseFloat(final CharSequence input, final int start, final int end)
+    {
+        int j = start;
+        long value = 0;
+        int divider = 1;
+        boolean dotfound = false;
+
+        if (j < end && input.charAt(j) == '-')
+        {
+            j++;
+            divider = -divider;
+            if (j == end)
+            {
+                return Float.NaN;
+            }
+        }
+        while (j < end && ((input.charAt(j) >= '0' && input.charAt(j) <= '9') || input.charAt(j) == '.'))
+        {
+            if (input.charAt(j) == '.')
+            {
+                if (dotfound)
+                {
+                    return Float.NaN; // double dots?!
+                }
+                dotfound = true;
+            }
+            else
+            {
+                value = value * 10 + (input.charAt(j) - '0');
+                if (dotfound)
+                {
+                    divider = divider * 10;
+                }
+            }
+
+            j++;
+        }
+        if (j != end || start == end)
+        {
+            return Float.NaN;
+        }
+        return (float) value / (float) divider;
+    }
+
+    public static float parseFloat(final CharSequence input)
+    {
+        return parseFloat(input, 0, input.length());
+    }
+
 }
