@@ -22,7 +22,7 @@ public interface Engine
 
     CharSequence displayableBoard();
 
-    boolean timeSettings(int mainTimeSecs, int byoYomiSecs, int byoYomiStones);
+    boolean setTimeSettings(int mainTimeSecs, int byoYomiSecs, int byoYomiStones);
 
     /***
      *

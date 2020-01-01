@@ -61,7 +61,7 @@ public class Core
 
             doName() || doProtocolVersion() || doVersion() ||
             doBoardSize() || doClearBoard() || doKomi() || doTimeSettings() ||
-            doListCommands() || doKnownCommand() || doShowBoard() || doFixedHandicap() ||
+            doListCommands() || doKnownCommand() || doShowBoard() || doFixedHandicapOrPlaceFreeHandicap() ||
             doQuit();
 
         if (!done)
@@ -308,7 +308,7 @@ public class Core
             {
                 failure().append("invalid positive integer");
             }
-            else if (engine.timeSettings(mainSecs, byoYomiSecs, byoYomiStones))
+            else if (engine.setTimeSettings(mainSecs, byoYomiSecs, byoYomiStones))
             {
                 success();
             }
@@ -321,9 +321,10 @@ public class Core
         return false;
     }
 
-    private boolean doFixedHandicap()
+    private boolean doFixedHandicapOrPlaceFreeHandicap()
     {
-        if (FIXED_HANDICAP.matches(input, cmdIdxStart, cmdIdxEnd))
+        if (FIXED_HANDICAP.matches(input, cmdIdxStart, cmdIdxEnd) ||
+            PLACE_FREE_HANDICAP.matches(input, cmdIdxStart, cmdIdxEnd))
         {
             int start = skipSpaces(cmdIdxEnd);
             int end = skipNonSpaces(start);
@@ -332,7 +333,7 @@ public class Core
             {
                 failure().append("handicap not an integer");
             }
-            else if (handicap < 0 || handicap > 9)
+            else if (handicap < 2 || handicap > 9)
             {
                 failure().append("invalid handicap");
             }

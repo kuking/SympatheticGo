@@ -2,6 +2,7 @@ package uk.kukino.sgo.gtp;
 
 import com.google.common.truth.Subject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -232,7 +233,6 @@ public class CoreTest
     @Test
     public void fixedHandicap()
     {
-
         when(engine.fixedHandicap(2))
             .thenReturn(new short[] {Coord.parseToVal("D4"), Coord.parseToVal("Q16")})
             .thenReturn(null);
@@ -242,6 +242,7 @@ public class CoreTest
         verify(engine, times(2)).fixedHandicap(2);
 
         assertGTP("fixed_handicap").isEqualTo("? handicap not an integer");
+        assertGTP("fixed_handicap 1").isEqualTo("? invalid handicap");
         assertGTP("fixed_handicap 10").isEqualTo("? invalid handicap");
         assertGTP("123 fixed_handicap 10").isEqualTo("?123 invalid handicap");
     }
@@ -249,7 +250,19 @@ public class CoreTest
     @Test
     public void placeFreeHandicap()
     {
-        fail("Implement");
+        // as today, as implemented by fixed_handicap
+        when(engine.fixedHandicap(2))
+            .thenReturn(new short[] {Coord.parseToVal("D4"), Coord.parseToVal("Q16")})
+            .thenReturn(null);
+
+        assertGTP("place_free_handicap 2").isEqualTo("= D4 Q16 ");
+        assertGTP("place_free_handicap 2").isEqualTo("? board not empty");
+        verify(engine, times(2)).fixedHandicap(2);
+
+        assertGTP("place_free_handicap").isEqualTo("? handicap not an integer");
+        assertGTP("place_free_handicap 1").isEqualTo("? invalid handicap");
+        assertGTP("place_free_handicap 10").isEqualTo("? invalid handicap");
+        assertGTP("123 place_free_handicap 10").isEqualTo("?123 invalid handicap");
     }
 
     @Test
@@ -267,11 +280,11 @@ public class CoreTest
     @Test
     public void timeSettings()
     {
-        when(engine.timeSettings(anyInt(), anyInt(), anyInt())).thenReturn(true).thenReturn(false);
+        when(engine.setTimeSettings(anyInt(), anyInt(), anyInt())).thenReturn(true).thenReturn(false);
 
         assertGTP("time_settings 1 2 3").isEqualTo("= ");
         assertGTP("time_settings 4 5 6").isEqualTo("? time not accepted");
-        verify(engine, times(2)).timeSettings(intCapt.capture(), intCapt.capture(), intCapt.capture());
+        verify(engine, times(2)).setTimeSettings(intCapt.capture(), intCapt.capture(), intCapt.capture());
         assertThat(intCapt.getAllValues()).containsExactly(1, 2, 3, 4, 5, 6);
 
         assertGTP("time_settings").isEqualTo("? not three integers");
@@ -280,18 +293,21 @@ public class CoreTest
     }
 
     @Test
+    @Disabled
     public void timeLeft()
     {
         fail("Implement");
     }
 
     @Test
+    @Disabled
     public void finalScore()
     {
         fail("Implement");
     }
 
     @Test
+    @Disabled
     public void finalStatusList()
     {
         fail("Implement");
