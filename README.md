@@ -90,6 +90,7 @@ Effectively:  14659ms, 3555552 plys, 242550.79 ply/s, 4.123μs/ply
   - Better implementation with MTCS (UCT)
   - Side-channel stats, i.e. current top-10 exploration trees, its odds, maybe visuals.
   - Time Management
+  - Basic statical positional board for MCCS. i.e. D4 has a 1/8 chance of being played on 1st move, using games.
   - Introduce a NN to prune exploration tree (i.e. to pre-populate UCT tree) 
   - Simple Remote Service, so it can be distributed
 
@@ -98,3 +99,8 @@ Effectively:  14659ms, 3555552 plys, 242550.79 ply/s, 4.123μs/ply
 - Check about SuperKO rules here, we might need to revisit current impl: http://www.weddslist.com/kgs/past/superko.html
 - Check "Mastering the game of Go without Human Knowledge" https://www.nature.com/articles/nature24270.epdf
 - https://github.com/leela-zero/leela-zero
+- http://www.lysator.liu.se/~gunnar/gtp/gtp2-spec-draft2/gtp2-spec.html
+
+- GTP
+  - Some of the verbs missing (see @Disabled tests)
+  - Streaming wrappers

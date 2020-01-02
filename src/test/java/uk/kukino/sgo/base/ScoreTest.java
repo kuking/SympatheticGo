@@ -124,6 +124,7 @@ public class ScoreTest
         assertThat(Score.parseToVal("B+WAT")).isEqualTo(Score.UNKNOWN);
         assertThat(Score.parseToVal("  DRAW  WAT? ")).isEqualTo(Score.UNKNOWN);
         assertThat(Score.parseToVal("E+1")).isEqualTo(Score.UNKNOWN);
+        assertThat(Score.parseToVal("Unknown")).isEqualTo(Score.UNKNOWN);
     }
 
     @Test

@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import uk.kukino.sgo.base.Color;
 import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Move;
+import uk.kukino.sgo.base.Score;
 import uk.kukino.sgo.util.Parsing;
 
 import static uk.kukino.sgo.gtp.Command.*;
@@ -61,7 +62,7 @@ public class Core
 
             doName() || doProtocolVersion() || doVersion() ||
             doBoardSize() || doClearBoard() || doKomi() || doTimeSettings() ||
-            doListCommands() || doKnownCommand() || doShowBoard() || doFixedHandicapOrPlaceFreeHandicap() ||
+            doListCommands() || doKnownCommand() || doShowBoard() || doFixedHandicapOrPlaceFreeHandicap() || doFinalScore() ||
             doQuit();
 
         if (!done)
@@ -275,7 +276,6 @@ public class Core
         return false;
     }
 
-
     private boolean doShowBoard()
     {
         if (SHOWBOARD.matches(input, cmdIdxStart, cmdIdxEnd))
@@ -353,6 +353,29 @@ public class Core
                         out.append(' ');
                     }
                 }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean doFinalScore()
+    {
+        if (FINAL_SCORE.matches(input, cmdIdxStart, cmdIdxEnd))
+        {
+            final int score = engine.calculateFinalScore();
+            if (Score.isUnknown(score))
+            {
+                failure().append("cannot score");
+            }
+            else if (Score.isDraw(score))
+            {
+                success().append(0);
+            }
+            else
+            {
+                success();
+                Score.write(out, score);
             }
             return true;
         }

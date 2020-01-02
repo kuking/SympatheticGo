@@ -30,4 +30,7 @@ public interface Engine
      * @return null if board is not empty or handicap can't be set, or the list of stones placed in the board.
      */
     short[] fixedHandicap(int stones);
+
+    int calculateFinalScore();
+
 }

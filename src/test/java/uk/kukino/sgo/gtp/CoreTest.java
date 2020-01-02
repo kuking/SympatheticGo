@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.kukino.sgo.base.Color;
 import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Move;
+import uk.kukino.sgo.base.Score;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -300,10 +301,20 @@ public class CoreTest
     }
 
     @Test
-    @Disabled
     public void finalScore()
     {
-        fail("Implement");
+        when(engine.calculateFinalScore())
+            .thenReturn(Score.parseToVal("W+4.5"))
+            .thenReturn(Score.parseToVal("B+R"))
+            .thenReturn(Score.parseToVal("Unknown"))
+            .thenReturn(Score.parseToVal("Draw"));
+
+        assertGTP("final_score").isEqualTo("= W+4.5");
+        assertGTP("123 final_score").isEqualTo("=123 B+Resign");
+        assertGTP("final_score").isEqualTo("? cannot score");
+        assertGTP("final_score").isEqualTo("= 0");
+
+        verify(engine, times(4)).calculateFinalScore();
     }
 
     @Test
