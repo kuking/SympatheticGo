@@ -33,4 +33,5 @@ public interface Engine
 
     int calculateFinalScore();
 
+    void shutdown();
 }

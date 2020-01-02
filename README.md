@@ -9,7 +9,7 @@ Some ideas from http://mechanical-sympathy.blogspot.com and some libraries from 
 $ sysctl -n machdep.cpu.brand_string
 Intel(R) Core(TM) i7-8559U CPU @ 2.70GHz
 
-$ ./gradlew run
+$ ./gradlew run --args 'perf'
 ===================================================================
 Running 1 concurrent threads with 9x9 games ...
    thrd.  0:   7820ms,  222222 plys,  28417.14 ply/s, 35.190μs/ply
@@ -44,7 +44,7 @@ Effectively:  15319ms, 1777776 plys, 116050.39 ply/s, 8.617μs/ply
 $ lscpu | grep "Model name"
 Model name:          AMD Ryzen 7 3800X 8-Core Processor
 
-$ ./gradlew run
+$ ./gradlew run --args 'perf'
 ===================================================================
 Running 1 concurrent threads with 9x9 games ...
    thrd.  0:   8140ms,  222222 plys,  27300.00 ply/s, 36.630μs/ply
@@ -82,6 +82,17 @@ Running 16 concurrent threads with 9x9 games ...
 Agr. & avg.: 228491ms,  222222 plys,  15561.02 ply/s, 64.263μs/ply
 Effectively:  14659ms, 3555552 plys, 242550.79 ply/s, 4.123μs/ply
 ```
+
+## Usage
+
+```
+$ ./gradlew build 
+$ java -jar build/libs/sgo.jar help
+$ java -jar build/libs/sgo.jar perf
+$ java -jar build/libs/sgo.jar gtp
+$ misc/sgo-gtp
+```
+
 
 ## Mini-Roadmap 
 - Better MCTS implementation

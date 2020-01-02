@@ -452,5 +452,17 @@ public class Game
         return lastMove;
     }
 
+    public short moveN(final int moveNo)
+    {
+        if (moveNo >= lastMove)
+        {
+            return Move.INVALID;
+        }
+        else
+        {
+            return moves[moveNo];
+        }
+    }
+
 }
 

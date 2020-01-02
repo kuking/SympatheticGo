@@ -1,4 +1,5 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
     id 'java'
     id 'application'
 }
@@ -21,8 +22,14 @@ dependencies {
 }
 
 application {
-    // Define the main class for the application
-    mainClassName = 'uk.kukino.sgo.PerfStats'
+    mainClassName = 'uk.kukino.sgo.Main'
+}
+
+shadowJar {
+    baseName('sgo')
+    classifier('')
+    archiveVersion = ''
+    minimize()
 }
 
 test {

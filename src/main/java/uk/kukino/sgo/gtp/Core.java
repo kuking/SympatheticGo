@@ -17,18 +17,27 @@ public class Core
     private int cmdIdxStart, cmdIdxEnd;
 
     private int id;
-    private boolean closed;
+    private boolean shutdown;
 
     public Core(final Engine engine)
     {
         this.engine = engine;
         this.out = new StringBuilder(4096);
-        this.closed = false;
+        this.shutdown = false;
     }
 
-    public boolean isClosed()
+    public boolean isShutdown()
     {
-        return closed;
+        return shutdown;
+    }
+
+    public void shutdown()
+    {
+        if (!isShutdown())
+        {
+            engine.shutdown();
+            shutdown = true;
+        }
     }
 
     /***
@@ -40,7 +49,7 @@ public class Core
     {
         this.input = input;
         out.delete(0, out.length());
-        if (input == null || closed)
+        if (input == null || shutdown)
         {
             return out;
         }
@@ -69,7 +78,6 @@ public class Core
         {
             doUnknownCommand();
         }
-
 
         return out;
     }
@@ -270,7 +278,7 @@ public class Core
         if (QUIT.matches(input, cmdIdxStart, cmdIdxEnd))
         {
             success();
-            closed = true;
+            shutdown = true;
             return true;
         }
         return false;

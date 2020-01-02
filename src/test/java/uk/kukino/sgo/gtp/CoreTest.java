@@ -87,6 +87,18 @@ public class CoreTest
     }
 
     @Test
+    public void shutdowns()
+    {
+        assertThat(underTest.isShutdown()).isFalse();
+        underTest.shutdown();
+        assertThat(underTest.isShutdown()).isTrue();
+        underTest.shutdown();
+        underTest.shutdown();
+
+        verify(engine, times(1)).shutdown();
+    }
+
+    @Test
     public void unknownCommand()
     {
         assertGTP("wtf").isEqualTo("? unknown command");
@@ -352,12 +364,12 @@ public class CoreTest
 
     private void assertNotClosed()
     {
-        assertThat(underTest.isClosed()).isFalse();
+        assertThat(underTest.isShutdown()).isFalse();
     }
 
     private void assertClosed()
     {
-        assertThat(underTest.isClosed()).isTrue();
+        assertThat(underTest.isShutdown()).isTrue();
     }
 
 }
