@@ -13,6 +13,16 @@ public class Parsing
         return j;
     }
 
+    public static int scanNonSpaces(final CharSequence seq, final int start)
+    {
+        int j = start;
+        while (j < seq.length() && seq.charAt(j) != ' ')
+        {
+            j++;
+        }
+        return j;
+    }
+
     public static int scanAlphas(final CharSequence seq, final int start)
     {
         int j = start;
@@ -130,5 +140,4 @@ public class Parsing
     {
         return parseFloat(input, 0, input.length());
     }
-
 }
