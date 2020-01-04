@@ -100,7 +100,7 @@ public class SGFReaderTest
             },
             node ->
             {
-                assertThat(node.move).isEqualTo(Move.parseToVal("BLACK D4"));
+                assertThat(Move.shortToString(node.move)).isEqualTo("Black D4");
                 nodes.add(node.clone());
             }
         );
@@ -207,6 +207,35 @@ public class SGFReaderTest
         );
         assertThat(headers).hasSize(1);
         assertThat(nodes).hasSize(1);
+    }
+
+    @Test
+    public void aMoveTTisPassInSmallBoards() throws IOException
+    {
+        var sgfR = new StringReader("(;FF[4]GM[1]SZ[19];B[];W[tt])");
+        underTest.parse(sgfR, header -> {
+            },
+            node -> nodes.add(node.clone())
+        );
+
+        assertThat(nodes).hasSize(2);
+        assertThat(Move.isPass(nodes.get(0).move)).isTrue();
+        assertThat(Move.isPass(nodes.get(1).move)).isTrue();
+    }
+
+    @Test
+    public void aMoveTTisU6In25x25Boards() throws IOException
+    {
+        var sgfR = new StringReader("(;FF[4]GM[1]SZ[25];B[];W[tt])");
+        underTest.parse(sgfR, header -> {
+            },
+            node -> nodes.add(node.clone())
+        );
+
+        assertThat(nodes).hasSize(2);
+        assertThat(Move.isPass(nodes.get(0).move)).isTrue();
+        assertThat(Move.isPass(nodes.get(1).move)).isFalse();
+        assertThat(Move.shortToString(nodes.get(1).move)).isEqualTo("White U6");
     }
 
     @Test

@@ -280,7 +280,11 @@ public class SGFReader
         {
             throwWithDetails("Expected a closing property tag (']').");
         }
-        return Move.move((byte) (Character.toUpperCase((char) a) - 65), (byte) (header.size - Character.toUpperCase((char) b) + 64), color);
+        if (header.size <= 19 && Character.toUpperCase((char) a) == 'T' && Character.toUpperCase((char) b) == 'T')
+        {
+            return Move.pass(color);
+        }
+        return Move.move((byte) (Character.toUpperCase((char) a) - 65), (byte) (header.size - (Character.toUpperCase((char) b) - 64)), color);
     }
 
 
