@@ -111,7 +111,13 @@ $ misc/sgo-gtp
 - Check "Mastering the game of Go without Human Knowledge" https://www.nature.com/articles/nature24270.epdf
 - https://github.com/leela-zero/leela-zero
 - http://www.lysator.liu.se/~gunnar/gtp/gtp2-spec-draft2/gtp2-spec.html
+- https://github.com/lightvector/KataGo/
+- https://github.com/mattheww/gomill
 
 - GTP
   - Some of the verbs missing (see @Disabled tests)
   - Streaming wrappers
+  - genmove 
+    - TODO: can answer 'resign'
+    - TODO: The controller is allowed to use this command for either color, regardless who played the last move.
+  

@@ -121,6 +121,7 @@ public class GameRegressionTest
             game[0] = new Game(header.size, header.handicap, (byte) (header.komi * 10));
         }, node ->
         {
+//            System.out.println(Move.shortToString(node.move) + " P?" + Move.isPass(node.move));
             assertThat(game[0].play(node.move)).isTrue();
         });
 

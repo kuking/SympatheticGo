@@ -75,7 +75,9 @@ public class RandomEngine implements Engine
                 return candidate;
             }
         }
-        return Move.pass(game.playerToPlay());
+        final short itIsPass = Move.pass(game.playerToPlay());
+        game.play(itIsPass);
+        return itIsPass;
     }
 
     @Override

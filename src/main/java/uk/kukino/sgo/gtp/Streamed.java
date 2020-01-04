@@ -15,7 +15,7 @@ public class Streamed
     private OutputStreamWriter writer;
     private OutputStreamWriter monitor;
 
-    public Streamed(final Engine engine, final InputStream in, final OutputStream out, final OutputStream monout)
+    public Streamed(final Engine engine, final InputStream in, final OutputStream out, final OutputStream monout) throws IOException
     {
         core = new Core(engine);
         reader = new BufferedReader(new InputStreamReader(in, CHARSET));
@@ -23,6 +23,7 @@ public class Streamed
         if (monout != null)
         {
             monitor = new OutputStreamWriter(monout, CHARSET);
+            outputToWriter(monitor, "STARTING GAME", true);
         }
         else
         {
@@ -50,6 +51,10 @@ public class Streamed
             final String line = reader.readLine();
             if (line == null)
             {
+                if (monitor != null)
+                {
+                    outputToWriter(monitor, "//EOF//CLOSING//", true);
+                }
                 close();
                 return;
             }
@@ -68,7 +73,7 @@ public class Streamed
         }
     }
 
-    private void outputToWriter(final Writer writer, final CharSequence out, boolean doubleLF) throws IOException
+    private void outputToWriter(final Writer writer, final CharSequence out, final boolean doubleLF) throws IOException
     {
         for (int i = 0; i < out.length(); i++)
         {

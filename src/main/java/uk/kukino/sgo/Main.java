@@ -3,14 +3,14 @@ package uk.kukino.sgo;
 import uk.kukino.sgo.gtp.Streamed;
 import uk.kukino.sgo.util.RandomEngine;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 public class Main
 {
 
-    public static void main(final String[] args) throws FileNotFoundException
+    public static void main(final String[] args) throws IOException
     {
         if (args.length == 0 || "help".equals(args[0]))
         {
