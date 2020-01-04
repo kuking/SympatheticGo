@@ -1,6 +1,7 @@
 package uk.kukino.sgo.base;
 
 import java.util.Arrays;
+import java.util.function.Supplier;
 
 public class Game
 {
@@ -54,6 +55,10 @@ public class Game
         other.lastMove = lastMove;
         other.blackDeaths = blackDeaths;
         other.whiteDeaths = whiteDeaths;
+        if (other.moves.length != moves.length)
+        {
+            other.moves = new short[moves.length]; // this was extended, so the other has to ..
+        }
         System.arraycopy(moves, 0, other.moves, 0, moves.length);
         System.arraycopy(superKos, 0, other.superKos, 0, superKos.length);
         other.lastSuperKoP = lastSuperKoP;
@@ -206,6 +211,13 @@ public class Game
         }
         return false; // all painted without finding an empty border in the base board, dead
     }
+
+
+    private void debug(final Supplier<CharSequence> entry)
+    {
+        System.err.println(entry.get());
+    }
+
 
     private boolean isOKMove(final short move)
     {

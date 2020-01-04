@@ -312,6 +312,23 @@ public class GameTest
     }
 
     @Test
+    public void notSoSimpleFinish()
+    {
+        game = given9x9Game();
+        assertThat(game.play("black a1")).isTrue();
+        assertThat(game.play("white pass")).isTrue();
+        assertThat(game.play("black b1")).isTrue();
+        assertThat(game.play("white pass")).isTrue();
+        assertThat(game.play("black c1")).isTrue();
+        assertThat(game.play("white d1")).isTrue();
+        assertThat(game.play("black pass")).isTrue();
+        assertThat(game.play("white f1")).isTrue();
+        assertThat(game.play("black pass")).isTrue();
+        assertThat(game.play("white pass")).isTrue();
+        assertThat(game.finished()).isTrue();
+    }
+
+    @Test
     public void shortestGame()
     {
         game = given9x9Game();
