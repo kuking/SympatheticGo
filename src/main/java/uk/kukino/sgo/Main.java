@@ -28,7 +28,6 @@ public class Main
         }
         else if (args[0].startsWith("gtp:"))
         {
-            final FileOutputStream monitor = new FileOutputStream("/tmp/random-engine.log");
             final Engine engine;
             if ("gtp:random".equals(args[0]))
             {
@@ -44,6 +43,7 @@ public class Main
                 System.err.println("I don't know how to build the engine: " + args[0]);
                 System.exit(1);
             }
+            final FileOutputStream monitor = new FileOutputStream("/tmp/" + engine.name() + "-" + engine.version() + ".log");
             final Streamed stream = new Streamed(engine, System.in, System.out, monitor);
             while (!stream.isClosed())
             {
