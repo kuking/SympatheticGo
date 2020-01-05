@@ -12,9 +12,9 @@ public class MC1Engine extends BaseEngine
 
     private TTable ttable;
     private Buffers<Game> gameBuffers;
-    private byte levels = 3;
+    private byte levels = 2;
     private byte wide = 9 * 9; // terrible!
-    private int bottomRandom = 50;
+    private int bottomRandom = 150;
 
     private long plys = 0;
 
@@ -35,21 +35,53 @@ public class MC1Engine extends BaseEngine
     public short genMove(final Color color)
     {
         playouts();
-        final short move;
-        final short best = ttable.topsFor(game.getBoard().hashCode(), 1, game.playerToPlay())[0];
-        if (Coord.isValid(best))
-        {
-            move = Move.move(best, game.playerToPlay());
-        }
-        else
-        {
-            move = Move.pass(game.playerToPlay());
-        }
+        final short move = findBestFor(game.playerToPlay()); // this feels wrong....
+//        final short best = ttable.topsFor(game.getBoard().hashCode(), 1, game.playerToPlay())[0];
+//        if (Coord.isValid(best))
+//        {
+//            move = Move.move(best, game.playerToPlay());
+//        }
+//        else
+//        {
+//            move = Move.pass(game.playerToPlay());
+//        }
 
         System.err.println("Looks like the move is going to be " + Move.shortToString(move));
         game.play(move);
         System.err.println(game);
         return move;
+    }
+
+    private short findBestFor(final Color playerToPlay)
+    {
+        final Game copy = gameBuffers.lease();
+        try
+        {
+            final short[] tops = ttable.topsFor(game.getBoard().hashCode(), boardSize * boardSize, playerToPlay);
+            for (int i = 0; i < tops.length; i++)
+            {
+                final short coord = tops[i];
+                if (!Coord.isValid(coord))
+                {
+                    break; // nothing more to check
+                }
+                if (game.getBoard().get(coord) == Color.EMPTY)
+                {
+                    final short move = Move.move(coord, playerToPlay);
+                    game.copyTo(copy);
+                    if (copy.play(move))
+                    {
+                        return move; // a valid one then
+                    }
+                }
+            }
+            // if none is valid, goodbye
+            return Move.pass(playerToPlay);
+        }
+        finally
+        {
+            gameBuffers.ret(copy);
+        }
     }
 
     private void playouts()
