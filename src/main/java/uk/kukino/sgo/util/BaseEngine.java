@@ -35,7 +35,7 @@ public abstract class BaseEngine implements Engine
     }
 
 
-    private void resetGame()
+    protected void resetGame()
     {
         game = new Game(boardSize, handicap, komiX10);
     }
