@@ -1,6 +1,8 @@
 package uk.kukino.sgo;
 
+import uk.kukino.sgo.gtp.Engine;
 import uk.kukino.sgo.gtp.Streamed;
+import uk.kukino.sgo.util.MC1Engine;
 import uk.kukino.sgo.util.RandomEngine;
 
 import java.io.FileOutputStream;
@@ -16,24 +18,40 @@ public class Main
         {
             System.out.println("Main for SympatheticGO.");
             System.out.println("try: ./gradlew run --args 'perf'");
-            System.out.println("..or: java -jar build/libs/sgo.jar gtp");
+            System.out.println("..or: java -jar build/libs/sgo.jar gtp:random");
+            System.out.println("..or: java -jar build/libs/sgo.jar gtp:mc1");
 
         }
         else if ("perf".equals(args[0]))
         {
             PerfStats.main(args);
         }
-        else if ("gtp".equals(args[0]))
+        else if (args[0].startsWith("gtp:"))
         {
             final FileOutputStream monitor = new FileOutputStream("/tmp/random-engine.log");
-            final RandomEngine randomEngine = new RandomEngine();
-            final Streamed stream = new Streamed(randomEngine, System.in, System.out, monitor);
+            final Engine engine;
+            if ("gtp:random".equals(args[0]))
+            {
+                engine = new RandomEngine();
+            }
+            else if ("gtp:mc1".equals(args[0]))
+            {
+                engine = new MC1Engine();
+            }
+            else
+            {
+                engine = null;
+                System.err.println("I don't know how to build the engine: " + args[0]);
+                System.exit(1);
+            }
+            final Streamed stream = new Streamed(engine, System.in, System.out, monitor);
             while (!stream.isClosed())
             {
                 stream.doWork(true);
             }
         }
         else
+
         {
             System.err.println("I don't know how to do: " + args[0]);
         }

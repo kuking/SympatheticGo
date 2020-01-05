@@ -89,7 +89,8 @@ Effectively:  14659ms, 3555552 plys, 242550.79 ply/s, 4.123μs/ply
 $ ./gradlew build 
 $ java -jar build/libs/sgo.jar help
 $ java -jar build/libs/sgo.jar perf
-$ java -jar build/libs/sgo.jar gtp
+$ java -jar build/libs/sgo.jar gtp:random
+$ java -jar build/libs/sgo.jar gtp:mc1
 $ misc/sgo-gtp
 ```
 
