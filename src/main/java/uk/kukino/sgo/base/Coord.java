@@ -43,6 +43,24 @@ public final class Coord
     public static final int S = 7;
     public static final int SE = 8;
 
+
+    public static final short A1 = parseToVal("A1");
+    public static final short A2 = parseToVal("A2");
+    public static final short A3 = parseToVal("A3");
+    public static final short A4 = parseToVal("A4");
+    public static final short B1 = parseToVal("B1");
+    public static final short B2 = parseToVal("B2");
+    public static final short B3 = parseToVal("B3");
+    public static final short B4 = parseToVal("B4");
+    public static final short C1 = parseToVal("C1");
+    public static final short C2 = parseToVal("C2");
+    public static final short C3 = parseToVal("C3");
+    public static final short C4 = parseToVal("C4");
+    public static final short D1 = parseToVal("D1");
+    public static final short D2 = parseToVal("D2");
+    public static final short D3 = parseToVal("D3");
+    public static final short D4 = parseToVal("D4");
+
     private Coord()
     {
     }
