@@ -355,7 +355,7 @@ public class Game
                 move = randomMove();
             }
 
-            if (play(move))
+            if (!fillsOwnEye(move) && play(move))
             {
                 invalidCount = 0;
             }
@@ -363,16 +363,27 @@ public class Game
             {
                 invalidCount++;
             }
-//            if (lastMove > moves.length - 6)
-//            {
-//                System.out.println(Coord.shortToString(move));
-//                System.out.println(this);
-//            }
         }
-//        if (lastMove > moves.length - 6)
-//        {
-//            System.exit(1);
-//        }
+    }
+
+    private boolean fillsOwnEye(final short move)
+    {
+        if (Move.isStone(move))
+        {
+            final Color opposite = Move.color(move).opposite();
+            int adjs = Adjacent.asVal(move, board.size());
+            while (Adjacent.iterHasNext(adjs))
+            {
+                final Color adjCol = board.get(Adjacent.iterPosition(adjs));
+                if (adjCol == Color.EMPTY || adjCol == opposite)
+                {
+                    return false;
+                }
+                adjs = Adjacent.iterMoveNext(adjs);
+            }
+            return true;
+        }
+        return false;
     }
 
     private short randomMove()
