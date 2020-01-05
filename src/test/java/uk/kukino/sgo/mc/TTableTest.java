@@ -136,5 +136,16 @@ public class TTableTest
         return result;
     }
 
+    @Test
+    public void newTablesAreAlwaysEmptied()
+    {
+        underTest = new TTable((byte) 19, (byte) 2, (byte) 2); // smaller so less buffers to cycle
+        for (int i = 0; i < 2000; i++)
+        {
+            assertThat(underTest.topsFor(i, 1, Color.WHITE)[0]).isEqualTo(Coord.INVALID);
+            underTest.account(i, Coord.A1, Color.WHITE);
+        }
+    }
+
 }
 

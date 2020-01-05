@@ -21,7 +21,11 @@ public class TTable
         this.size = size;
         final int capacity = (int) Math.pow(wide, levels);
         buffers = new Buffers<>(capacity + 1, () -> new int[size * size * 2]);
-        cache = new IntLruCache<>(capacity, key -> buffers.lease(), buffers::ret);
+        cache = new IntLruCache<>(capacity, key -> buffers.lease(), buf ->
+        {
+            Arrays.fill(buf, 0);
+            buffers.ret(buf);
+        });
         this.results = new short[size * size];
         this.ratios = new float[size * size];
     }
