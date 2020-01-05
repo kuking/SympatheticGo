@@ -172,4 +172,17 @@ public final class Adjacent
         final byte flags = (byte) (adjs & 0b11110000 ^ (0b1 << (7 - pos)));
         return (adjs & 0xffff0000) + (flags & 0b11110000) + pos;
     }
+
+    public static byte iterCount(final int adjs)
+    {
+        byte result = 0;
+        for (byte i = 0; i < 4; i++)
+        {
+            if (readIterFlag(adjs, i))
+            {
+                result++;
+            }
+        }
+        return result;
+    }
 }

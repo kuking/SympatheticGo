@@ -19,6 +19,7 @@ public class AdjacentTest
 
         assertThat(Adjacent.iterHasNext(adjs)).isFalse();
         assertThat(Adjacent.iterPosition(adjs)).isEqualTo(Coord.INVALID);
+        assertThat(Adjacent.iterCount(adjs)).isEqualTo(0);
     }
 
     @Test
@@ -39,6 +40,8 @@ public class AdjacentTest
 
         adjs = Adjacent.iterMoveNext(adjs);
         assertThat(Adjacent.iterPosition(adjs)).isEqualTo(Coord.INVALID);
+
+        assertThat(Adjacent.iterCount(adjs)).isEqualTo(4);
     }
 
     @Test
@@ -103,6 +106,7 @@ public class AdjacentTest
     {
         int adjs = Adjacent.asVal(Coord.parseToVal("A9"), boardSize);
         assertPositions(adjs, "B9", "A8");
+        assertThat(Adjacent.iterCount(adjs)).isEqualTo(2);
     }
 
     @Test
@@ -110,6 +114,7 @@ public class AdjacentTest
     {
         int adjs = Adjacent.asVal(Coord.parseToVal("E9"), boardSize);
         assertPositions(adjs, "F9", "E8", "D9");
+        assertThat(Adjacent.iterCount(adjs)).isEqualTo(3);
     }
 
     @Test
@@ -117,6 +122,7 @@ public class AdjacentTest
     {
         int adjs = Adjacent.asVal(Coord.parseToVal("J9"), boardSize);
         assertPositions(adjs, "J8", "H9");
+        assertThat(Adjacent.iterCount(adjs)).isEqualTo(2);
     }
 
     @Test
@@ -124,6 +130,7 @@ public class AdjacentTest
     {
         int adjs = Adjacent.asVal(Coord.parseToVal("J5"), boardSize);
         assertPositions(adjs, "J6", "J4", "H5");
+        assertThat(Adjacent.iterCount(adjs)).isEqualTo(3);
     }
 
     @Test
@@ -131,6 +138,7 @@ public class AdjacentTest
     {
         int adjs = Adjacent.asVal(Coord.parseToVal("J1"), boardSize);
         assertPositions(adjs, "J2", "H1");
+        assertThat(Adjacent.iterCount(adjs)).isEqualTo(2);
     }
 
     @Test
@@ -138,6 +146,7 @@ public class AdjacentTest
     {
         int adjs = Adjacent.asVal(Coord.parseToVal("E1"), boardSize);
         assertPositions(adjs, "E2", "F1", "D1");
+        assertThat(Adjacent.iterCount(adjs)).isEqualTo(3);
     }
 
     @Test
@@ -145,6 +154,7 @@ public class AdjacentTest
     {
         int adjs = Adjacent.asVal(Coord.parseToVal("A1"), boardSize);
         assertPositions(adjs, "A2", "B1");
+        assertThat(Adjacent.iterCount(adjs)).isEqualTo(2);
     }
 
     @Test
@@ -152,6 +162,7 @@ public class AdjacentTest
     {
         int adjs = Adjacent.asVal(Coord.parseToVal("A5"), boardSize);
         assertPositions(adjs, "A6", "B5", "A4");
+        assertThat(Adjacent.iterCount(adjs)).isEqualTo(3);
     }
 
     @Test
@@ -159,6 +170,7 @@ public class AdjacentTest
     {
         assertThat(Adjacent.iterHasNext(Adjacent.EMPTY_ITERATOR)).isFalse();
         assertThat(Adjacent.iterPosition(Adjacent.EMPTY_ITERATOR)).isEqualTo(Coord.INVALID);
+        assertThat(Adjacent.iterCount(Adjacent.EMPTY_ITERATOR)).isEqualTo(0);
     }
     // util
 
