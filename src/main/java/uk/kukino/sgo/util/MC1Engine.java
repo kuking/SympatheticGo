@@ -12,7 +12,7 @@ public class MC1Engine extends BaseEngine
 
     private TTable ttable;
     private Buffers<Game> gameBuffers;
-    private byte levels = 2;
+    private byte levels = 3;
     private byte wide = 9 * 9; // terrible!
     private int bottomRandom = 50;
 

@@ -1,6 +1,7 @@
 package uk.kukino.sgo.mc;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import uk.kukino.sgo.base.Color;
 import uk.kukino.sgo.base.Coord;
@@ -122,6 +123,13 @@ public class TTableTest
         assertThat(underTest.playoutsFor(ONE_HASH)).isEqualTo(4);
         assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 10, Color.WHITE)))
             .asList().containsExactly(Coord.A1, Coord.D1, Coord.D4);
+    }
+
+    @Test
+    @Disabled
+    public void handlesPassesCorrectly()
+    {
+        assertThat(true).isFalse();
     }
 
     short[] cutOnFirstInvalid(final short[] bigList)

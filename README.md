@@ -98,9 +98,15 @@ $ misc/sgo-gtp
 
 ## Mini-Roadmap 
 - Better MCTS implementation
-  - implement Go Text Protocol, so it can play against itself, GNUGO and in KGS. Helps to define the Engine API.
-  - Basic Complete engine
+  - MC Game finisher has to understand eyes and basic livability, to avoid committing suicide.
+  - ttable should handle pass and "who" plays in this board, maybe two boards? one per user?
+  - Statistical odds of a coord likely to be played in the game (use this for MC).
+    - Output nice board with percentiles of like-hood, 
+      i.e.: · • * x @  (<50%, 50-70% (range 20), 70-85% (range 15), 85-95% (range 10), 95-100% (range 5) )
+    - Should be serializable so can re-calculated
   - Better implementation with MTCS (UCT)
+  - Engine should generate moves for any of the players (i.e. a flag to not enforce next player in Game class)
+  - MCTS should understand when to resign
   - Side-channel stats, i.e. current top-10 exploration trees, its odds, maybe visuals.
   - Time Management
   - Basic statical positional board for MCCS. i.e. D4 has a 1/8 chance of being played on 1st move, using games.
@@ -115,11 +121,4 @@ $ misc/sgo-gtp
 - http://www.lysator.liu.se/~gunnar/gtp/gtp2-spec-draft2/gtp2-spec.html
 - https://github.com/lightvector/KataGo/
 - https://github.com/mattheww/gomill
-
-- GTP
-  - Some of the verbs missing (see @Disabled tests)
-  - Streaming wrappers
-  - genmove 
-    - TODO: can answer 'resign'
-    - TODO: The controller is allowed to use this command for either color, regardless who played the last move.
   

@@ -1,5 +1,6 @@
 #!/bin/sh
 
 BASEDIR=$(dirname "$0")
+#DEBUG="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
 java -jar "$BASEDIR"/../build/libs/sgo.jar gtp:mc1
 
