@@ -48,7 +48,7 @@ public final class Adjacent
         return (coord << 16) + (result & 0b11110000) + iterPos;
     }
 
-    public static int asVal(short coord, byte size)
+    public static int asVal(final short coord, final byte size)
     {
         final byte x = Coord.X(coord);
         final byte y = Coord.Y(coord);

@@ -4,7 +4,7 @@ public enum Species
 {
     Human, Computer;
 
-    public static final Species fromInt(final int val)
+    public static Species fromInt(final int val)
     {
         if (val == 0)
         {

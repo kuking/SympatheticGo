@@ -9,7 +9,7 @@ public enum GameType
 
     final int value;
 
-    GameType(int value)
+    GameType(final int value)
     {
         this.value = value;
     }

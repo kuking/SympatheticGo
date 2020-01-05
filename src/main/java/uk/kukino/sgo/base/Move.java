@@ -168,7 +168,7 @@ public final class Move
         return isValid(value) && !isPass(value);
     }
 
-    public static String shortToString(short value)
+    public static String shortToString(final short value)
     {
         final StringBuilder sb = new StringBuilder();
         write(sb, value);

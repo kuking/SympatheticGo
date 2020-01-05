@@ -334,8 +334,8 @@ public class Core
         if (FIXED_HANDICAP.matches(input, cmdIdxStart, cmdIdxEnd) ||
             PLACE_FREE_HANDICAP.matches(input, cmdIdxStart, cmdIdxEnd))
         {
-            int start = skipSpaces(cmdIdxEnd);
-            int end = skipNonSpaces(start);
+            final int start = skipSpaces(cmdIdxEnd);
+            final int end = skipNonSpaces(start);
             final int handicap = Parsing.parseInteger(input, start, end);
             if (handicap == Integer.MIN_VALUE)
             {
@@ -347,7 +347,7 @@ public class Core
             }
             else
             {
-                short[] coords = engine.fixedHandicap(handicap);
+                final short[] coords = engine.fixedHandicap(handicap);
                 if (coords == null)
                 {
                     failure().append("board not empty");

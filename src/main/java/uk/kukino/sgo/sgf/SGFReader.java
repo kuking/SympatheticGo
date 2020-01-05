@@ -25,7 +25,7 @@ public class SGFReader
     private Consumer<Header> headerConsumer;
     private Consumer<Node> nodeConsumer;
 
-    public void parse(final java.io.Reader buf, Consumer<Header> headerConsumer, Consumer<Node> nodeConsumer) throws IOException
+    public void parse(final Reader buf, final Consumer<Header> headerConsumer, final Consumer<Node> nodeConsumer) throws IOException
     {
         header.reset();
         node.reset();

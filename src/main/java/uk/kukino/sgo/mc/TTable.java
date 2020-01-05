@@ -8,9 +8,9 @@ import java.util.Arrays;
 
 public class TTable
 {
-    final private int size;
-    final private Buffers<int[]> buffers; // int[((y*size+x)*2){+1}] first int, black count, second, white count.
-    final private IntLruCache<int[]> cache;
+    private final int size;
+    private final Buffers<int[]> buffers; // int[((y*size+x)*2){+1}] first int, black count, second, white count.
+    private final IntLruCache<int[]> cache;
 
     private short[] results;
     private float[] ratios;
@@ -120,7 +120,7 @@ public class TTable
     {
         final byte x = Coord.X(coord);
         final byte y = Coord.Y(coord);
-        int ofs = (((y * size) + x) << 1) + (winner == Color.WHITE ? 1 : 0);
+        final int ofs = (((y * size) + x) << 1) + (winner == Color.WHITE ? 1 : 0);
         cache.lookup(boardHash)[ofs] += wins;
     }
 

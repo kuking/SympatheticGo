@@ -14,8 +14,8 @@ public enum Identity
     Comment("C"), Black("B"), White("W"), AddBlack("AB"), AddWhite("AW"),
     Circles("CR"), Triangles("TR"), Squares("SQ"), SelectedPoints("SL"), Marks("MA"),
     PlayerToPlay("PL"),
-    BlackTerritory("TB"),WhiteTerritory("TW"),
-    BlackMovesLeft("OB"),WhiteMovesLeft("OW"),
+    BlackTerritory("TB"), WhiteTerritory("TW"),
+    BlackMovesLeft("OB"), WhiteMovesLeft("OW"),
 
     // Unknown?
     Unknown("??");
@@ -47,4 +47,4 @@ public enum Identity
         }
         return Unknown;
     }
-    }
+}

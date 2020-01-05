@@ -55,14 +55,14 @@ public abstract class BaseEngine implements Engine
     }
 
     @Override
-    public void setKomi(float komi)
+    public void setKomi(final float komi)
     {
         this.komiX10 = (byte) (komi * 10f);
         resetGame();
     }
 
     @Override
-    public boolean play(short move)
+    public boolean play(final short move)
     {
         return game.play(move);
     }
@@ -80,13 +80,13 @@ public abstract class BaseEngine implements Engine
     }
 
     @Override
-    public boolean setTimeSettings(int mainTimeSecs, int byoYomiSecs, int byoYomiStones)
+    public boolean setTimeSettings(final int mainTimeSecs, final int byoYomiSecs, final int byoYomiStones)
     {
         return false;
     }
 
     @Override
-    public short[] fixedHandicap(int stones)
+    public short[] fixedHandicap(final int stones)
     {
         this.handicap = (byte) stones;
         final Board board = game.getBoard();
