@@ -20,11 +20,10 @@ public class TTable
     {
         this.size = size;
         final int capacity = (int) Math.pow(wide, levels);
-        buffers = new Buffers<>(capacity, () -> new int[size * size * 2]);
+        buffers = new Buffers<>(capacity + 1, () -> new int[size * size * 2]);
         cache = new IntLruCache<>(capacity, key -> buffers.lease(), buffers::ret);
         this.results = new short[size * size];
         this.ratios = new float[size * size];
-
     }
 
     public int playoutsFor(final int boardHash)
@@ -40,7 +39,6 @@ public class TTable
 
     public short[] topsFor(final int boardHash, final int qty, final Color color)
     {
-        Arrays.fill(results, Coord.INVALID);
         Arrays.fill(ratios, Float.NaN);
         final int[] table = cache.lookup(boardHash);
         int nonEmpty = 0;
@@ -66,12 +64,12 @@ public class TTable
             }
         }
 
-        if (nonEmpty == 0)
+        final int finalQty = Math.min(qty, nonEmpty);
+        Arrays.fill(results, 0, Math.min(results.length, finalQty + 1), Coord.INVALID);
+        if (finalQty == 0)
         {
             return results;
         }
-
-        final int finalQty = Math.min(qty, nonEmpty);
 
         for (int i = 0; i < ratios.length; i++)
         {
@@ -114,12 +112,17 @@ public class TTable
      * @param boardHash board' hash
      * @param winner who won in this hash
      */
-    public void account(final int boardHash, final short coord, final Color winner)
+    public void account(final int boardHash, final short coord, final Color winner, final int wins)
     {
         final byte x = Coord.X(coord);
         final byte y = Coord.Y(coord);
         int ofs = (((y * size) + x) << 1) + (winner == Color.WHITE ? 1 : 0);
-        cache.lookup(boardHash)[ofs]++;
+        cache.lookup(boardHash)[ofs] += wins;
+    }
+
+    public void account(final int boardHash, final short coord, final Color winner)
+    {
+        account(boardHash, coord, winner, 1);
     }
 
 }
