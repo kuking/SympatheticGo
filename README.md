@@ -99,7 +99,6 @@ $ misc/sgo-gtp
 ## Mini-Roadmap 
 - Better MCTS implementation
   - MC Game finisher has to understand eyes and basic livability, to avoid committing suicide.
-  - ttable should handle pass and "who" plays in this board, maybe two boards? one per user?
   - Statistical odds of a coord likely to be played in the game (use this for MC).
     - Output nice board with percentiles of like-hood, 
       i.e.: · • * x @  (<50%, 50-70% (range 20), 70-85% (range 15), 85-95% (range 10), 95-100% (range 5) )
@@ -121,4 +120,5 @@ $ misc/sgo-gtp
 - http://www.lysator.liu.se/~gunnar/gtp/gtp2-spec-draft2/gtp2-spec.html
 - https://github.com/lightvector/KataGo/
 - https://github.com/mattheww/gomill
-  
+ 
+- Integrate https://github.com/jythontools/jython for meta-programming?
