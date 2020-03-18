@@ -3,6 +3,7 @@ package uk.kukino.sgo.mc;
 import uk.co.real_logic.agrona.collections.IntLruCache;
 import uk.kukino.sgo.base.Color;
 import uk.kukino.sgo.base.Coord;
+import uk.kukino.sgo.base.Move;
 
 import java.util.Arrays;
 
@@ -20,14 +21,14 @@ public class TTable
     {
         this.size = size;
         final int capacity = (int) Math.pow(wide, levels);
-        buffers = new Buffers<>(capacity + 1, () -> new int[size * size * 2]);
+        buffers = new Buffers<>(capacity + 1, () -> new int[size * size * 2 + 2]); // last two are pass moves
         cache = new IntLruCache<>(capacity, key -> buffers.lease(), buf ->
         {
             Arrays.fill(buf, 0);
             buffers.ret(buf);
         });
-        this.results = new short[size * size];
-        this.ratios = new float[size * size];
+        this.results = new short[size * size + 2];
+        this.ratios = new float[size * size + 2];
     }
 
     public int playoutsFor(final int boardHash)
@@ -67,12 +68,42 @@ public class TTable
                 nonEmpty++;
             }
         }
+        buildResultsFromRatios(Math.min(qty, nonEmpty), color);
+        return results;
+    }
 
-        final int finalQty = Math.min(qty, nonEmpty);
+    public short[] uct(final int boardHash, final int qty, final Color color, final float factor)
+    {
+        Arrays.fill(ratios, Float.NaN);
+        final int[] table = cache.lookup(boardHash);
+        final int n = playoutsFor(boardHash);
+        final double c2logn = factor * Math.log(n);
+        int nonEmpty = 0;
+        for (int i = 0; i < table.length; i += 2)
+        {
+            final int blackWin = table[i];
+            final int whiteWin = table[i + 1];
+
+            // https://thegreendestiny.wordpress.com/2009/10/22/computer-go-2/
+            if (blackWin != 0 || whiteWin != 0)
+            {
+                final float tj = blackWin + whiteWin;
+                final float xj = (float) ((color == Color.WHITE) ? whiteWin : blackWin) / (float) n;
+                final float uct = xj + (float) Math.sqrt(c2logn / tj);
+                ratios[i / 2] = uct;
+                nonEmpty++;
+            }
+        }
+        buildResultsFromRatios(Math.min(qty, nonEmpty), color);
+        return results;
+    }
+
+    private void buildResultsFromRatios(final int finalQty, final Color color)
+    {
         if (finalQty == 0)
         {
             results[0] = Coord.INVALID;
-            return results;
+            return;
         }
         Arrays.fill(results, 0, Math.min(results.length, finalQty + 1), Coord.INVALID);
 
@@ -97,37 +128,50 @@ public class TTable
             }
         }
 
+        final int passBoundary = size * size;
         for (int i = 0; i < finalQty; i++)
         {
             final short orig = results[i];
-            results[i] = Coord.XY((byte) (orig % size), (byte) (orig / size));
+            if (orig < passBoundary)
+            {
+                results[i] = Coord.XY((byte) (orig % size), (byte) (orig / size));
+            }
+            else if (orig >= passBoundary)
+            {
+                results[i] = Move.pass(color);
+            }
         }
-
-        return results;
-    }
-
-    public short[] uct(final int boardHash, final int qty)
-    {
-        return new short[0];
-
     }
 
     /***
      * Account a winner for this particular board configuration, if Color==Empty, implies 'DRAW'
      * @param boardHash board' hash
-     * @param winner who won in this hash
+     * @param move move
+     * @param wins how many wins to account
      */
-    public void account(final int boardHash, final short coord, final Color winner, final int wins)
+    public void account(final int boardHash, final short move, final int wins)
     {
-        final byte x = Coord.X(coord);
-        final byte y = Coord.Y(coord);
-        final int ofs = (((y * size) + x) << 1) + (winner == Color.WHITE ? 1 : 0);
+        final Color c = Move.color(move);
+        final int ofs;
+        if (Move.isStone(move))
+        {
+            ofs = (((Move.Y(move) * size) + Move.X(move)) << 1) + (c == Color.WHITE ? 1 : 0);
+        }
+        else if (Move.isPass(move))
+        {
+            ofs = ((size * size) << 1) + (c == Color.WHITE ? 1 : 0);
+        }
+        else
+        {
+            throw new IllegalArgumentException("I don't know how to handle move");
+        }
         cache.lookup(boardHash)[ofs] += wins;
+
     }
 
-    public void account(final int boardHash, final short coord, final Color winner)
+    public void account(final int boardHash, final short move)
     {
-        account(boardHash, coord, winner, 1);
+        account(boardHash, move, 1);
     }
 
 }
