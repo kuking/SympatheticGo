@@ -79,8 +79,37 @@ public class TTableTest
 
         assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 5, Color.BLACK))).asList()
             .containsExactly(Coord.B2, Coord.A1, Coord.B1, Coord.C1, Coord.D1);
+    }
 
+    @Test
+    public void bigOneMinusOne()
+    {
+        for (byte x = 0; x < 19; x++)
+        {
+            for (byte y = 0; y < 19; y++)
+            {
+                if (!(x == 18 && y == 18))
+                {
+                    underTest.account(ONE_HASH, Coord.XY(x, y), Color.WHITE);
+                    underTest.account(ONE_HASH, Coord.XY(x, y), Color.WHITE);
+                    underTest.account(ONE_HASH, Coord.XY(x, y), Color.BLACK);
+                    underTest.account(ANOTHER_HASH, Coord.XY(x, y), Color.BLACK);
+                }
+            }
+        }
+        underTest.account(ONE_HASH, Coord.D4, Color.WHITE);
+        underTest.account(ONE_HASH, Coord.D4, Color.WHITE);
+        underTest.account(ONE_HASH, Coord.D4, Color.WHITE);
+        underTest.account(ONE_HASH, Coord.D4, Color.WHITE);
+        underTest.account(ONE_HASH, Coord.B2, Color.BLACK);
+        underTest.account(ANOTHER_HASH, Coord.D4, Color.WHITE);
 
+        assertThat(underTest.playoutsFor(ONE_HASH)).isEqualTo(19 * 19 * 3 - 3 + 5);
+        assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 5, Color.WHITE))).asList()
+            .containsExactly(Coord.D4, Coord.A1, Coord.B1, Coord.C1, Coord.D1);
+
+        assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 5, Color.BLACK))).asList()
+            .containsExactly(Coord.B2, Coord.A1, Coord.B1, Coord.C1, Coord.D1);
     }
 
     @Test

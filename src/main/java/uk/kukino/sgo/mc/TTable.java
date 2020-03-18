@@ -69,11 +69,12 @@ public class TTable
         }
 
         final int finalQty = Math.min(qty, nonEmpty);
-        Arrays.fill(results, 0, Math.min(results.length, finalQty + 1), Coord.INVALID);
         if (finalQty == 0)
         {
+            results[0] = Coord.INVALID;
             return results;
         }
+        Arrays.fill(results, 0, Math.min(results.length, finalQty + 1), Coord.INVALID);
 
         for (int i = 0; i < ratios.length; i++)
         {
