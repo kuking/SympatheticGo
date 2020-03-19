@@ -7,7 +7,7 @@ import java.util.Collection;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static uk.kukino.sgo.TUtils.cutOnFirstInvalid;
+import static uk.kukino.sgo.util.TUtils.cutOnFirstInvalid;
 
 public class GameTest
 {

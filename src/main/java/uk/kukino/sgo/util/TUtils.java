@@ -1,7 +1,9 @@
-package uk.kukino.sgo;
+package uk.kukino.sgo.util;
 
 import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Move;
+
+import java.io.PrintStream;
 
 public class TUtils
 {
@@ -17,17 +19,17 @@ public class TUtils
         return result;
     }
 
-    public static void printMoves(final short[] moves)
+    public static void printMoves(final PrintStream stream, final short[] moves)
     {
-        System.out.print("[");
+        stream.print("[");
         for (int i = 0; i < moves.length; i++)
         {
-            System.out.print(Move.shortToString(moves[i]));
+            stream.print(Move.shortToString(moves[i]));
             if (i + 1 != moves.length)
             {
-                System.out.print(", ");
+                stream.print(", ");
             }
         }
-        System.out.println("]");
+        stream.println("]");
     }
 }

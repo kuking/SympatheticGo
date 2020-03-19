@@ -7,7 +7,7 @@ import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Move;
 
 import static com.google.common.truth.Truth.assertThat;
-import static uk.kukino.sgo.TUtils.cutOnFirstInvalid;
+import static uk.kukino.sgo.util.TUtils.cutOnFirstInvalid;
 
 public class TTableTest
 {
