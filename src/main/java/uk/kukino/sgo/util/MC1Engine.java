@@ -14,7 +14,7 @@ public class MC1Engine extends BaseEngine
     private Buffers<Game> gameBuffers;
     private byte levels = 2;
     private byte wide = 9 * 9; // terrible!
-    private int bottomRandom = 150;
+    private int bottomRandom = 25;
 
     private long plys = 0;
 
@@ -36,16 +36,6 @@ public class MC1Engine extends BaseEngine
     {
         playouts();
         final short move = findBestFor(game.playerToPlay()); // this feels wrong....
-//        final short best = ttable.topsFor(game.getBoard().hashCode(), 1, game.playerToPlay())[0];
-//        if (Coord.isValid(best))
-//        {
-//            move = Move.move(best, game.playerToPlay());
-//        }
-//        else
-//        {
-//            move = Move.pass(game.playerToPlay());
-//        }
-
         System.err.println("Looks like the move is going to be " + Move.shortToString(move));
         game.play(move);
         System.err.println(game);
@@ -73,6 +63,7 @@ public class MC1Engine extends BaseEngine
                     {
                         return move; // a valid one then
                     }
+                    System.err.println("This move is wrong? " + Move.shortToString(move) + " in the following Board " + game);
                 }
             }
             // if none is valid, goodbye
@@ -133,8 +124,8 @@ public class MC1Engine extends BaseEngine
                             if (copy.play(move))
                             {
                                 final long wins = playout(copy, (byte) (level - 1), bottomRandoms);
-                                ttable.account(hash, coord, Color.BLACK, IntIntAsLong.left(wins));
-                                ttable.account(hash, coord, Color.WHITE, IntIntAsLong.right(wins));
+                                ttable.account(hash, Move.move(coord, Color.BLACK), IntIntAsLong.left(wins));
+                                ttable.account(hash, Move.move(coord, Color.WHITE), IntIntAsLong.right(wins));
                                 blackWins += IntIntAsLong.left(wins);
                                 whiteWins += IntIntAsLong.right(wins);
                             }
