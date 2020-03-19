@@ -227,4 +227,17 @@ public final class Move
         write(sb, value, true, true);
     }
 
+    public static short oppositePlayer(final short move)
+    {
+        if (isPass(move))
+        {
+            return pass(color(move).opposite());
+        }
+        else if (isStone(move))
+        {
+            return move(X(move), Y(move), color(move).opposite());
+        }
+        return move;
+    }
+
 }

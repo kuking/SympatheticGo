@@ -141,4 +141,13 @@ public class MoveTest
             }
         }
     }
+
+    @Test
+    public void invertPlayer()
+    {
+        assertThat(Move.oppositePlayer(Move.WHITE_PASS)).isEqualTo(Move.BLACK_PASS);
+        assertThat(Move.oppositePlayer(Move.BLACK_PASS)).isEqualTo(Move.WHITE_PASS);
+        assertThat(Move.oppositePlayer(Move.BLACK_A1)).isEqualTo(Move.WHITE_A1);
+        assertThat(Move.oppositePlayer(Move.WHITE_B1)).isEqualTo(Move.BLACK_B1);
+    }
 }
