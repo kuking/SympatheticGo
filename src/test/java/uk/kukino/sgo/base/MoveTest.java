@@ -118,4 +118,27 @@ public class MoveTest
         assertThat(sb.toString()).isEqualTo("B10");
     }
 
+    @Test
+    public void toStringIsParsed_itRoundTrips()
+    {
+        Color[] colors = new Color[] {Color.BLACK, Color.WHITE};
+        for (byte x = 0; x < 25; x++)
+        {
+            for (byte y = 0; y < 25; y++)
+            {
+                for (Color color : colors)
+                {
+                    final short original = Move.move(x, y, color);
+                    final short original2 = Move.move(Coord.XY(x, y), color);
+                    assertThat(original).isEqualTo(original2);
+                    final String toString = Move.shortToString(original);
+                    final short parsed = Move.parseToVal(toString);
+                    assertThat(Move.X(parsed)).isEqualTo(x);
+                    assertThat(Move.Y(parsed)).isEqualTo(y);
+                    assertThat(Move.color(parsed)).isEqualTo(color);
+                    assertThat(original).isEqualTo(parsed);
+                }
+            }
+        }
+    }
 }

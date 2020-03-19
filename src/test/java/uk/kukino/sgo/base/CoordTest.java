@@ -84,7 +84,7 @@ public class CoordTest
     }
 
     @Test
-    public void toStringIsParsed()
+    public void toStringIsParsed_itRountrips()
     {
         for (byte x = 0; x < 25; x++)
         {
@@ -95,6 +95,7 @@ public class CoordTest
                 final short parsed = Coord.parseToVal(toString);
                 assertThat(Coord.X(parsed)).isEqualTo(x);
                 assertThat(Coord.Y(parsed)).isEqualTo(y);
+                assertThat(original).isEqualTo(parsed);
             }
         }
     }
