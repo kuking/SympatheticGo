@@ -403,7 +403,6 @@ public class Game
     {
         final int black = ((board.count(Color.BLACK) + whiteDeaths) * 10);
         final int white = ((board.count(Color.WHITE) + blackDeaths) * 10) + komi;
-//        System.out.println(black + " - " + white + " = " + (black-white));
         if (black > white)
         {
             return Color.BLACK;
@@ -412,6 +411,43 @@ public class Game
         {
             return Color.WHITE;
         }
+    }
+
+    // this method is not super efficient (copies a board per move), but it is evaluated rarely so it might not be worth optimising early on
+    public int validMoves(final short[] buffer)
+    {
+        final Game copy = new Game(board.size(), handicap, komi); //TODO: allocates
+        int idx = 0;
+        for (byte x = 0; x < board.size(); x++)
+        {
+            for (byte y = 0; y < board.size(); y++)
+            {
+                final short coord = Coord.XY(x, y);
+                final short move = Move.move(coord, playerToPlay());
+                if (isOKMove(move))
+                {
+                    if (board.adjacentsWithColor(coord, Color.WHITE) == 0 && board.adjacentsWithColor(coord, Color.BLACK) == 0)
+                    {
+                        buffer[idx++] = move;
+                    }
+                    else
+                    {
+                        copyTo(copy);
+                        if (copy.play(move))
+                        {
+                            buffer[idx++] = move;
+                        }
+                    }
+                    if (buffer.length == idx)
+                    {
+                        return idx;
+                    }
+                }
+            }
+        }
+        buffer[idx++] = Move.pass(playerToPlay());
+        buffer[idx] = Move.INVALID;
+        return idx;
     }
 
 
