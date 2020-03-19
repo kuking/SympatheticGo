@@ -7,6 +7,7 @@ import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Move;
 
 import static com.google.common.truth.Truth.assertThat;
+import static uk.kukino.sgo.TUtils.cutOnFirstInvalid;
 
 public class TTableTest
 {
@@ -43,46 +44,46 @@ public class TTableTest
     @Test
     public void topsFor_simplest()
     {
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
+        underTest.account(ONE_HASH, Move.WHITE_D4);
 
         assertThat(underTest.playoutsFor(ONE_HASH)).isEqualTo(1);
-        assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 10, Color.WHITE))).asList().containsExactly(Coord.D4);
+        assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 10, Color.WHITE))).asList().containsExactly(Move.WHITE_D4);
     }
 
     @Test
     public void uct_simplest()
     {
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
+        underTest.account(ONE_HASH, Move.WHITE_D4);
 
         assertThat(underTest.playoutsFor(ONE_HASH)).isEqualTo(1);
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.WHITE, 2.0f))).asList().containsExactly(Coord.D4);
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.WHITE, 2.0f))).asList().containsExactly(Move.WHITE_D4);
     }
 
     @Test
     public void topsFor_almostSimplest()
     {
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.BLACK));
-        underTest.account(ONE_HASH, Move.move(Coord.D1, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.A1, Color.WHITE));
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.BLACK_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D1);
+        underTest.account(ONE_HASH, Move.WHITE_A1);
         underTest.account(ONE_HASH, Move.pass(Color.WHITE));
 
         assertThat(underTest.playoutsFor(ONE_HASH)).isEqualTo(5);
         assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 10, Color.WHITE)))
-            .asList().containsExactly(Coord.A1, Coord.D1, Coord.D4, Move.pass(Color.WHITE));
+            .asList().containsExactly(Move.WHITE_A1, Move.WHITE_D1, Move.WHITE_D4, Move.pass(Color.WHITE));
     }
 
     @Test
     public void uct_almostSimplest()
     {
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.BLACK));
-        underTest.account(ONE_HASH, Move.move(Coord.D1, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.A1, Color.WHITE));
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.BLACK_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D1);
+        underTest.account(ONE_HASH, Move.WHITE_A1);
 
         assertThat(underTest.playoutsFor(ONE_HASH)).isEqualTo(4);
         assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.WHITE, 2.0f)))
-            .asList().containsExactly(Coord.A1, Coord.D1, Coord.D4);
+            .asList().containsExactly(Move.WHITE_A1, Move.WHITE_D1, Move.WHITE_D4);
     }
 
     @Test
@@ -98,19 +99,19 @@ public class TTableTest
                 underTest.account(ANOTHER_HASH, Move.move(Coord.XY(x, y), Color.BLACK));
             }
         }
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.B2, Color.BLACK));
-        underTest.account(ANOTHER_HASH, Move.move(Coord.D4, Color.WHITE));
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.BLACK_B2);
+        underTest.account(ANOTHER_HASH, Move.WHITE_D4);
 
         assertThat(underTest.playoutsFor(ONE_HASH)).isEqualTo(19 * 19 * 3 + 5);
         assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 5, Color.WHITE))).asList()
-            .containsExactly(Coord.D4, Coord.A1, Coord.B1, Coord.C1, Coord.D1);
+            .containsExactly(Move.WHITE_D4, Move.WHITE_A1, Move.WHITE_B1, Move.WHITE_C1, Move.WHITE_D1);
 
         assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 5, Color.BLACK))).asList()
-            .containsExactly(Coord.B2, Coord.A1, Coord.B1, Coord.C1, Coord.D1);
+            .containsExactly(Move.BLACK_B2, Move.BLACK_A1, Move.BLACK_B1, Move.BLACK_C1, Move.BLACK_D1);
     }
 
     @Test
@@ -129,39 +130,40 @@ public class TTableTest
                 }
             }
         }
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.B2, Color.BLACK));
-        underTest.account(ANOTHER_HASH, Move.move(Coord.D4, Color.WHITE));
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.BLACK_B2);
+        underTest.account(ANOTHER_HASH, Move.WHITE_D4);
 
         assertThat(underTest.playoutsFor(ONE_HASH)).isEqualTo(19 * 19 * 3 - 3 + 5);
         assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 5, Color.WHITE))).asList()
-            .containsExactly(Coord.D4, Coord.A1, Coord.B1, Coord.C1, Coord.D1);
+            .containsExactly(Move.WHITE_D4, Move.WHITE_A1, Move.WHITE_B1, Move.WHITE_C1, Move.WHITE_D1);
 
         assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 5, Color.BLACK))).asList()
-            .containsExactly(Coord.B2, Coord.A1, Coord.B1, Coord.C1, Coord.D1);
+            .containsExactly(Move.BLACK_B2, Move.BLACK_A1, Move.BLACK_B1, Move.BLACK_C1, Move.BLACK_D1);
     }
 
 
     @Test
     public void uct_evolves()
     {
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D1, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D1, Color.BLACK));
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 1, Color.WHITE, 2f))).asList().containsExactly(Coord.D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D1);
+        underTest.account(ONE_HASH, Move.BLACK_D1);
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 1, Color.WHITE, 2f))).asList()
+            .containsExactly(Move.WHITE_D4);
 
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 1, Color.WHITE, 2f))).asList().containsExactly(Coord.D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 1, Color.WHITE, 2f))).asList().containsExactly(Move.WHITE_D4);
 
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 1, Color.WHITE, 2f))).asList().containsExactly(Coord.D1);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 1, Color.WHITE, 2f))).asList().containsExactly(Move.WHITE_D1);
     }
 
 
@@ -181,30 +183,30 @@ public class TTableTest
         {
             underTest.account(ONE_HASH, Move.move(Coord.B2, Color.WHITE));
         }
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D4);
 
         assertThat(underTest.playoutsFor(ONE_HASH)).isEqualTo(19 * 19 * 3 + 100 + 3);
         assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 6, Color.WHITE))).asList()
-            .containsExactly(Coord.B2, Coord.D4, Coord.A1, Coord.B1, Coord.C1, Coord.D1);
+            .containsExactly(Move.WHITE_B2, Move.WHITE_D4, Move.WHITE_A1, Move.WHITE_B1, Move.WHITE_C1, Move.WHITE_D1);
     }
 
 
     @Test
     public void differentTablesDoesNotOverlap()
     {
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.D4, Color.BLACK));
-        underTest.account(ONE_HASH, Move.move(Coord.D1, Color.WHITE));
-        underTest.account(ONE_HASH, Move.move(Coord.A1, Color.WHITE));
-        underTest.account(ANOTHER_HASH, Move.move(Coord.D4, Color.BLACK));
-        underTest.account(ANOTHER_HASH, Move.move(Coord.D4, Color.WHITE));
-        underTest.account(ANOTHER_HASH, Move.move(Coord.D1, Color.BLACK));
+        underTest.account(ONE_HASH, Move.WHITE_D4);
+        underTest.account(ONE_HASH, Move.BLACK_D4);
+        underTest.account(ONE_HASH, Move.WHITE_D1);
+        underTest.account(ONE_HASH, Move.WHITE_A1);
+        underTest.account(ANOTHER_HASH, Move.BLACK_D4);
+        underTest.account(ANOTHER_HASH, Move.WHITE_D4);
+        underTest.account(ANOTHER_HASH, Move.BLACK_D1);
 
         assertThat(underTest.playoutsFor(ONE_HASH)).isEqualTo(4);
         assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 10, Color.WHITE)))
-            .asList().containsExactly(Coord.A1, Coord.D1, Coord.D4);
+            .asList().containsExactly(Move.WHITE_A1, Move.WHITE_D1, Move.WHITE_D4);
     }
 
 
@@ -228,25 +230,14 @@ public class TTableTest
         assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.BLACK, 2f)))
             .asList().containsExactly(Move.pass(Color.BLACK));
 
-        underTest.account(ONE_HASH, Move.move(Coord.D1, Color.WHITE), 1);
+        underTest.account(ONE_HASH, Move.WHITE_D1, 1);
         assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.WHITE, 2f)))
-            .asList().containsExactly(Coord.D1, Move.pass(Color.WHITE));
+            .asList().containsExactly(Move.WHITE_D1, Move.pass(Color.WHITE));
 
         assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.BLACK, 2f)))
-            .asList().containsExactly(Coord.D1, Move.pass(Color.BLACK));
+            .asList().containsExactly(Move.BLACK_D1, Move.pass(Color.BLACK));
     }
 
-    short[] cutOnFirstInvalid(final short[] bigList)
-    {
-        int size = 0;
-        while (bigList[size] != Coord.INVALID)
-        {
-            size++;
-        }
-        final short[] result = new short[size];
-        System.arraycopy(bigList, 0, result, 0, size);
-        return result;
-    }
 
     @Test
     public void newTablesAreAlwaysEmptied()
@@ -255,7 +246,7 @@ public class TTableTest
         for (int i = 0; i < 2000; i++)
         {
             assertThat(underTest.topsFor(i, 1, Color.WHITE)[0]).isEqualTo(Coord.INVALID);
-            underTest.account(i, Move.move(Coord.A1, Color.WHITE));
+            underTest.account(i, Move.WHITE_A1);
         }
     }
 

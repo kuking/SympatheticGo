@@ -15,8 +15,25 @@ public final class Move
     public static final short INVALID = 0xffffffff;
     public static final SplittableRandom RND = new SplittableRandom(System.currentTimeMillis());
 
-    private static final short BLACK_PASS = move((byte) 127, (byte) 127, Color.BLACK);
-    private static final short WHITE_PASS = move((byte) 127, (byte) 127, Color.WHITE);
+    public static final short BLACK_PASS = move((byte) 127, (byte) 127, Color.BLACK);
+    public static final short WHITE_PASS = move((byte) 127, (byte) 127, Color.WHITE);
+
+    public static final short BLACK_A1 = parseToVal("BLACK A1");
+    public static final short BLACK_A2 = parseToVal("BLACK A2");
+    public static final short BLACK_A4 = parseToVal("BLACK A4");
+    public static final short BLACK_B1 = parseToVal("BLACK B1");
+    public static final short BLACK_B2 = parseToVal("BLACK B2");
+    public static final short BLACK_C1 = parseToVal("BLACK C1");
+    public static final short BLACK_D1 = parseToVal("BLACK D1");
+    public static final short BLACK_D4 = parseToVal("BLACK D4");
+    public static final short WHITE_A1 = parseToVal("WHITE A1");
+    public static final short WHITE_A2 = parseToVal("WHITE A2");
+    public static final short WHITE_A4 = parseToVal("WHITE A4");
+    public static final short WHITE_B1 = parseToVal("WHITE B1");
+    public static final short WHITE_B2 = parseToVal("WHITE B2");
+    public static final short WHITE_C1 = parseToVal("WHITE C1");
+    public static final short WHITE_D1 = parseToVal("WHITE D1");
+    public static final short WHITE_D4 = parseToVal("WHITE D4");
 
     private Move()
     {
@@ -145,7 +162,7 @@ public final class Move
 
     public static Color color(final short value)
     {
-        return Color.fromByte((byte) (value >> 14 & 3));
+        return Color.fromByte((byte) ((value & (short) 0b1100000000000000) >> 14 & 3));
     }
 
     public static boolean isPass(final short value)

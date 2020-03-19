@@ -3,6 +3,7 @@ package uk.kukino.sgo.mc;
 import uk.co.real_logic.agrona.collections.IntLruCache;
 import uk.kukino.sgo.base.Color;
 import uk.kukino.sgo.base.Coord;
+import uk.kukino.sgo.base.Game;
 import uk.kukino.sgo.base.Move;
 
 import java.util.Arrays;
@@ -42,6 +43,11 @@ public class TTable
         return playouts;
     }
 
+    public int playoutsFor(final Game game)
+    {
+        return playoutsFor(game.getBoard().hashCode());
+    }
+
     public short[] topsFor(final int boardHash, final int qty, final Color color)
     {
         Arrays.fill(ratios, Float.NaN);
@@ -72,6 +78,11 @@ public class TTable
         return results;
     }
 
+    public short[] topsFor(final Game game, final int qty, final Color color)
+    {
+        return topsFor(game.getBoard().hashCode(), qty, color);
+    }
+
     public short[] uct(final int boardHash, final int qty, final Color color, final float factor)
     {
         Arrays.fill(ratios, Float.NaN);
@@ -96,6 +107,11 @@ public class TTable
         }
         buildResultsFromRatios(Math.min(qty, nonEmpty), color);
         return results;
+    }
+
+    public short[] uct(final Game game, final int qty, final Color color, final float factor)
+    {
+        return uct(game.getBoard().hashCode(), qty, color, factor);
     }
 
     private void buildResultsFromRatios(final int finalQty, final Color color)
@@ -134,7 +150,7 @@ public class TTable
             final short orig = results[i];
             if (orig < passBoundary)
             {
-                results[i] = Coord.XY((byte) (orig % size), (byte) (orig / size));
+                results[i] = Move.move(Coord.XY((byte) (orig % size), (byte) (orig / size)), color);
             }
             else if (orig >= passBoundary)
             {
@@ -172,6 +188,16 @@ public class TTable
     public void account(final int boardHash, final short move)
     {
         account(boardHash, move, 1);
+    }
+
+    public void account(final Game game, final short move, final int wins)
+    {
+        account(game.getBoard().hashCode(), move, 1);
+    }
+
+    public void account(final Game game, final short move)
+    {
+        account(game, move, 1);
     }
 
 }
