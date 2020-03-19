@@ -1,6 +1,7 @@
 package uk.kukino.sgo.mc;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import uk.kukino.sgo.base.Color;
 import uk.kukino.sgo.base.Coord;
@@ -152,17 +153,13 @@ public class TTableTest
         underTest.account(ONE_HASH, Move.WHITE_D4);
         underTest.account(ONE_HASH, Move.WHITE_D1);
         underTest.account(ONE_HASH, Move.BLACK_D1);
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 1, Color.WHITE, 2f))).asList()
-            .containsExactly(Move.WHITE_D4);
-
-        underTest.account(ONE_HASH, Move.WHITE_D4);
-        underTest.account(ONE_HASH, Move.WHITE_D4);
-        underTest.account(ONE_HASH, Move.WHITE_D4);
-        underTest.account(ONE_HASH, Move.WHITE_D4);
-        underTest.account(ONE_HASH, Move.WHITE_D4);
         assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 1, Color.WHITE, 2f))).asList().containsExactly(Move.WHITE_D4);
 
         underTest.account(ONE_HASH, Move.WHITE_D4);
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 1, Color.WHITE, 2f))).asList().containsExactly(Move.WHITE_D4);
+
+        underTest.account(ONE_HASH, Move.BLACK_D4);
+        underTest.account(ONE_HASH, Move.BLACK_D4);
         assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 1, Color.WHITE, 2f))).asList().containsExactly(Move.WHITE_D1);
     }
 

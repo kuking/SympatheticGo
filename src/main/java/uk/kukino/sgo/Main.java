@@ -3,6 +3,7 @@ package uk.kukino.sgo;
 import uk.kukino.sgo.gtp.Engine;
 import uk.kukino.sgo.gtp.Streamed;
 import uk.kukino.sgo.util.MC1Engine;
+import uk.kukino.sgo.util.MC2Engine;
 import uk.kukino.sgo.util.RandomEngine;
 
 import java.io.FileOutputStream;
@@ -20,6 +21,7 @@ public class Main
             System.out.println("try: ./gradlew run --args 'perf'");
             System.out.println("..or: java -jar build/libs/sgo.jar gtp:random");
             System.out.println("..or: java -jar build/libs/sgo.jar gtp:mc1");
+            System.out.println("..or: java -jar build/libs/sgo.jar gtp:mc2");
 
         }
         else if ("perf".equals(args[0]))
@@ -36,6 +38,10 @@ public class Main
             else if ("gtp:mc1".equals(args[0]))
             {
                 engine = new MC1Engine();
+            }
+            else if ("gtp:mc2".equals(args[0]))
+            {
+                engine = new MC2Engine();
             }
             else
             {

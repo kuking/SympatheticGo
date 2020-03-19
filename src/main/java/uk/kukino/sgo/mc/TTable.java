@@ -74,6 +74,8 @@ public class TTable
                 nonEmpty++;
             }
         }
+//        System.err.print("TOPS ");
+//        dumpRatios();
         buildResultsFromRatios(Math.min(qty, nonEmpty), color);
         return results;
     }
@@ -92,21 +94,32 @@ public class TTable
         int nonEmpty = 0;
         for (int i = 0; i < table.length; i += 2)
         {
-            final int blackWin = table[i];
-            final int whiteWin = table[i + 1];
-
+            final float blackWin = table[i];
+            final float whiteWin = table[i + 1];
             // https://thegreendestiny.wordpress.com/2009/10/22/computer-go-2/
             if (blackWin != 0 || whiteWin != 0)
             {
                 final float tj = blackWin + whiteWin;
-                final float xj = (float) ((color == Color.WHITE) ? whiteWin : blackWin) / (float) n;
+                final float xj = ((color == Color.WHITE) ? whiteWin : blackWin) / tj;
                 final float uct = xj + (float) Math.sqrt(c2logn / tj);
                 ratios[i / 2] = uct;
                 nonEmpty++;
             }
         }
+//        System.err.print("UCT ");
+//        dumpRatios();
         buildResultsFromRatios(Math.min(qty, nonEmpty), color);
         return results;
+    }
+
+    private void dumpRatios()
+    {
+        System.err.print("RATIOS: ");
+        for (int i = 0; i < ratios.length; i++)
+        {
+            System.err.print(String.format("%1.2f ", ratios[i]));
+        }
+        System.err.println();
     }
 
     public short[] uct(final Game game, final int qty, final Color color, final float factor)
@@ -190,14 +203,10 @@ public class TTable
         account(boardHash, move, 1);
     }
 
-    public void account(final Game game, final short move, final int wins)
+    public void account(final Game game, final short move, final int wins, final int losses)
     {
-        account(game.getBoard().hashCode(), move, 1);
-    }
-
-    public void account(final Game game, final short move)
-    {
-        account(game, move, 1);
+        account(game.getBoard().hashCode(), move, wins);
+        account(game.getBoard().hashCode(), Move.oppositePlayer(move), losses);
     }
 
 }
