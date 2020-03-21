@@ -1,4 +1,4 @@
-package uk.kukino.sgo.util;
+package uk.kukino.sgo.engines;
 
 import uk.kukino.sgo.base.Color;
 import uk.kukino.sgo.base.Coord;
@@ -6,6 +6,7 @@ import uk.kukino.sgo.base.Game;
 import uk.kukino.sgo.base.Move;
 import uk.kukino.sgo.mc.Buffers;
 import uk.kukino.sgo.mc.TTable;
+import uk.kukino.sgo.util.IntIntAsLong;
 
 public class MC1Engine extends BaseEngine
 {

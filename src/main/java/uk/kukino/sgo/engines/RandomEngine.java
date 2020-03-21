@@ -1,4 +1,4 @@
-package uk.kukino.sgo.util;
+package uk.kukino.sgo.engines;
 
 import uk.kukino.sgo.base.Color;
 import uk.kukino.sgo.base.Game;

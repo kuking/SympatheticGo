@@ -2,9 +2,9 @@ package uk.kukino.sgo;
 
 import uk.kukino.sgo.gtp.Engine;
 import uk.kukino.sgo.gtp.Streamed;
-import uk.kukino.sgo.util.MC1Engine;
-import uk.kukino.sgo.util.MC2Engine;
-import uk.kukino.sgo.util.RandomEngine;
+import uk.kukino.sgo.engines.MC1Engine;
+import uk.kukino.sgo.engines.MC2Engine;
+import uk.kukino.sgo.engines.RandomEngine;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
