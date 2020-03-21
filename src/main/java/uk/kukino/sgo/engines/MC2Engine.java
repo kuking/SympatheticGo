@@ -4,7 +4,7 @@ import uk.kukino.sgo.base.Color;
 import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Game;
 import uk.kukino.sgo.base.Move;
-import uk.kukino.sgo.mc.Buffers;
+import uk.kukino.sgo.util.Buffers;
 import uk.kukino.sgo.mc.TTable;
 
 import static uk.kukino.sgo.util.TUtils.cutOnFirstInvalid;

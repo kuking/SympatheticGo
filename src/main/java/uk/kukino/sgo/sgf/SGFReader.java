@@ -284,7 +284,10 @@ public class SGFReader
         {
             return Move.pass(color);
         }
-        return Move.move((byte) (Character.toUpperCase((char) a) - 65), (byte) (header.size - (Character.toUpperCase((char) b) - 64)), color);
+        return Move.move(
+            (byte) (Character.toUpperCase((char) a) - 65),
+            (byte) (header.size - (Character.toUpperCase((char) b) - 64)),
+            color);
     }
 
 

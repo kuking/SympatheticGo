@@ -107,7 +107,7 @@ public final class CanadianTimeRules
     }
 
 
-    private class CanadianTimeManagementImpl implements TimeManager
+    private final class CanadianTimeManagementImpl implements TimeManager
     {
         private CanadianTimeRules config;
         private boolean expectedNewMove = true;

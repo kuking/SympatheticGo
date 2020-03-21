@@ -1,4 +1,4 @@
-package uk.kukino.sgo.mc;
+package uk.kukino.sgo.util;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;

@@ -5,6 +5,7 @@ import uk.kukino.sgo.base.Color;
 import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Game;
 import uk.kukino.sgo.base.Move;
+import uk.kukino.sgo.util.Buffers;
 
 import java.util.Arrays;
 

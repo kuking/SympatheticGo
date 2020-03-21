@@ -84,7 +84,7 @@ public class Benchmark
         System.out.println("Total replayed: " + counters[0] + " skipped: " + counters[1] + " - with issues:" + counters[2]);
     }
 
-    public static void main(String[] args) throws IOException
+    public static void main(final String[] args) throws IOException
     {
         //readAll();
         replayKgsForRegression();

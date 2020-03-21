@@ -1,6 +1,6 @@
 package uk.kukino.sgo.sgf;
 
-public class Rank
+public final class Rank
 {
 
     public static final Rank UNKNOWN = new Rank("UNKNOWN");
