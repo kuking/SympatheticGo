@@ -19,8 +19,6 @@ public class TUtils
         return result;
     }
 
-    //TODO: convert this into a logger lambda
-
     public static void logMoves(final Consumer<String> logger, final short[] moves)
     {
         for (final short move : moves)
@@ -44,6 +42,14 @@ public class TUtils
                 }
             }
             logger.accept(" ");
+        }
+    }
+
+    public static void logRatios(final Consumer<String> logger, final float[] ratios, final int limit)
+    {
+        for (int i = 0; i < limit; i++)
+        {
+            logger.accept(String.format("%.3f ", ratios[i]));
         }
     }
 

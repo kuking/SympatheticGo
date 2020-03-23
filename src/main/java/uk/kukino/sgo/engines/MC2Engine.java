@@ -10,8 +10,7 @@ import uk.kukino.sgo.util.Buffers;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static uk.kukino.sgo.util.TUtils.cutOnFirstInvalid;
-import static uk.kukino.sgo.util.TUtils.logMoves;
+import static uk.kukino.sgo.util.TUtils.*;
 
 public class MC2Engine extends BaseEngine
 {
@@ -19,14 +18,13 @@ public class MC2Engine extends BaseEngine
 
     private TTable ttable;
     private Buffers<Game> gameBuffers;
-    private byte levels = 2;
-    private byte wide = 9 * 9; // terrible!
+    private byte maxDepth = 5;
     private short[] validMoves;
 
 
     private final AtomicInteger genMovePlys = new AtomicInteger(0);
 
-    private int uctSeedingLotSize = 1000;
+    private int uctSeedingLotSize = 500;
     private int uctTopCandidates = 10;
     private int uctCandidateLotSize = 50;
     private float uctFactor = 2f;
@@ -42,7 +40,7 @@ public class MC2Engine extends BaseEngine
     protected void resetGame()
     {
         super.resetGame();
-        ttable = new TTable(boardSize, levels, wide);
+        ttable = new TTable(boardSize, maxDepth, uctTopCandidates);
         validMoves = new short[boardSize * boardSize + 2];
         gameBuffers = new Buffers<>(100, () -> new Game(boardSize, handicap, komiX10));
         timeManager = canadianTimeRulesBuilder()
@@ -53,7 +51,7 @@ public class MC2Engine extends BaseEngine
     private CanadianTimeRules canadianTimeRulesBuilder()
     {
         return CanadianTimeRules.builder()
-            .maxMoveSecs(30)
+            .maxMoveSecs(60)
             .enoughConfidence(0.99f);
     }
 
@@ -64,8 +62,8 @@ public class MC2Engine extends BaseEngine
         playouts();
         final short[] moves = ttable.topsFor(game, 1, game.playerToPlay());
         final short move = moves[0];
-        debugln("genMove " + Move.shortToString(move));
         game.play(move);
+        debugln("genMove " + Move.shortToString(move));
         debugln(game.toString());
         return move;
     }
@@ -74,7 +72,7 @@ public class MC2Engine extends BaseEngine
     {
         timeManager.newGenerateMove();
         seedUct(game);
-        exploreUtc(game);
+        exploreUtc(game, maxDepth);
     }
 
     private void seedUct(final Game game)
@@ -104,7 +102,7 @@ public class MC2Engine extends BaseEngine
         }
     }
 
-    private void exploreUtc(final Game game)
+    private void exploreUtc(final Game game, final int maxDepth)
     {
         debugln("Exploring UTC ...");
         final Game copy = gameBuffers.lease();
@@ -113,12 +111,7 @@ public class MC2Engine extends BaseEngine
             int tickNo = 0;
             while (!timeManager.tick(genMovePlys.get(), 0.1f))
             {
-                debug("UCT " + tickNo + "; " + timeManager + "; Candidates: ");
-                logMoves(this::debug, cutOnFirstInvalid(ttable.uct(game, uctTopCandidates, game.playerToPlay(), uctFactor)));
-                debug(" Top 3: ");
-                logMoves(this::debug, cutOnFirstInvalid(ttable.topsFor(game, 3, game.playerToPlay())));
-                debugln("");
-
+                logUtc(game, maxDepth, tickNo);
 
                 final short[] uctCandidates = ttable.uct(game, uctTopCandidates, game.playerToPlay(), uctFactor);
 
@@ -147,6 +140,19 @@ public class MC2Engine extends BaseEngine
         {
             gameBuffers.ret(copy);
         }
+    }
+
+    private void logUtc(Game game, int maxDepth, int tickNo)
+    {
+        debug("H" + maxDepth + " UCT " + tickNo + "; " + timeManager + "; Candidates: ");
+        logMoves(this::debug, cutOnFirstInvalid(ttable.uct(game, uctTopCandidates, game.playerToPlay(), uctFactor)));
+        debug("[");
+        logRatios(this::debug, ttable.lastRatiosSorted(), uctTopCandidates);
+        debug("\b] Tops: ");
+        logMoves(this::debug, cutOnFirstInvalid(ttable.topsFor(game, 7, game.playerToPlay())));
+        debug("[");
+        logRatios(this::debug, ttable.lastRatiosSorted(), 7);
+        debugln("\b]");
     }
 
 

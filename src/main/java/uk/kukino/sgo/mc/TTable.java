@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 public class TTable
 {
-    private final int size;
+    private final int boardSize;
     private final Buffers<int[]> buffers; // int[((y*size+x)*2){+1}] first int, black count, second, white count.
     private final IntLruCache<int[]> cache;
 
@@ -19,18 +19,18 @@ public class TTable
     private float[] ratios;
 
 
-    public TTable(final byte size, final byte levels, final byte wide)
+    public TTable(final byte boardSize, final int levels, final int wide)
     {
-        this.size = size;
+        this.boardSize = boardSize;
         final int capacity = (int) Math.pow(wide, levels);
-        buffers = new Buffers<>(capacity + 1, () -> new int[size * size * 2 + 2]); // last two are pass moves
+        buffers = new Buffers<>(capacity + 1, () -> new int[boardSize * boardSize * 2 + 2]); // last two are pass moves
         cache = new IntLruCache<>(capacity, key -> buffers.lease(), buf ->
         {
             Arrays.fill(buf, 0);
             buffers.ret(buf);
         });
-        this.results = new short[size * size + 2];
-        this.ratios = new float[size * size + 2];
+        this.results = new short[boardSize * boardSize + 2];
+        this.ratios = new float[boardSize * boardSize + 2];
     }
 
     public int playoutsFor(final int boardHash)
@@ -75,8 +75,6 @@ public class TTable
                 nonEmpty++;
             }
         }
-//        System.err.print("TOPS ");
-//        dumpRatios();
         buildResultsFromRatios(Math.min(qty, nonEmpty), color);
         return results;
     }
@@ -107,20 +105,8 @@ public class TTable
                 nonEmpty++;
             }
         }
-//        System.err.print("UCT ");
-//        dumpRatios();
         buildResultsFromRatios(Math.min(qty, nonEmpty), color);
         return results;
-    }
-
-    private void dumpRatios()
-    {
-        System.err.print("RATIOS: ");
-        for (int i = 0; i < ratios.length; i++)
-        {
-            System.err.print(String.format("%1.2f ", ratios[i]));
-        }
-        System.err.println();
     }
 
     public short[] uct(final Game game, final int qty, final Color color, final float factor)
@@ -158,19 +144,41 @@ public class TTable
             }
         }
 
-        final int passBoundary = size * size;
+        final int passBoundary = boardSize * boardSize;
         for (int i = 0; i < finalQty; i++)
         {
             final short orig = results[i];
             if (orig < passBoundary)
             {
-                results[i] = Move.move(Coord.XY((byte) (orig % size), (byte) (orig / size)), color);
+                results[i] = Move.move(Coord.XY((byte) (orig % boardSize), (byte) (orig / boardSize)), color);
             }
             else if (orig >= passBoundary)
             {
                 results[i] = Move.pass(color);
             }
         }
+    }
+
+    /**
+     * Returns the last results' ratios, sorted. Obviously no thread safe.
+     *
+     * @return
+     */
+    public float[] lastRatiosSorted()
+    {
+        Arrays.sort(ratios);
+        int tail = ratios.length - 1;
+        while (tail > 0 && Float.isNaN(ratios[tail]))
+        {
+            tail--;
+        }
+        for (int i = 0; i < tail / 2; i++)
+        {
+            final float tmp = ratios[i];
+            ratios[i] = ratios[tail - i];
+            ratios[tail - i] = tmp;
+        }
+        return ratios;
     }
 
     /***
@@ -185,11 +193,11 @@ public class TTable
         final int ofs;
         if (Move.isStone(move))
         {
-            ofs = (((Move.Y(move) * size) + Move.X(move)) << 1) + (c == Color.WHITE ? 1 : 0);
+            ofs = (((Move.Y(move) * boardSize) + Move.X(move)) << 1) + (c == Color.WHITE ? 1 : 0);
         }
         else if (Move.isPass(move))
         {
-            ofs = ((size * size) << 1) + (c == Color.WHITE ? 1 : 0);
+            ofs = ((boardSize * boardSize) << 1) + (c == Color.WHITE ? 1 : 0);
         }
         else
         {
