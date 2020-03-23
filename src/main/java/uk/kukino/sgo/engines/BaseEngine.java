@@ -118,4 +118,15 @@ public abstract class BaseEngine implements Engine
 
     }
 
+    void debug(final String log)
+    {
+        System.err.print(log);
+    }
+
+    void debugln(final String log)
+    {
+        System.err.println(log);
+    }
+
+
 }

@@ -1,14 +1,13 @@
 package uk.kukino.sgo.engines;
 
 import uk.kukino.sgo.base.Color;
-import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Game;
 import uk.kukino.sgo.base.Move;
-import uk.kukino.sgo.util.Buffers;
 import uk.kukino.sgo.mc.TTable;
+import uk.kukino.sgo.util.Buffers;
 
 import static uk.kukino.sgo.util.TUtils.cutOnFirstInvalid;
-import static uk.kukino.sgo.util.TUtils.printMoves;
+import static uk.kukino.sgo.util.TUtils.logMoves;
 
 public class MC2Engine extends BaseEngine
 {
@@ -19,10 +18,11 @@ public class MC2Engine extends BaseEngine
     private short[] validMoves;
 
 
-    private int uctSeedingLotSize = 1000;
-    private int uctTopCandidates = 15;
-    private int uctCandidateLotSize = 200;
-    private int uctIterationsPerGenMove = 50;
+    private int uctSeedingLotSize = 100;
+
+    private int uctTopCandidates = 10;
+    private int uctCandidateLotSize = 50;
+    private int uctIterationsPerGenMove = 500;
     private float uctFactor = 2f;
 
 
@@ -40,45 +40,30 @@ public class MC2Engine extends BaseEngine
         gameBuffers = new Buffers<>(100, () -> new Game(boardSize, handicap, komiX10));
     }
 
+
     @Override
     public short genMove(final Color color)
     {
-        if (color != game.playerToPlay())
-        {
-            System.err.println("COLOR NOT EXPECTED");
-            return Coord.INVALID;
-        }
         playouts();
 
-        final short[] moves = ttable.topsFor(game, 10, game.playerToPlay());
-        printMoves(System.err, cutOnFirstInvalid(moves));
-
+        final short[] moves = ttable.topsFor(game, 1, game.playerToPlay());
         final short move = moves[0];
-        //        final short move = findBestFor(game.playerToPlay()); // this feels wrong....
-
-        System.err.println("Looks like the move is going to be " + Move.shortToString(move));
+        debugln("genMove " + Move.shortToString(move));
         game.play(move);
-        System.err.println(game);
+        debugln(game.toString());
         return move;
     }
 
     private void playouts()
     {
 
-        if (ttable.playoutsFor(game) < 2)
-        {
-            System.err.println("Seeding UCT");
-            seedUct(game);
-        }
-        for (int i = 0; i < uctIterationsPerGenMove; i++)
-        {
-            System.err.print("UCT " + i + "/" + uctIterationsPerGenMove);
-            exploreUtc(game);
-        }
+        seedUct(game);
+        exploreUtc(game);
     }
 
     private void seedUct(final Game game)
     {
+        debugln("Seeding UCT ...");
         final Game copy = gameBuffers.lease();
         final int validMovesQ = game.validMoves(validMoves);
         try
@@ -104,45 +89,43 @@ public class MC2Engine extends BaseEngine
 
     private void exploreUtc(final Game game)
     {
-        final Game uctBaseCopy = gameBuffers.lease();
+        debugln("Exploring UTC ...");
         final Game copy = gameBuffers.lease();
         try
         {
-            final short[] uctCandidates = ttable.uct(game, uctTopCandidates, game.playerToPlay(), uctFactor);
-
-
-            System.err.print("; Candidates: ");
-            for (int uctIdx = 0; uctIdx < uctCandidates.length && uctCandidates[uctIdx] != Move.INVALID; uctIdx++)
+            for (int i = 0; i < uctIterationsPerGenMove; i++)
             {
-                final short uctMove = uctCandidates[uctIdx];
-                System.err.print(Coord.shortToString(uctMove) + ", ");
-            }
-            System.err.println();
+                debug("UCT " + i + "/" + uctIterationsPerGenMove + "; Candidates: ");
+                logMoves(this::debug, cutOnFirstInvalid(ttable.uct(game, uctTopCandidates, game.playerToPlay(), uctFactor)));
+                debug(" Top 3: ");
+                logMoves(this::debug, cutOnFirstInvalid(ttable.topsFor(game, 3, game.playerToPlay())));
+                debugln("");
 
-            for (int uctIdx = 0; uctIdx < uctCandidates.length && uctCandidates[uctIdx] != Move.INVALID; uctIdx++)
-            {
-                final short uctMove = uctCandidates[uctIdx];
-                for (int c = 0; c < uctTopCandidates; c++)
+
+                final short[] uctCandidates = ttable.uct(game, uctTopCandidates, game.playerToPlay(), uctFactor);
+
+                for (int uctIdx = 0; uctIdx < uctCandidates.length && uctCandidates[uctIdx] != Move.INVALID; uctIdx++)
                 {
-                    game.copyTo(uctBaseCopy);
-                    if (!uctBaseCopy.play(uctMove))
+                    final short uctMove = uctCandidates[uctIdx];
+                    for (int c = 0; c < uctTopCandidates; c++)
                     {
-                        throw new IllegalStateException("uct is retuning invalid moves! Are we seeding it wrong?");
-                    }
-
-                    for (int s = 0; s < uctCandidateLotSize; s++)
-                    {
-                        uctBaseCopy.copyTo(copy);
-                        copy.finishRandomly();
-                        final Color winner = copy.simpletonWinnerUsingChineseRules();
-                        ttable.account(game, uctMove, winner == Move.color(uctMove) ? 1 : 0, winner == Move.color(uctMove) ? 0 : 1);
+                        for (int s = 0; s < uctCandidateLotSize; s++)
+                        {
+                            game.copyTo(copy);
+                            if (!copy.play(uctMove))
+                            {
+                                throw new IllegalStateException("uct is retuning invalid moves! Are we seeding it wrong?");
+                            }
+                            copy.finishRandomly();
+                            final Color winner = copy.simpletonWinnerUsingChineseRules();
+                            ttable.account(game, uctMove, winner == Move.color(uctMove) ? 1 : 0, winner == Move.color(uctMove) ? 0 : 1);
+                        }
                     }
                 }
             }
         }
         finally
         {
-            gameBuffers.ret(uctBaseCopy);
             gameBuffers.ret(copy);
         }
     }

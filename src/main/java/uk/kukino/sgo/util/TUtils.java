@@ -3,7 +3,7 @@ package uk.kukino.sgo.util;
 import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Move;
 
-import java.io.PrintStream;
+import java.util.function.Consumer;
 
 public class TUtils
 {
@@ -19,17 +19,32 @@ public class TUtils
         return result;
     }
 
-    public static void printMoves(final PrintStream stream, final short[] moves)
+    //TODO: convert this into a logger lambda
+
+    public static void logMoves(final Consumer<String> logger, final short[] moves)
     {
-        stream.print("[");
-        for (int i = 0; i < moves.length; i++)
+        for (final short move : moves)
         {
-            stream.print(Move.shortToString(moves[i]));
-            if (i + 1 != moves.length)
+            if (!Move.isValid(move))
             {
-                stream.print(", ");
+                logger.accept("INV");
             }
+            else
+            {
+                logger.accept(Move.color(move).name().substring(0, 1));
+                logger.accept("-");
+
+                if (Move.isPass(move))
+                {
+                    logger.accept("PASS");
+                }
+                else
+                {
+                    logger.accept(Coord.shortToString(move));
+                }
+            }
+            logger.accept(" ");
         }
-        stream.println("]");
     }
+
 }
