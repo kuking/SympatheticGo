@@ -157,6 +157,12 @@ public final class CanadianTimeRules
             expectedNewMove = true;
             return true;
         }
+
+        @Override
+        public String toString()
+        {
+            return "CanadianTimeRules{move: " + (currentPlys / 1000) + "kp/" + (this.config.timeSupplier.get() - this.currentMoveMs) / 1000 + "s}";
+        }
     }
 
 
