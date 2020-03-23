@@ -1,5 +1,6 @@
 package uk.kukino.sgo.mc;
 
+import uk.co.real_logic.agrona.collections.Int2IntHashMap;
 import uk.co.real_logic.agrona.collections.IntHashSet;
 import uk.co.real_logic.agrona.collections.IntLruCache;
 import uk.kukino.sgo.base.Color;
@@ -16,6 +17,7 @@ public class TTable
     private final Buffers<int[]> buffers; // int[((y*size+x)*2){+1}] first int, black count, second, white count.
     private final IntLruCache<int[]> cache;
     private final IntHashSet keys;
+    private final Int2IntHashMap interests;
 
     private short[] results;
     private float[] ratios;
@@ -26,16 +28,19 @@ public class TTable
         this.boardSize = boardSize;
         final int capacity = (int) Math.pow(wide, levels);
         keys = new IntHashSet(capacity, Integer.MIN_VALUE);
+        interests = new Int2IntHashMap(capacity, 0.67d, 0);
         buffers = new Buffers<>(capacity + 1, () -> new int[boardSize * boardSize * 2 + 2 + 1]); // last two are pass moves, the last is the key
         cache = new IntLruCache<>(capacity, key ->
         {
             final int[] buf = buffers.lease();
             buf[buf.length - 1] = key;
             keys.add(key);
+            interests.remove(key);
             return buf;
         }, buf ->
         {
-            keys.remove(buf[buf.length - 1]);
+            final int key = buf[buf.length - 1];
+            keys.remove(key);
             Arrays.fill(buf, 0);
             buffers.ret(buf);
         });
@@ -203,6 +208,31 @@ public class TTable
         return contains(game.getBoard().hashCode());
     }
 
+    public int markInterest(final int boardHash)
+    {
+        if (!contains(boardHash))
+        {
+            final int newValue = interests.get(boardHash) + 1;
+            interests.put(boardHash, newValue);
+            return newValue;
+        }
+        return 0;
+    }
+
+    public int markInterest(final Game game)
+    {
+        return markInterest(game.getBoard().hashCode());
+    }
+
+    public int getInterest(final int boardHash)
+    {
+        return interests.get(boardHash);
+    }
+
+    public int getInterest(final Game game)
+    {
+        return getInterest(game.getBoard().hashCode());
+    }
 
     /***
      * Account a winner for this particular board configuration, if Color==Empty, implies 'DRAW'

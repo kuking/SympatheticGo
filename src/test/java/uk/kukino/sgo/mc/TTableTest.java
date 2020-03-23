@@ -241,16 +241,55 @@ public class TTableTest
         assertThat(underTest.contains(ONE_HASH)).isFalse();
         underTest.account(ONE_HASH, Move.WHITE_PASS);
         assertThat(underTest.contains(ONE_HASH)).isTrue();
+        insertLotsSoItEvictsCache((int) Math.pow(5, 5) + 1);
+        assertThat(underTest.contains(ONE_HASH)).isFalse();
+    }
 
-        final int capacity = (int) Math.pow(5, 5) + 1;
+    @Test
+    public void interests()
+    {
+        assertThat(underTest.getInterest(ONE_HASH)).isEqualTo(0);
+        assertThat(underTest.getInterest(ANOTHER_HASH)).isEqualTo(0);
+
+        assertThat(underTest.markInterest(ONE_HASH)).isEqualTo(1);
+        assertThat(underTest.getInterest(ONE_HASH)).isEqualTo(1);
+
+        assertThat(underTest.markInterest(ANOTHER_HASH)).isEqualTo(1);
+        assertThat(underTest.getInterest(ANOTHER_HASH)).isEqualTo(1);
+
+        assertThat(underTest.markInterest(ONE_HASH)).isEqualTo(2);
+        assertThat(underTest.getInterest(ONE_HASH)).isEqualTo(2);
+
+        assertThat(underTest.getInterest(ANOTHER_HASH)).isEqualTo(1); //continues to be 1
+
+        // inserting an entry in that hash, removes interests (as it becomes fact.)
+        underTest.account(ONE_HASH, Move.WHITE_PASS);
+        assertThat(underTest.getInterest(ONE_HASH)).isEqualTo(0);
+
+        // there is no possibility to mark interest on an existing ttable
+        assertThat(underTest.markInterest(ONE_HASH)).isEqualTo(0);
+        assertThat(underTest.markInterest(ONE_HASH)).isEqualTo(0);
+        // but ANOTHER_HASH can be marked
+        assertThat(underTest.markInterest(ANOTHER_HASH)).isEqualTo(2);
+
+        // but after eviction, ONE_HASH can be marked as interesting again
+        insertLotsSoItEvictsCache((int) Math.pow(5, 5) + 1);
+        assertThat(underTest.getInterest(ONE_HASH)).isEqualTo(0);
+        assertThat(underTest.markInterest(ONE_HASH)).isEqualTo(1);
+        assertThat(underTest.markInterest(ONE_HASH)).isEqualTo(2);
+        assertThat(underTest.getInterest(ONE_HASH)).isEqualTo(2);
+        // ANOTHER_HASH stays unaltered
+        assertThat(underTest.getInterest(ANOTHER_HASH)).isEqualTo(2);
+    }
+
+    private void insertLotsSoItEvictsCache(int capacity)
+    {
         for (int i = 0; i < capacity; i++)
         {
             underTest.account(i, Move.WHITE_PASS); // evicting ONE_HASH
             assertThat(underTest.contains(i)).isTrue();
         }
-        assertThat(underTest.contains(ONE_HASH)).isFalse();
     }
-
 
     @Test
     public void newTablesAreAlwaysEmptied()
