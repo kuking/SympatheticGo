@@ -1,7 +1,6 @@
 package uk.kukino.sgo.mc;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import uk.kukino.sgo.base.Color;
 import uk.kukino.sgo.base.Coord;
@@ -13,15 +12,15 @@ import static uk.kukino.sgo.util.TUtils.cutOnFirstInvalid;
 public class TTableTest
 {
 
-    public static final int ONE_HASH = 123;
-    public static final int ANOTHER_HASH = 234;
+    public static final int ONE_HASH = 123000;
+    public static final int ANOTHER_HASH = 234000;
 
     private TTable underTest;
 
     @BeforeEach
     public void beforeEach()
     {
-        underTest = new TTable((byte) 19, (byte) 5, (byte) 5);
+        underTest = new TTable((byte) 19, 5, 5);
     }
 
     @Test
@@ -233,6 +232,23 @@ public class TTableTest
 
         assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.BLACK, 2f)))
             .asList().containsExactly(Move.BLACK_D1, Move.pass(Color.BLACK));
+    }
+
+
+    @Test
+    public void contains()
+    {
+        assertThat(underTest.contains(ONE_HASH)).isFalse();
+        underTest.account(ONE_HASH, Move.WHITE_PASS);
+        assertThat(underTest.contains(ONE_HASH)).isTrue();
+
+        final int capacity = (int) Math.pow(5, 5) + 1;
+        for (int i = 0; i < capacity; i++)
+        {
+            underTest.account(i, Move.WHITE_PASS); // evicting ONE_HASH
+            assertThat(underTest.contains(i)).isTrue();
+        }
+        assertThat(underTest.contains(ONE_HASH)).isFalse();
     }
 
 

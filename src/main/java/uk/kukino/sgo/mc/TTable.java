@@ -1,5 +1,6 @@
 package uk.kukino.sgo.mc;
 
+import uk.co.real_logic.agrona.collections.IntHashSet;
 import uk.co.real_logic.agrona.collections.IntLruCache;
 import uk.kukino.sgo.base.Color;
 import uk.kukino.sgo.base.Coord;
@@ -14,6 +15,7 @@ public class TTable
     private final int boardSize;
     private final Buffers<int[]> buffers; // int[((y*size+x)*2){+1}] first int, black count, second, white count.
     private final IntLruCache<int[]> cache;
+    private final IntHashSet keys;
 
     private short[] results;
     private float[] ratios;
@@ -23,9 +25,17 @@ public class TTable
     {
         this.boardSize = boardSize;
         final int capacity = (int) Math.pow(wide, levels);
-        buffers = new Buffers<>(capacity + 1, () -> new int[boardSize * boardSize * 2 + 2]); // last two are pass moves
-        cache = new IntLruCache<>(capacity, key -> buffers.lease(), buf ->
+        keys = new IntHashSet(capacity, Integer.MIN_VALUE);
+        buffers = new Buffers<>(capacity + 1, () -> new int[boardSize * boardSize * 2 + 2 + 1]); // last two are pass moves, the last is the key
+        cache = new IntLruCache<>(capacity, key ->
         {
+            final int[] buf = buffers.lease();
+            buf[buf.length - 1] = key;
+            keys.add(key);
+            return buf;
+        }, buf ->
+        {
+            keys.remove(buf[buf.length - 1]);
             Arrays.fill(buf, 0);
             buffers.ret(buf);
         });
@@ -37,7 +47,7 @@ public class TTable
     {
         final int table[] = cache.lookup(boardHash);
         int playouts = 0;
-        for (int i = 0; i < table.length; i++)
+        for (int i = 0; i < table.length - 1; i++)
         {
             playouts += table[i];
         }
@@ -54,7 +64,7 @@ public class TTable
         Arrays.fill(ratios, Float.NaN);
         final int[] table = cache.lookup(boardHash);
         int nonEmpty = 0;
-        for (int i = 0; i < table.length; i += 2)
+        for (int i = 0; i < table.length - 1; i += 2)
         {
             final int blackWin = table[i];
             final int whiteWin = table[i + 1];
@@ -91,7 +101,7 @@ public class TTable
         final int n = playoutsFor(boardHash);
         final double c2logn = factor * Math.log(n);
         int nonEmpty = 0;
-        for (int i = 0; i < table.length; i += 2)
+        for (int i = 0; i < table.length - 1; i += 2)
         {
             final float blackWin = table[i];
             final float whiteWin = table[i + 1];
@@ -181,6 +191,19 @@ public class TTable
         return ratios;
     }
 
+
+    public boolean contains(final int boardHash)
+    {
+        return keys.contains(boardHash);
+    }
+
+
+    public boolean contains(final Game game)
+    {
+        return contains(game.getBoard().hashCode());
+    }
+
+
     /***
      * Account a winner for this particular board configuration, if Color==Empty, implies 'DRAW'
      * @param boardHash board' hash
@@ -204,7 +227,6 @@ public class TTable
             throw new IllegalArgumentException("I don't know how to handle move");
         }
         cache.lookup(boardHash)[ofs] += wins;
-
     }
 
     public void account(final int boardHash, final short move)
