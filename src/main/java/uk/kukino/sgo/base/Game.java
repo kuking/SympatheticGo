@@ -413,11 +413,10 @@ public class Game
         }
     }
 
-    // this method is not super efficient (copies a board per move), but it is evaluated rarely so it might not be worth optimising early on
-    public int validMoves(final short[] buffer)
+    public int validMoves(final short[] buffer, final Game copy)
     {
-        final Game copy = new Game(board.size(), handicap, komi); //TODO: allocates
         int idx = 0;
+        buffer[idx++] = Move.pass(playerToPlay());
         for (byte x = 0; x < board.size(); x++)
         {
             for (byte y = 0; y < board.size(); y++)
@@ -445,7 +444,6 @@ public class Game
                 }
             }
         }
-        buffer[idx++] = Move.pass(playerToPlay());
         buffer[idx] = Move.INVALID;
         return idx;
     }

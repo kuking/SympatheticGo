@@ -476,12 +476,13 @@ public class GameTest
         final short[] valids = new short[512];
 
         game = new Game((byte) 2, (byte) 0, (byte) 55);
-        assertThat(game.validMoves(valids)).isEqualTo(5);
+        Game copy = new Game((byte) 2, (byte) 0, (byte) 55);
+        assertThat(game.validMoves(valids, copy)).isEqualTo(5);
         assertThat(cutOnFirstInvalid(valids)).asList().containsExactly(
             Move.BLACK_A1, Move.BLACK_A2, Move.BLACK_B1, Move.BLACK_B2, Move.BLACK_PASS);
 
         game.play(Move.move(Coord.A1, Color.BLACK));
-        assertThat(game.validMoves(valids)).isEqualTo(4);
+        assertThat(game.validMoves(valids, copy)).isEqualTo(4);
         assertThat(cutOnFirstInvalid(valids)).asList().containsExactly(
             Move.WHITE_A2, Move.WHITE_B1, Move.WHITE_B2, Move.WHITE_PASS);
 

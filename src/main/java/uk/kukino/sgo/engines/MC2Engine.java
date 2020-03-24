@@ -145,11 +145,12 @@ public class MC2Engine extends BaseEngine
     private Long seed(final Game game, final boolean account)
     {
         final Game copy = gameBuffers.lease();
+        final Game validMovesGameBuffer = gameBuffers.lease();
         try
         {
             int blackWins = 0;
             int whiteWins = 0;
-            final int validMovesQ = game.validMoves(validMoves);
+            final int validMovesQ = game.validMoves(validMoves, validMovesGameBuffer);
             for (int m = 0; m < validMovesQ; m++)
             {
                 for (int s = 0; s < seedingSize; s++)
@@ -179,6 +180,7 @@ public class MC2Engine extends BaseEngine
         finally
         {
             gameBuffers.ret(copy);
+            gameBuffers.ret(validMovesGameBuffer);
         }
     }
 
