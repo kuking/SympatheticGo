@@ -133,7 +133,7 @@ public class Board
             {
                 delta = -delta;
                 delta++;
-                if (delta > linealSize / 2)
+                if (delta > linealSize)
                 {
                     return Move.INVALID;
                 }

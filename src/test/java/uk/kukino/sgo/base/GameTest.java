@@ -487,7 +487,32 @@ public class GameTest
             Move.WHITE_A2, Move.WHITE_B1, Move.WHITE_B2, Move.WHITE_PASS);
 
         //TODO: check it does verifies eyes, ko... when I have more time.
+    }
 
+    @Test
+    public void finishRandomly()
+    {
+        // on average, randomly finished games should have less than 10% divergence
+        final int total = 2500;
+        int blackWins = 0;
+        int whiteWins = 0;
+        game = new Game((byte) 9, (byte) 0, (byte) 65);
+        Game copy = new Game((byte) 9, (byte) 0, (byte) 65);
+        for (int i = 0; i < total; i++)
+        {
+            game.copyTo(copy);
+            copy.finishRandomly();
+            if (Color.BLACK == copy.simpletonWinnerUsingChineseRules())
+            {
+                blackWins++;
+            }
+            else
+            {
+                whiteWins++;
+            }
+        }
+        assertThat(blackWins).isAtLeast((int) (total * 0.45f));
+        assertThat(whiteWins).isAtLeast((int) (total * 0.45f));
     }
 
     /* --------------------------------------------------------------------------------------------------------------------------------- */

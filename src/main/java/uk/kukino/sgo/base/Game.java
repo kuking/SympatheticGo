@@ -1,7 +1,6 @@
 package uk.kukino.sgo.base;
 
 import java.util.Arrays;
-import java.util.function.Supplier;
 
 public class Game
 {
@@ -59,11 +58,11 @@ public class Game
         {
             other.moves = new short[moves.length]; // this was extended, so the other has to ..
         }
-        System.arraycopy(moves, 0, other.moves, 0, moves.length);
-        System.arraycopy(superKos, 0, other.superKos, 0, superKos.length);
+        System.arraycopy(moves, 0, other.moves, 0, lastMove);
+        System.arraycopy(superKos, 0, other.superKos, 0, Math.min(lastSuperKoP, superKos.length)); // superKos is a ring-buffer
         other.lastSuperKoP = lastSuperKoP;
         other.finished = finished;
-        // probably no at they are tmp: altBoard, chainLibertyBoard, adjacentBuffers;
+        // probably no at they are tmp: stashBoard, chainLibertyBoard
     }
 
     private void initializeHandicap()
@@ -130,48 +129,6 @@ public class Game
 
     }
 
-
-    /***
-     *
-     * @param base base board
-     * @param coord coordinate to start
-     * @return true if alive (and partially marked)
-     */
-    private boolean markChainAndLiberties(final Board base, final short coord)
-    {
-        final Color color = base.get(coord);
-        if (color == Color.EMPTY)
-        {
-            return true;
-        }
-        chainLibertyBoard.clear();
-        return recursivePaint(base, coord, color);
-    }
-
-    private boolean recursivePaint(final Board base, final short coord, final Color color)
-    {
-        chainLibertyBoard.set(coord, color);
-        int adjs = Adjacent.asVal(coord, base.size());
-        while (Adjacent.iterHasNext(adjs))
-        {
-            final short adjCoord = Adjacent.iterPosition(adjs);
-            final Color baseAdjColor = base.get(adjCoord);
-            if (baseAdjColor == Color.EMPTY)
-            {
-                return true;
-            }
-            else if (baseAdjColor == color && chainLibertyBoard.get(adjCoord) == Color.EMPTY)
-            {
-                if (recursivePaint(base, adjCoord, color))
-                {
-                    return true;
-                }
-            }
-            adjs = Adjacent.iterMoveNext(adjs);
-        }
-        return false;
-    }
-
     private boolean nonRecursiveMarkChainAndLiberties(final Board base, final short firstCoord)
     {
         final Color color = base.get(firstCoord);
@@ -213,12 +170,6 @@ public class Game
     }
 
 
-    private void debug(final Supplier<CharSequence> entry)
-    {
-        System.err.println(entry.get());
-    }
-
-
     private boolean isOKMove(final short move)
     {
 
@@ -257,6 +208,7 @@ public class Game
         {
             if (lastMove > 0 && Move.isPass(moves[lastMove - 1]))
             {
+                //FIXME: it is not recording the last move in the move list
                 finished = true;
             }
         }
@@ -290,6 +242,14 @@ public class Game
                     return false;
                 }
                 superKos[lastSuperKoP++ % superKos.length] = stashBoard.hashCode();
+                if (playerToPlay == Color.WHITE)
+                {
+                    blackDeaths += moveKills;
+                }
+                else
+                {
+                    whiteDeaths += moveKills;
+                }
             }
             else
             {
@@ -301,15 +261,6 @@ public class Game
                         return false;
                     }
                 }
-            }
-            // latest accounts and moves
-            if (playerToPlay == Color.WHITE)
-            {
-                blackDeaths += moveKills;
-            }
-            else
-            {
-                whiteDeaths += moveKills;
             }
         }
 
@@ -339,14 +290,17 @@ public class Game
 
     public void finishRandomly()
     {
+        final int tolerance = board.size() << 1;
         int invalidCount = 0;
         while (!finished())
         {
             final short move;
-            if (invalidCount > board.size() / 2 ||
-                blackDeaths > board.size() ||
-                whiteDeaths > board.size() ||
-                lastMove > moves.length - 3)
+            if ((blackDeaths > tolerance && playerToPlay == Color.BLACK) ||
+                (whiteDeaths > tolerance && playerToPlay == Color.WHITE))
+            {
+                move = Move.pass(playerToPlay);
+            }
+            else if (invalidCount > tolerance || lastMove > moves.length - 3)
             {
                 move = Move.pass(playerToPlay);
             }
@@ -357,6 +311,8 @@ public class Game
 
             if (!fillsOwnEye(move) && play(move))
             {
+//                System.err.println(Move.shortToString(move));
+//                System.err.println(this);
                 invalidCount = 0;
             }
             else
