@@ -28,8 +28,9 @@ public class MC2Engine extends BaseEngine
 
     private int seedingSize = 100;
     private int uctTopCandidates = 10;
-    private int expansionThreshold = 5;
+    private int expansionThreshold = 3;
     private float uctFactor = 2f;
+    private float minWinRatioForPass = 0.35f;
 
 
     public MC2Engine()
@@ -64,10 +65,13 @@ public class MC2Engine extends BaseEngine
     {
         genMovePlys.set(0);
         mcts();
-        final short[] moves = ttable.topsFor(game, 1, game.playerToPlay());
-        final short move = moves[0];
+        short move = ttable.topsFor(game, 1, game.playerToPlay())[0];
+        if (!Move.isValid(move) || ttable.lastRatiosSorted()[0] < minWinRatioForPass)
+        {
+            move = Move.pass(color);
+        }
+        debugln("genMove " + Move.shortToString(move) + " with confidence " + ttable.lastRatiosSorted()[0]);
         game.play(move);
-        debugln("genMove " + Move.shortToString(move));
         debugln(game.toString());
         return move;
     }
@@ -94,9 +98,22 @@ public class MC2Engine extends BaseEngine
         {
             int blackWins = 0;
             int whiteWins = 0;
+            if (game.finished())
+            {
+                if (game.simpletonWinnerUsingChineseRules() == Color.BLACK)
+                {
+                    blackWins++;
+                }
+                else
+                {
+                    whiteWins++;
+                }
+                return IntIntAsLong.enc(blackWins, whiteWins);
+            }
+
             if (!ttable.contains(game))
             {
-                final long wins = seed(game, true);
+                final long wins = seed(game, seedingSize, true);
                 blackWins += IntIntAsLong.left(wins);
                 whiteWins += IntIntAsLong.right(wins);
             }
@@ -121,7 +138,7 @@ public class MC2Engine extends BaseEngine
                     }
                     else
                     {
-                        wins = seed(copy, false);
+                        wins = seed(copy, 1, false);
                     }
                     // account
                     final int black = IntIntAsLong.left(wins);
@@ -142,7 +159,7 @@ public class MC2Engine extends BaseEngine
     }
 
 
-    private Long seed(final Game game, final boolean account)
+    private Long seed(final Game game, final int lotSize, final boolean account)
     {
         final Game copy = gameBuffers.lease();
         final Game validMovesGameBuffer = gameBuffers.lease();
@@ -153,7 +170,7 @@ public class MC2Engine extends BaseEngine
             final int validMovesQ = game.validMoves(validMoves, validMovesGameBuffer);
             for (int m = 0; m < validMovesQ; m++)
             {
-                for (int s = 0; s < seedingSize; s++)
+                for (int s = 0; s < lotSize; s++)
                 {
                     final short move = validMoves[m];
                     game.copyTo(copy);
@@ -192,9 +209,9 @@ public class MC2Engine extends BaseEngine
         debug("[");
         logRatios(this::debug, ttable.lastRatiosSorted(), uctTopCandidates);
         debug("\b] Tops: ");
-        logMoves(this::debug, cutOnFirstInvalid(ttable.topsFor(game, 5, game.playerToPlay())));
+        logMoves(this::debug, cutOnFirstInvalid(ttable.topsFor(game, 3, game.playerToPlay())));
         debug("[");
-        logRatios(this::debug, ttable.lastRatiosSorted(), 5);
+        logRatios(this::debug, ttable.lastRatiosSorted(), 3);
         debug("\b] -> ");
         logMoves(this::debug, cutOnFirstInvalid(exploration));
         debugln("");
