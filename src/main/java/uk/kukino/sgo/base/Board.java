@@ -110,6 +110,10 @@ public class Board
 
     public void copyTo(final Board toBoard)
     {
+        if (toBoard.size != size || toBoard.boardBits != boardBits || toBoard.boardSize != boardSize)
+        {
+            throw new IllegalArgumentException("Can't copy boards of different size.");
+        }
         System.arraycopy(board, 0, toBoard.board, 0, board.length);
     }
 

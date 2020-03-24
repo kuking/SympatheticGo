@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class BoardTest
 {
@@ -85,6 +86,23 @@ public class BoardTest
 
         board.copyTo(boardCopy);
         assertThat(boardCopy.get((byte) 4, (byte) 8)).isEqualTo(Color.BLACK);
+    }
+
+    @Test
+    public void copyToMustBeSameSize()
+    {
+        try
+        {
+            board = new Board((byte) 19);
+            Board boardCopy = new Board((byte) 9);
+
+            board.copyTo(boardCopy);
+            fail("This should have failed");
+        }
+        catch (final IllegalArgumentException e)
+        {
+            assertThat(e.getMessage()).isEqualTo("Can't copy boards of different size.");
+        }
     }
 
     @Test
