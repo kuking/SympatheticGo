@@ -34,8 +34,6 @@ public class TTable
         {
             final int[] buf = buffers.lease();
             buf[buf.length - 1] = key;
-            keys.add(key);
-            interests.remove(key);
             return buf;
         }, buf ->
         {
@@ -210,13 +208,9 @@ public class TTable
 
     public int markInterest(final int boardHash)
     {
-        if (!contains(boardHash))
-        {
-            final int newValue = interests.get(boardHash) + 1;
-            interests.put(boardHash, newValue);
-            return newValue;
-        }
-        return 0;
+        final int newValue = interests.get(boardHash) + 1;
+        interests.put(boardHash, newValue);
+        return newValue;
     }
 
     public int markInterest(final Game game)
@@ -234,6 +228,11 @@ public class TTable
         return getInterest(game.getBoard().hashCode());
     }
 
+    public void clearInterest()
+    {
+        interests.clear();
+    }
+
     /***
      * Account a winner for this particular board configuration, if Color==Empty, implies 'DRAW'
      * @param boardHash board' hash
@@ -242,6 +241,7 @@ public class TTable
      */
     public void account(final int boardHash, final short move, final int wins)
     {
+        keys.add(boardHash);
         final Color c = Move.color(move);
         final int ofs;
         if (Move.isStone(move))
