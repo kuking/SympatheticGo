@@ -100,4 +100,15 @@ public class CoordTest
         }
     }
 
+    @Test
+    public void linealOffset()
+    {
+        assertThat(Coord.linealOffset(Coord.A1, (byte) 9)).isEqualTo(0);
+        assertThat(Coord.linealOffset(Coord.A1, (byte) 19)).isEqualTo(0);
+        assertThat(Coord.linealOffset(Coord.B2, (byte) 4)).isEqualTo(5);
+        assertThat(Coord.linealOffset(Coord.B4, (byte) 4)).isEqualTo(13);
+        assertThat(Coord.linealOffset(Coord.D1, (byte) 4)).isEqualTo(3);
+        assertThat(Coord.linealOffset(Coord.XY((byte) 9, (byte) 9), (byte) 9)).isEqualTo(90);
+    }
+
 }

@@ -155,6 +155,11 @@ public final class Coord
         return (byte) (val & 0x7f);
     }
 
+    public static int linealOffset(final short value, final byte boardSize)
+    {
+        return Y(value) * boardSize + X(value);
+    }
+
     public static boolean isValid(final short val)
     {
         return val != INVALID;
