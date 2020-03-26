@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import java.nio.ByteBuffer;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.kukino.sgo.util.TUtils.cutOnFirstInvalid;
 
 
 public class CoordTest
@@ -98,6 +100,42 @@ public class CoordTest
                 assertThat(original).isEqualTo(parsed);
             }
         }
+    }
+
+    private short c(final String coordSt)
+    {
+        return Coord.parseToVal(coordSt);
+    }
+
+    @Test
+    public void rotationsAndReflections()
+    {
+        final short[] buffer = new short[9];
+
+        // centre, 1 result
+        assertThat(Coord.allRotationsAndReflections(buffer, Coord.parseToVal("E5"), (byte) 9)).isEqualTo(1);
+        assertThat(cutOnFirstInvalid(buffer)[0]).isEqualTo(c("E5"));
+
+        // diagonal, 4 results
+        assertThat(Coord.allRotationsAndReflections(buffer, Coord.A1, (byte) 9)).isEqualTo(4);
+        assertThat(cutOnFirstInvalid(buffer)).asList().containsExactly(c("A1"), c("A9"), c("J9"), c("J1"));
+
+        assertThat(Coord.allRotationsAndReflections(buffer, Coord.C3, (byte) 19)).isEqualTo(4);
+        assertThat(cutOnFirstInvalid(buffer)).asList().containsExactly(c("C3"), c("C17"), c("R17"), c("R3"));
+
+        // anything else, 8 results
+        assertThat(Coord.allRotationsAndReflections(buffer, Coord.A2, (byte) 9)).isEqualTo(8);
+        assertThat(cutOnFirstInvalid(buffer)).asList()
+            .containsExactly(c("A2"), c("J2"), c("J8"), c("A8"), c("B1"), c("H1"), c("H9"), c("B9"));
+
+        // 8 results in 19x19
+        assertThat(Coord.allRotationsAndReflections(buffer, Coord.parseToVal("E3"), (byte) 19)).isEqualTo(8);
+        assertThat(cutOnFirstInvalid(buffer)).asList()
+            .containsExactly(c("E3"), c("P3"), c("P17"), c("E17"), c("C5"), c("R5"), c("R15"), c("C15"));
+
+        Exception e = assertThrows(IllegalArgumentException.class,
+            () -> Coord.allRotationsAndReflections(new short[1], Coord.A1, (byte) 9));
+        assertThat(e).hasMessageThat().isEqualTo("Please provide an array of at least size 8.");
     }
 
     @Test

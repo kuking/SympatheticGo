@@ -140,6 +140,51 @@ public final class Coord
         return XY((byte) (x - 1), (byte) (y - 1));
     }
 
+
+    private static byte mirror(final byte value, final byte size)
+    {
+        return (byte) Math.abs(size - value - 1);
+    }
+
+    public static int allRotationsAndReflections(final short[] buffer, final short coord, final byte boardSize)
+    {
+        if (buffer.length < 8)
+        {
+            throw new IllegalArgumentException("Please provide an array of at least size 8.");
+        }
+        final byte centre = (byte) (boardSize >> 1);
+        final byte x = X(coord);
+        final byte y = Y(coord);
+        if (centre == x && centre == y)
+        {
+            buffer[0] = coord;
+            buffer[1] = Coord.INVALID;
+            return 1;
+        }
+
+        buffer[0] = XY(x, y);
+        buffer[1] = XY(mirror(x, boardSize), y);
+        buffer[2] = XY(mirror(x, boardSize), mirror(y, boardSize));
+        buffer[3] = XY(x, mirror(y, boardSize));
+        if (Math.abs(centre - x) == Math.abs(centre - y))
+        {
+            buffer[4] = Coord.INVALID;
+            return 4;
+        }
+
+        final byte rx = y;
+        final byte ry = x;
+        buffer[4] = XY(rx, ry);
+        buffer[5] = XY(mirror(rx, boardSize), ry);
+        buffer[6] = XY(mirror(rx, boardSize), mirror(ry, boardSize));
+        buffer[7] = XY(rx, mirror(ry, boardSize));
+        if (buffer.length > 8)
+        {
+            buffer[8] = Coord.INVALID;
+        }
+        return 8;
+    }
+
     public static short XY(final byte x, final byte y)
     {
         return (short) ((short) ((x & 0x7f) << 7) | (short) (y & 0x7f));
