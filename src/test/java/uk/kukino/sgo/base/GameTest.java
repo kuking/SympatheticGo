@@ -511,8 +511,8 @@ public class GameTest
                 whiteWins++;
             }
         }
-        assertThat(blackWins).isAtLeast((int) (total * 0.45f));
-        assertThat(whiteWins).isAtLeast((int) (total * 0.45f));
+        assertThat(blackWins).isAtLeast((int) (total * 0.42f));
+        assertThat(whiteWins).isAtLeast((int) (total * 0.42f));
     }
 
     /* --------------------------------------------------------------------------------------------------------------------------------- */
