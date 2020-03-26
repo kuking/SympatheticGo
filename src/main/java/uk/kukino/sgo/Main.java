@@ -1,10 +1,11 @@
 package uk.kukino.sgo;
 
-import uk.kukino.sgo.gtp.Engine;
-import uk.kukino.sgo.gtp.Streamed;
 import uk.kukino.sgo.engines.MC1Engine;
 import uk.kukino.sgo.engines.MC2Engine;
 import uk.kukino.sgo.engines.RandomEngine;
+import uk.kukino.sgo.gtp.Engine;
+import uk.kukino.sgo.gtp.Streamed;
+import uk.kukino.sgo.valuators.Makers;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,11 +23,17 @@ public class Main
             System.out.println("..or: java -jar build/libs/sgo.jar gtp:random");
             System.out.println("..or: java -jar build/libs/sgo.jar gtp:mc1");
             System.out.println("..or: java -jar build/libs/sgo.jar gtp:mc2");
+            System.out.println("");
+            System.out.println("$ java -jar build/libs/sgo.jar gen:9x9:matrix");
 
         }
         else if ("perf".equals(args[0]))
         {
             PerfStats.main(args);
+        }
+        else if ("gen:9x9:matrix".equals(args[0]))
+        {
+            Makers.main(args);
         }
         else if (args[0].startsWith("gtp:"))
         {
