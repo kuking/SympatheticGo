@@ -118,3 +118,15 @@ $ misc/sgo-gtp
 - https://en.wikipedia.org/wiki/Thompson_sampling#Upper-Confidence-Bound_(UCB)_Algorithms
 - https://en.wikipedia.org/wiki/Monte_Carlo_tree_search
 
+- GTP resign needs implementation
+- Log into stderr the expanded mtcs tree
+- Fix TimeManager ticks
+
+- tune a factor for uct + coordByMoveDist9x9[moveNo][i / 2] * FACTOR;
+- tune expansionThreshold = 3
+
+- Heatmaps for UCT, topsFor, so easier to analyse
+- Heatmap better, i.e. normalise, Heats
+
+- fix misc/sgfs/20200327-lost-because-played-in-atari-multiple-times.sgf
+- playing in atari should not be an option (in most of the cases) (random and no random...)
