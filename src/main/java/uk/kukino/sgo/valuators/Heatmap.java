@@ -3,22 +3,37 @@ package uk.kukino.sgo.valuators;
 import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Move;
 
+import java.io.*;
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
 
-public class Heatmap
+public class Heatmap implements Serializable
 {
     private byte size;
     private float[] values;
-    private float min = Float.NaN;
-    private float max = Float.NaN;
-    private SoftReference<float[]> sortedSR = new SoftReference<>(null);
-
+    private float min;
+    private float max;
+    private SoftReference<float[]> sortedSR;
 
     public Heatmap(final byte boardSize, final float[] values)
     {
+        intialize(boardSize, values);
+    }
+
+    private void intialize(final byte boardSize, final float[] values)
+    {
         this.size = boardSize;
         this.values = Arrays.copyOf(values, values.length);
+        this.min = Float.NaN;
+        this.max = Float.NaN;
+        this.sortedSR = new SoftReference<>(null);
+    }
+
+    private void resetCaches()
+    {
+        min = Float.NaN;
+        max = Float.NaN;
+        sortedSR.clear();
     }
 
     public float min()
@@ -65,11 +80,8 @@ public class Heatmap
             newValues[i] = (values[i] - min()) / delta;
         }
         values = newValues;
-        min = Float.NaN;
-        max = Float.NaN;
-        sortedSR.clear();
+        resetCaches();
     }
-
 
 
     public float percentile(final int q)
@@ -118,6 +130,11 @@ public class Heatmap
     public float[] getCopy()
     {
         return Arrays.copyOf(values, values.length);
+    }
+
+    public byte size()
+    {
+        return size;
     }
 
     public static final String ANSI_RESET = "\u001B[0m";
@@ -204,5 +221,34 @@ public class Heatmap
 
         return sb.toString();
     }
+
+
+    private void writeObject(final ObjectOutputStream oos) throws IOException
+    {
+        oos.writeByte(size);
+        oos.writeInt(values.length);
+        for (int i = 0; i < values.length; i++)
+        {
+            oos.writeFloat(values[i]);
+        }
+    }
+
+    private void readObjectNoData() throws ObjectStreamException
+    {
+        intialize((byte) 0, new float[] {});
+    }
+
+    private void readObject(final ObjectInputStream ois) throws IOException, ClassNotFoundException
+    {
+        final byte size = ois.readByte();
+        final int valuesSize = ois.readInt();
+        final float[] values = new float[valuesSize];
+        for (int i = 0; i < values.length; i++)
+        {
+            values[i] = ois.readFloat();
+        }
+        this.intialize(size, values);
+    }
+
 
 }
