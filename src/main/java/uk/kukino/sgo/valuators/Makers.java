@@ -4,6 +4,7 @@ import com.google.common.base.Stopwatch;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
+import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream;
 import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Move;
 import uk.kukino.sgo.sgf.Header;
@@ -125,18 +126,47 @@ public class Makers
         return res;
     }
 
+    private float[][] normalizeFrequencies(final float[][] freqs)
+    {
+        System.out.println("Normalizing frequencies within range [0..1] ...");
+        final float[][] res = new float[freqs.length][freqs[0].length];
+        for (int b = 0; b < freqs.length; b++)
+        {
+            final Heatmap heatmap = new Heatmap((byte) 9, freqs[b]);
+            heatmap.normalize();
+            //System.out.println(b + "\n" + heatmap);
+            res[b] = heatmap.getCopy();
+        }
+        return res;
+    }
+
+    private void store9x9CoordMoveFrequencies(final float[][] frequencies) throws IOException
+    {
+        final String outputFile = "data/9x9-coord-by-move-dist.xz";
+        System.out.println("Writting " + outputFile + " ...");
+        final FileOutputStream fout = new FileOutputStream(outputFile);
+        final XZCompressorOutputStream xzout = new XZCompressorOutputStream(fout);
+        final ObjectOutputStream oos = new ObjectOutputStream(xzout);
+
+        oos.writeByte(9);
+        oos.writeInt(frequencies.length);
+        for (int b = 0; b < frequencies.length; b++)
+        {
+            for (int i = 0; i < frequencies[b].length; i++)
+            {
+                oos.writeFloat(frequencies[b][i]);
+            }
+        }
+        oos.close();
+    }
+
     public void gen9x9MoveProbabilityMatrix() throws IOException
     {
         System.out.println("Generating 9x9 probability matrix ...");
         final int[][] samples = ingest9x9GnuGoLvl3SelfPlay();
         final float[][] frequencies = frequenciesForSamples(samples);
-
-        for (int i = 0; i < frequencies.length; i++)
-        {
-            System.out.println("Move #" + i);
-            System.out.println(new Heatmap((byte) 9, frequencies[i]));
-        }
-
+        final float[][] normalized = normalizeFrequencies(frequencies);
+        store9x9CoordMoveFrequencies(normalized);
     }
 
 
