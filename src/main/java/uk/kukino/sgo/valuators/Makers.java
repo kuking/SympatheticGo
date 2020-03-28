@@ -106,7 +106,7 @@ public class Makers
         final String tarFilename = "misc/sgfs/gnugo-lvl3-100k-self-play.tar.xz";
         System.out.println(stopwatch + " - Ingesting " + tarFilename + " ... ");
         forEachInTarXz(tarFilename, newFileC, headerC, nodeC);
-        System.out.print("                                                   \r");
+        System.out.print("                                                          \r");
         System.out.println(stopwatch + " - " + fileCount[0] + " game files ingested.");
         System.out.println(stopwatch + " - " + highestMoveNo[0] + " moves in the longest game.");
         System.out.println(stopwatch + " - " + totalCount[0] + " moves in total.");
@@ -140,7 +140,7 @@ public class Makers
 
     private void store9x9CoordByMoveHeatmaps(final Heatmaps heatmaps) throws IOException
     {
-        final String outputFile = "data/9x9-coord-by-move-heatmap.xz";
+        final String outputFile = "src/main/resources/9x9-coord-by-move-heatmap.xz";
         System.out.println(stopwatch + " - Writting " + outputFile + " ...");
         heatmaps.writeToFile(outputFile);
     }

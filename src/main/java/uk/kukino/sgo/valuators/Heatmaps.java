@@ -96,25 +96,48 @@ public class Heatmaps implements Serializable
         }
     }
 
-    public boolean loadFromFile(final String filename)
+    public static Heatmaps loadFromStream(final InputStream in)
     {
-        try (FileInputStream fin = new FileInputStream(filename);
-             XZCompressorInputStream xzin = new XZCompressorInputStream(fin);
+        try (XZCompressorInputStream xzin = new XZCompressorInputStream(in);
              ObjectInputStream ois = new ObjectInputStream(xzin))
         {
-            ois.readObject();
-            return true;
+            return (Heatmaps) ois.readObject();
         }
         catch (final IOException e)
         {
             e.printStackTrace();
-            return false;
         }
         catch (final ClassNotFoundException e)
         {
             e.printStackTrace();
-            return false;
         }
+        return null;
+    }
+
+    public static Heatmaps loadFromFile(final String filename)
+    {
+        try (FileInputStream fin = new FileInputStream(filename))
+        {
+            return loadFromStream(fin);
+        }
+        catch (final IOException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Heatmaps loadFromResources(final String name)
+    {
+        try
+        {
+            return loadFromStream(Heatmaps.class.getResource(name).openStream());
+        }
+        catch (final IOException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
