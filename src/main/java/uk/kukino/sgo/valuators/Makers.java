@@ -18,6 +18,8 @@ import java.util.function.Consumer;
 public class Makers
 {
 
+    private Stopwatch stopwatch;
+
     public void forEachInTarXz(final String tarXz,
                                final Consumer<String> newFile,
                                final Consumer<Header> headerC, final Consumer<Node> nodeC) throws IOException
@@ -56,7 +58,7 @@ public class Makers
         {
             if (fileCount[0] % 10000 == 0)
             {
-                System.out.print(fileCount[0] + " " + fn + " ... \r");
+                System.out.print(stopwatch + " - " + fileCount[0] + " " + fn + " ... \r");
                 System.out.flush();
             }
             fileCount[0]++;
@@ -66,6 +68,7 @@ public class Makers
             skip[0] = header.size != 9;
             if (skip[0])
             {
+                System.out.println();
                 System.out.println("Skipping as it is not 9x9.");
             }
             moveNo[0] = 0;
@@ -101,81 +104,70 @@ public class Makers
         };
 
         final String tarFilename = "misc/sgfs/gnugo-lvl3-100k-self-play.tar.xz";
-        System.out.println("Ingesting " + tarFilename + " ...");
+        System.out.println(stopwatch + " - Ingesting " + tarFilename + " ... ");
         forEachInTarXz(tarFilename, newFileC, headerC, nodeC);
         System.out.print("                                                   \r");
-        System.out.println(fileCount[0] + " game files ingested.");
-        System.out.println(highestMoveNo[0] + " moves in the longest game.");
-        System.out.println(totalCount[0] + " moves in total.");
+        System.out.println(stopwatch + " - " + fileCount[0] + " game files ingested.");
+        System.out.println(stopwatch + " - " + highestMoveNo[0] + " moves in the longest game.");
+        System.out.println(stopwatch + " - " + totalCount[0] + " moves in total.");
 
         return Arrays.copyOf(samples, highestMoveNo[0]);
     }
 
-    private float[][] frequenciesForSamples(final int[][] samples)
+    private Heatmaps buildHeatmapsFromMovesSamples(final int[][] samples)
     {
-        System.out.println("Generating frequencies ...");
-        final float[][] res = new float[samples.length][samples[0].length];
-        for (int b = 0; b < samples.length; b++)
+        System.out.println(stopwatch + " - Building Heatmaps from moves' samples ... ");
+        final Heatmaps heatmaps = new Heatmaps();
+        for (int moveNo = 0; moveNo < samples.length; moveNo++)
         {
-            final int total = Arrays.stream(samples[b]).sum();
-            for (int o = 0; o < samples[0].length; o++)
+            final int total = Arrays.stream(samples[moveNo]).sum();
+            final float[] sample = new float[samples[moveNo].length];
+            for (int o = 0; o < sample.length; o++)
             {
-                res[b][o] = (float) samples[b][o] / (float) total;
+                sample[o] = (float) samples[moveNo][o] / (float) total;
             }
+
+            heatmaps.put(moveNo, new Heatmap((byte) 9, sample));
         }
-        return res;
+        return heatmaps;
     }
 
-    private float[][] normalizeFrequencies(final float[][] freqs)
+    private void normalizeHeatmaps(final Heatmaps heatmaps)
     {
-        System.out.println("Normalizing frequencies within range [0..1] ...");
-        final float[][] res = new float[freqs.length][freqs[0].length];
-        for (int b = 0; b < freqs.length; b++)
-        {
-            final Heatmap heatmap = new Heatmap((byte) 9, freqs[b]);
-            heatmap.normalize();
-            //System.out.println(b + "\n" + heatmap);
-            res[b] = heatmap.getCopy();
-        }
-        return res;
+        System.out.println(stopwatch + " - " + "Normalizing heatmaps ...");
+        heatmaps.values().forEach(Heatmap::normalize);
     }
 
-    private void store9x9CoordMoveFrequencies(final float[][] frequencies) throws IOException
+    private void store9x9CoordByMoveHeatmaps(final Heatmaps heatmaps) throws IOException
     {
-        final String outputFile = "data/9x9-coord-by-move-dist.xz";
-        System.out.println("Writting " + outputFile + " ...");
-        final FileOutputStream fout = new FileOutputStream(outputFile);
-        final XZCompressorOutputStream xzout = new XZCompressorOutputStream(fout);
-        final ObjectOutputStream oos = new ObjectOutputStream(xzout);
-
-        oos.writeByte(9);
-        oos.writeInt(frequencies.length);
-        for (int b = 0; b < frequencies.length; b++)
-        {
-            for (int i = 0; i < frequencies[b].length; i++)
-            {
-                oos.writeFloat(frequencies[b][i]);
-            }
-        }
-        oos.close();
+        final String outputFile = "data/9x9-coord-by-move-heatmap.xz";
+        System.out.println(stopwatch + " - Writting " + outputFile + " ...");
+        heatmaps.writeToFile(outputFile);
     }
 
     public void gen9x9MoveProbabilityMatrix() throws IOException
     {
-        System.out.println("Generating 9x9 probability matrix ...");
+        System.out.println("Generating 9x9 probability matrix");
+        System.out.println("---------------------------------");
         final int[][] samples = ingest9x9GnuGoLvl3SelfPlay();
-        final float[][] frequencies = frequenciesForSamples(samples);
-        final float[][] normalized = normalizeFrequencies(frequencies);
-        store9x9CoordMoveFrequencies(normalized);
+        final Heatmaps heatmaps = buildHeatmapsFromMovesSamples(samples);
+        normalizeHeatmaps(heatmaps);
+        store9x9CoordByMoveHeatmaps(heatmaps);
+
+//        heatmaps.keys().forEach(moveNo ->
+//        {
+//            System.out.println(moveNo);
+//            System.out.println(heatmaps.get((Long) moveNo));
+//        });
     }
 
 
     public static void main(final String[] args) throws IOException
     {
-        final Stopwatch sw = Stopwatch.createStarted();
         final Makers makers = new Makers();
+        makers.stopwatch = Stopwatch.createStarted();
         makers.gen9x9MoveProbabilityMatrix();
-        System.out.println(sw);
+        System.out.println(makers.stopwatch);
     }
 
 }
