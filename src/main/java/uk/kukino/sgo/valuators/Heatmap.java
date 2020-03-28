@@ -3,22 +3,31 @@ package uk.kukino.sgo.valuators;
 import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Move;
 
+import java.lang.ref.SoftReference;
 import java.util.Arrays;
 
 public class Heatmap
 {
     private byte size;
     private float[] values;
+    private float min = Float.NaN;
+    private float max = Float.NaN;
+    private SoftReference<float[]> sortedSR = new SoftReference<>(null);
+
 
     public Heatmap(final byte boardSize, final float[] values)
     {
         this.size = boardSize;
-        this.values = values;
+        this.values = Arrays.copyOf(values, values.length);
     }
 
     public float min()
     {
-        float min = Float.MAX_VALUE;
+        if (!Float.isNaN(min))
+        {
+            return min;
+        }
+        min = Float.MAX_VALUE;
         for (int i = 0; i < values.length; i++)
         {
             if (min > values[i])
@@ -31,7 +40,11 @@ public class Heatmap
 
     public float max()
     {
-        float max = Float.MIN_VALUE;
+        if (!Float.isNaN(max))
+        {
+            return max;
+        }
+        max = Float.MIN_VALUE;
         for (int i = 0; i < values.length; i++)
         {
             if (max < values[i])
@@ -42,14 +55,36 @@ public class Heatmap
         return max;
     }
 
+
+    public void normalize()
+    {
+        final float[] newValues = new float[values.length];
+        final float delta = max() - min();
+        for (int i = 0; i < values.length; i++)
+        {
+            newValues[i] = (values[i] - min()) / delta;
+        }
+        values = newValues;
+        min = Float.NaN;
+        max = Float.NaN;
+        sortedSR.clear();
+    }
+
+
+
     public float percentile(final int q)
     {
         if (q < 0 || q > 100)
         {
             throw new IllegalArgumentException("Percentile should be between 0 and 100, inclusive.");
         }
-        final float sorted[] = Arrays.copyOf(values, values.length);
-        Arrays.sort(sorted);
+        float sorted[] = sortedSR.get();
+        if (sorted == null)
+        {
+            sorted = Arrays.copyOf(values, values.length);
+            Arrays.sort(sorted);
+            sortedSR = new SoftReference<>(sorted);
+        }
         if (q == 0)
         {
             return sorted[0];
@@ -70,9 +105,19 @@ public class Heatmap
         return values[Coord.linealOffset(coord, size)];
     }
 
+    public float heatLineal(final int ofs)
+    {
+        return values[ofs];
+    }
+
     private int ofs(final byte x, final byte y)
     {
         return y * size + x;
+    }
+
+    public float[] getCopy()
+    {
+        return Arrays.copyOf(values, values.length);
     }
 
     public static final String ANSI_RESET = "\u001B[0m";
