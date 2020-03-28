@@ -8,6 +8,8 @@ import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Game;
 import uk.kukino.sgo.base.Move;
 import uk.kukino.sgo.util.Buffers;
+import uk.kukino.sgo.valuators.Heatmap;
+import uk.kukino.sgo.valuators.Heatmaps;
 
 import java.util.Arrays;
 
@@ -22,6 +24,7 @@ public class TTable
     private short[] results;
     private float[] ratios;
 
+    private Heatmaps coordByMove9x9;
 
     public TTable(final byte boardSize, final int levels, final int wide)
     {
@@ -44,6 +47,16 @@ public class TTable
         });
         this.results = new short[boardSize * boardSize + 2];
         this.ratios = new float[boardSize * boardSize + 2];
+    }
+
+    public void setCoordByMove9x9(final Heatmaps coordByMove9x9)
+    {
+        this.coordByMove9x9 = coordByMove9x9;
+    }
+
+    public Heatmaps getCoordByMove9x9()
+    {
+        return this.coordByMove9x9;
     }
 
     public int playoutsFor(final int boardHash)
@@ -97,9 +110,10 @@ public class TTable
         return topsFor(game.getBoard().hashCode(), qty, color);
     }
 
-    public short[] uct(final int boardHash, final int qty, final Color color, final float factor)
+    public short[] uct(final int boardHash, final int moveNo, final int qty, final Color color, final float factor)
     {
         Arrays.fill(ratios, Float.NaN);
+        final Heatmap heatmap = boardSize != 9 || coordByMove9x9 == null ? null : coordByMove9x9.get(moveNo);
         final int[] table = cache.lookup(boardHash);
         final int n = playoutsFor(boardHash);
         final double c2logn = factor * Math.log(n);
@@ -108,13 +122,16 @@ public class TTable
         {
             final float blackWin = table[i];
             final float whiteWin = table[i + 1];
-            // https://thegreendestiny.wordpress.com/2009/10/22/computer-go-2/
             if (blackWin != 0 || whiteWin != 0)
             {
                 final float tj = blackWin + whiteWin;
                 final float xj = ((color == Color.WHITE) ? whiteWin : blackWin) / tj;
                 final float uct = xj + (float) Math.sqrt(c2logn / tj);
                 ratios[i / 2] = uct;
+                if (heatmap != null)
+                {
+                    ratios[i / 2] += heatmap.heatLineal(i / 2) * 0.25f;
+                }
                 nonEmpty++;
             }
         }
@@ -124,7 +141,7 @@ public class TTable
 
     public short[] uct(final Game game, final int qty, final Color color, final float factor)
     {
-        return uct(game.getBoard().hashCode(), qty, color, factor);
+        return uct(game.getBoard().hashCode(), game.lastMove(), qty, color, factor);
     }
 
     private void buildResultsFromRatios(final int finalQty, final Color color)

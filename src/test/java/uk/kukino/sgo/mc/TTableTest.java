@@ -38,7 +38,7 @@ public class TTableTest
     @Test
     public void uct_uninitializedHash()
     {
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.WHITE, 2.0f))).isEmpty();
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 0, 10, Color.WHITE, 2.0f))).isEmpty();
     }
 
     @Test
@@ -56,7 +56,7 @@ public class TTableTest
         underTest.account(ONE_HASH, Move.WHITE_D4);
 
         assertThat(underTest.playoutsFor(ONE_HASH)).isEqualTo(1);
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.WHITE, 2.0f))).asList().containsExactly(Move.WHITE_D4);
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 0, 10, Color.WHITE, 2.0f))).asList().containsExactly(Move.WHITE_D4);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class TTableTest
         underTest.account(ONE_HASH, Move.WHITE_A1);
 
         assertThat(underTest.playoutsFor(ONE_HASH)).isEqualTo(4);
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.WHITE, 2.0f)))
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 0, 10, Color.WHITE, 2.0f)))
             .asList().containsExactly(Move.WHITE_A1, Move.WHITE_D1, Move.WHITE_D4);
     }
 
@@ -152,14 +152,14 @@ public class TTableTest
         underTest.account(ONE_HASH, Move.WHITE_D4);
         underTest.account(ONE_HASH, Move.WHITE_D1);
         underTest.account(ONE_HASH, Move.BLACK_D1);
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 1, Color.WHITE, 2f))).asList().containsExactly(Move.WHITE_D4);
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 0, 1, Color.WHITE, 2f))).asList().containsExactly(Move.WHITE_D4);
 
         underTest.account(ONE_HASH, Move.WHITE_D4);
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 1, Color.WHITE, 2f))).asList().containsExactly(Move.WHITE_D4);
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 0, 1, Color.WHITE, 2f))).asList().containsExactly(Move.WHITE_D4);
 
         underTest.account(ONE_HASH, Move.BLACK_D4);
         underTest.account(ONE_HASH, Move.BLACK_D4);
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 1, Color.WHITE, 2f))).asList().containsExactly(Move.WHITE_D1);
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 0, 1, Color.WHITE, 2f))).asList().containsExactly(Move.WHITE_D1);
     }
 
 
@@ -220,17 +220,17 @@ public class TTableTest
         assertThat(cutOnFirstInvalid(underTest.topsFor(ONE_HASH, 10, Color.BLACK)))
             .asList().containsExactly(Move.pass(Color.BLACK));
 
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.WHITE, 2f)))
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 0, 10, Color.WHITE, 2f)))
             .asList().containsExactly(Move.pass(Color.WHITE));
 
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.BLACK, 2f)))
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 0, 10, Color.BLACK, 2f)))
             .asList().containsExactly(Move.pass(Color.BLACK));
 
         underTest.account(ONE_HASH, Move.WHITE_D1, 1);
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.WHITE, 2f)))
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 0, 10, Color.WHITE, 2f)))
             .asList().containsExactly(Move.WHITE_D1, Move.pass(Color.WHITE));
 
-        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 10, Color.BLACK, 2f)))
+        assertThat(cutOnFirstInvalid(underTest.uct(ONE_HASH, 0, 10, Color.BLACK, 2f)))
             .asList().containsExactly(Move.BLACK_D1, Move.pass(Color.BLACK));
     }
 
