@@ -55,21 +55,31 @@ class CanadianTimeRulesTest
         }
         catch (final IllegalStateException e)
         {
-            assertThat(e.getMessage()).isEqualTo("newGenerateMove() should have been called first, or after a positive tick.");
+            assertThat(e.getMessage()).isEqualTo("newGenerateMove() should have been called first at the beginning of time.");
         }
 
         tm.newGenerateMove();
-        try
-        {
-            assertThat(tm.tick(10, 0.1f)).isFalse();
-            assertThat(tm.tick(10, 1f)).isTrue();
-            tm.tick(10, 1f);
-            fail("This should have thrown.");
-        }
-        catch (final IllegalStateException e)
-        {
-            assertThat(e.getMessage()).isEqualTo("newGenerateMove() should have been called first, or after a positive tick.");
-        }
+        assertThat(tm.tick(10, 0.1f)).isFalse();
+        assertThat(tm.tick(10, 1f)).isTrue();
+        assertThat(tm.tick(10, 1f)).isTrue();
+        assertThat(tm.tick(0, 0f)).isTrue();
+    }
+
+    @Test
+    public void onceTickSaysNewMoveItAlwaysSaysIt()
+    {
+        final TimeManager tm = CanadianTimeRules.builder()
+            .enoughConfidence(0.9f)
+            .build();
+
+        tm.newGenerateMove();
+        assertThat(tm.tick(0, 0.1f)).isFalse();
+        assertThat(tm.tick(0, 1f)).isTrue();
+        assertThat(tm.tick(0, 0f)).isTrue();
+        assertThat(tm.tick(1, 0f)).isTrue();
+        assertThat(tm.tick(0, 1f)).isTrue();
+        tm.newGenerateMove();
+        assertThat(tm.tick(0, 0f)).isFalse();
     }
 
     @Test

@@ -110,6 +110,7 @@ public final class CanadianTimeRules
     private final class CanadianTimeManagementImpl implements TimeManager
     {
         private CanadianTimeRules config;
+        private boolean asItEverTick = false;
         private boolean expectedNewMove = true;
         private int currentPlys = 0;
         private long currentMoveMs = 0;
@@ -128,13 +129,19 @@ public final class CanadianTimeRules
         }
 
         @Override
-        public boolean tick(final int plys, final float confidence)
+        public boolean tick(final int deltaPlys, final float confidence)
         {
             if (expectedNewMove)
             {
-                throw new IllegalStateException("newGenerateMove() should have been called first, or after a positive tick.");
+                if (!asItEverTick)
+                {
+                    throw new IllegalStateException("newGenerateMove() should have been called first at the beginning of time.");
+                }
+                return newMove();
             }
-            currentPlys += plys;
+            asItEverTick = true;
+            currentPlys += deltaPlys;
+
             if (config.moveMaxPlys < currentPlys)
             {
                 return newMove();
