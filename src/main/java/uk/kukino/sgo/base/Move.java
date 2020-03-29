@@ -17,6 +17,8 @@ public final class Move
 
     public static final short BLACK_PASS = move((byte) 127, (byte) 127, Color.BLACK);
     public static final short WHITE_PASS = move((byte) 127, (byte) 127, Color.WHITE);
+    public static final short BLACK_RESIGN = move((byte) 126, (byte) 126, Color.BLACK);
+    public static final short WHITE_RESIGN = move((byte) 126, (byte) 126, Color.WHITE);
 
     public static final short BLACK_A1 = parseToVal("BLACK A1");
     public static final short BLACK_A2 = parseToVal("BLACK A2");
@@ -117,6 +119,20 @@ public final class Move
                     return Move.pass(color);
                 }
             }
+            if (j - 6 == i)
+            {
+                final char a = Character.toUpperCase(seq.charAt(i));
+                final char b = Character.toUpperCase(seq.charAt(i + 1));
+                final char c = Character.toUpperCase(seq.charAt(i + 2));
+                final char d = Character.toUpperCase(seq.charAt(i + 3));
+                final char e = Character.toUpperCase(seq.charAt(i + 4));
+                final char f = Character.toUpperCase(seq.charAt(i + 5));
+                if (a == 'R' && b == 'E' && c == 'S' && d == 'I' && e == 'G' && f == 'N')
+                {
+                    return Move.resign(color);
+                }
+
+            }
         }
 
         if (color == Color.EMPTY || !Coord.isValid(coord))
@@ -150,6 +166,19 @@ public final class Move
         throw new IllegalArgumentException("Can't build a pass move with color" + color);
     }
 
+    public static short resign(final Color color)
+    {
+        if (color == Color.WHITE)
+        {
+            return WHITE_RESIGN;
+        }
+        else if (color == Color.BLACK)
+        {
+            return BLACK_RESIGN;
+        }
+        throw new IllegalArgumentException("Can't build a resign move with color" + color);
+    }
+
     public static byte X(final short value)
     {
         return (byte) ((value >> 7) & 0x7f);
@@ -165,14 +194,19 @@ public final class Move
         return Color.fromByte((byte) ((value & (short) 0b1100000000000000) >> 14 & 3));
     }
 
+    public static short random(final byte size, final Color color)
+    {
+        return Move.move((byte) RND.nextInt(size), (byte) RND.nextInt(size), color);
+    }
+
     public static boolean isPass(final short value)
     {
         return value == WHITE_PASS || value == BLACK_PASS;
     }
 
-    public static short random(final byte size, final Color color)
+    public static boolean isResign(final short value)
     {
-        return Move.move((byte) RND.nextInt(size), (byte) RND.nextInt(size), color);
+        return value == WHITE_RESIGN || value == BLACK_RESIGN;
     }
 
     public static boolean isValid(final short value)
@@ -182,7 +216,7 @@ public final class Move
 
     public static boolean isStone(final short value)
     {
-        return isValid(value) && !isPass(value);
+        return isValid(value) && !isPass(value) && !isResign(value);
     }
 
     public static String shortToString(final short value)
@@ -216,6 +250,17 @@ public final class Move
                 sb.append("PASS");
             }
         }
+        if (isResign(value))
+        {
+            if (camelCase)
+            {
+                sb.append("Resign");
+            }
+            else
+            {
+                sb.append("RESIGN");
+            }
+        }
         if (isStone(value))
         {
             Coord.write(sb, value);
@@ -229,13 +274,17 @@ public final class Move
 
     public static short oppositePlayer(final short move)
     {
+        if (isStone(move))
+        {
+            return move(X(move), Y(move), color(move).opposite());
+        }
         if (isPass(move))
         {
             return pass(color(move).opposite());
         }
-        else if (isStone(move))
+        if (isResign(move))
         {
-            return move(X(move), Y(move), color(move).opposite());
+            return resign(color(move).opposite());
         }
         return move;
     }

@@ -244,6 +244,20 @@ public class CoreTest
     }
 
     @Test
+    public void genmove_pass()
+    {
+        when(engine.genMove(Color.BLACK)).thenReturn(Move.pass(Color.BLACK));
+        assertGTP("genmove b").isEqualTo("= PASS");
+    }
+
+    @Test
+    public void genmove_resign()
+    {
+        when(engine.genMove(Color.BLACK)).thenReturn(Move.resign(Color.BLACK));
+        assertGTP("genmove b").isEqualTo("= RESIGN");
+    }
+
+    @Test
     public void fixedHandicap()
     {
         when(engine.fixedHandicap(2))
