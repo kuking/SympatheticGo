@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class Heatmap implements Serializable
 {
-    private byte size;
+    private byte boardSize;
     private float[] values;
     private float min;
     private float max;
@@ -22,7 +22,7 @@ public class Heatmap implements Serializable
 
     private void intialize(final byte boardSize, final float[] values)
     {
-        this.size = boardSize;
+        this.boardSize = boardSize;
         this.values = Arrays.copyOf(values, values.length);
         this.min = Float.NaN;
         this.max = Float.NaN;
@@ -112,9 +112,9 @@ public class Heatmap implements Serializable
     {
         if (Move.isPass(coord))
         {
-            return values[size * size];
+            return values[boardSize * boardSize];
         }
-        return values[Coord.linealOffset(coord, size)];
+        return values[Coord.linealOffset(coord, boardSize)];
     }
 
     public float heatLineal(final int ofs)
@@ -124,7 +124,7 @@ public class Heatmap implements Serializable
 
     private int ofs(final byte x, final byte y)
     {
-        return y * size + x;
+        return y * boardSize + x;
     }
 
     public float[] getCopy()
@@ -134,7 +134,7 @@ public class Heatmap implements Serializable
 
     public byte size()
     {
-        return size;
+        return boardSize;
     }
 
     public static final String ANSI_RESET = "\u001B[0m";
@@ -183,26 +183,28 @@ public class Heatmap implements Serializable
         final StringBuffer sb = new StringBuffer();
         sb.append(String.format("Range: [%.4f, %.4f]\n", min(), max()))
             .append(String.format("p20(%s): %.4f p50(%s): %.4f\n", P20_50_SLOT, p20, P50_75_SLOT, p50))
-            .append(String.format("p75(%s): %.4f p90(%s): %.4f\n", P75_90_SLOT, p75, P90_100_SLOT, p90));
+            .append(String.format("p75(%s): %.4f p90(%s): %.4f\n", P75_90_SLOT, p75, P90_100_SLOT, p90))
+            .append(String.format("pass(%s): %.4f \n",
+                heatChar(values[boardSize * boardSize], p20, p50, p75, p90), values[boardSize * boardSize]));
 
         sb.append("   ");
-        for (int x = 0; x < size; x++)
+        for (int x = 0; x < boardSize; x++)
         {
             final char symb = (x <= 'I' - 'A' - 1) ? (char) (65 + x) : (char) (65 + 1 + x);
             sb.append(symb).append(' ');
         }
         sb.append("\n");
 
-        for (byte y = 0; y < size; y++)
+        for (byte y = 0; y < boardSize; y++)
         {
-            final int yToUse = size - y;
+            final int yToUse = boardSize - y;
             if (yToUse < 10)
             {
                 sb.append(' ');
             }
             sb.append(yToUse);
             sb.append(' ');
-            for (byte x = 0; x < size; x++)
+            for (byte x = 0; x < boardSize; x++)
             {
                 sb.append(heatChar(values[ofs(x, (byte) (yToUse - 1))], p20, p50, p75, p90));
                 sb.append(' ');
@@ -211,12 +213,11 @@ public class Heatmap implements Serializable
         }
 
         sb.append("   ");
-        for (byte x = 0; x < size; x++)
+        for (byte x = 0; x < boardSize; x++)
         {
             final char symb = (x <= 'I' - 'A' - 1) ? (char) (65 + x) : (char) (65 + 1 + x);
             sb.append(symb).append(' ');
         }
-
         sb.append("\n");
 
         return sb.toString();
@@ -225,7 +226,7 @@ public class Heatmap implements Serializable
 
     private void writeObject(final ObjectOutputStream oos) throws IOException
     {
-        oos.writeByte(size);
+        oos.writeByte(boardSize);
         oos.writeInt(values.length);
         for (int i = 0; i < values.length; i++)
         {
