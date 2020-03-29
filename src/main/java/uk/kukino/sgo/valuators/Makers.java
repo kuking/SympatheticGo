@@ -4,7 +4,6 @@ import com.google.common.base.Stopwatch;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
-import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream;
 import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Move;
 import uk.kukino.sgo.sgf.Header;

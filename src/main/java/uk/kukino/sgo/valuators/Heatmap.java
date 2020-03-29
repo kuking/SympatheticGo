@@ -183,9 +183,7 @@ public class Heatmap implements Serializable
         final StringBuffer sb = new StringBuffer();
         sb.append(String.format("Range: [%.4f, %.4f]\n", min(), max()))
             .append(String.format("p20(%s): %.4f p50(%s): %.4f\n", P20_50_SLOT, p20, P50_75_SLOT, p50))
-            .append(String.format("p75(%s): %.4f p90(%s): %.4f\n", P75_90_SLOT, p75, P90_100_SLOT, p90))
-            .append(String.format("pass(%s): %.4f \n",
-                heatChar(values[boardSize * boardSize], p20, p50, p75, p90), values[boardSize * boardSize]));
+            .append(String.format("p75(%s): %.4f p90(%s): %.4f\n", P75_90_SLOT, p75, P90_100_SLOT, p90));
 
         sb.append("   ");
         for (int x = 0; x < boardSize; x++)
@@ -219,6 +217,8 @@ public class Heatmap implements Serializable
             sb.append(symb).append(' ');
         }
         sb.append("\n");
+        sb.append(String.format("    Pass(%s): %.4f \n",
+            heatChar(values[boardSize * boardSize], p20, p50, p75, p90), values[boardSize * boardSize]));
 
         return sb.toString();
     }
