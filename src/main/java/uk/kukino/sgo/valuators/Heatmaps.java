@@ -15,7 +15,11 @@ import java.util.Map;
 public class Heatmaps implements Serializable
 {
 
-    private static final String FILE_SIGNATURE = "SympatheticGo Heatmap file\nhttps://github.com/kuking/SympatheticGo\nversion=0.1\n\026";
+    private static final String FILE_SIGNATURE = "\r\033[2K" +
+        "SympatheticGo Heatmap file\n" +
+        "https://github.com/kuking/SympatheticGo\n" +
+        "version=0.1\n" +
+        "\n";
 
     private Long2ObjectHashMap<Heatmap> heatmaps;
 
