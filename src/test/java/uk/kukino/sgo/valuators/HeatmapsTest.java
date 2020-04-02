@@ -52,8 +52,6 @@ public class HeatmapsTest
         oos.writeObject(hms);
         oos.close();
 
-        System.out.println(new String(baos.toByteArray()));
-
         final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         final ObjectInputStream ois = new ObjectInputStream(bais);
 
