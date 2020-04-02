@@ -100,10 +100,6 @@ $ misc/sgo-gtp
 
 - Better MCTS implementation
   - MC Game finisher has to understand eyes and basic livability, to avoid committing suicide.
-  - Statistical odds of a coord likely to be played in the game (use this for MC).
-    - Output nice board with percentiles of like-hood, 
-      i.e.: · • * x @  (<50%, 50-70% (range 20), 70-85% (range 15), 85-95% (range 10), 95-100% (range 5) )
-    - Should be serializable so can re-calculated
   - Engine should generate moves for any of the players (i.e. a flag to not enforce next player in Game class)
   - Basic statical positional board for MCCS. i.e. D4 has a 1/8 chance of being played on 1st move, using games.
   - Simple Remote Service, so it can be distributed
@@ -118,7 +114,6 @@ $ misc/sgo-gtp
 - https://en.wikipedia.org/wiki/Thompson_sampling#Upper-Confidence-Bound_(UCB)_Algorithms
 - https://en.wikipedia.org/wiki/Monte_Carlo_tree_search
 
-- GTP resign needs implementation
 - Log into stderr the expanded mtcs tree
 - Fix TimeManager ticks
 
@@ -126,7 +121,6 @@ $ misc/sgo-gtp
 - tune expansionThreshold = 3
 
 - Heatmaps for UCT, topsFor, so easier to analyse
-- Heatmap better, i.e. normalise, Heats
 
 - fix misc/sgfs/20200327-lost-because-played-in-atari-multiple-times.sgf
 - playing in atari should not be an option (in most of the cases) (random and no random...)
