@@ -10,8 +10,6 @@ import uk.kukino.sgo.util.Buffers;
 import uk.kukino.sgo.util.IntIntAsLong;
 import uk.kukino.sgo.valuators.Heatmaps;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static uk.kukino.sgo.util.TUtils.*;
 
 public class MC2Engine extends BaseEngine
@@ -22,14 +20,11 @@ public class MC2Engine extends BaseEngine
     private Buffers<Game> gameBuffers;
     private byte maxDepth = 5;
     private short[] validMoves;
+    private int tickNo = 0;
 
-
-    private final AtomicInteger genMovePlys = new AtomicInteger(0);
-    private final AtomicInteger tickNo = new AtomicInteger(0);
-
-    private int seedingSize = 100;
-    private int uctTopCandidates = 10;
-    private int expansionThreshold = 3;
+    private int seedingSize = 500;
+    private int uctTopCandidates = 1; // 10
+    private int expansionThreshold = 5;
     private float uctFactor = 2f;
     private float minWinRatioForResign = 0.20f;
     private float minWinRatioForPass = 0.95f;
@@ -56,8 +51,8 @@ public class MC2Engine extends BaseEngine
     private CanadianTimeRules canadianTimeRulesBuilder()
     {
         return CanadianTimeRules.builder()
-            .maxMoveSecs(15)
-//            .maxMovePlys(1000_000_000)
+//            .maxMoveSecs(15)
+            .maxMovePlys(100_000)
             .enoughConfidence(0.99f);
     }
 
@@ -65,44 +60,40 @@ public class MC2Engine extends BaseEngine
     @Override
     public short genMove(final Color color)
     {
-        genMovePlys.set(0);
-
-        if (ttable.getCoordByMove9x9() != null && ttable.getCoordByMove9x9().get(game.lastMove()) != null)
+        if (game.getBoard().size() == 9 && ttable.getCoordByMove9x9() != null && ttable.getCoordByMove9x9().get(game.lastMove()) != null)
         {
             System.err.println(ttable.getCoordByMove9x9().get(game.lastMove()));
         }
         final short move;
 
-        // pass here when there is a huge difference in points
-        if (game.deadStones(color) - game.deadStones(color.opposite()) > boardSize)
+        mcts();
+
+        System.err.println("Final UTC Heatmap");
+        System.err.println(ttable.uctHeatmap(game, game.playerToPlay()));
+        System.err.println("Final Tops Moves");
+        System.err.println(ttable.topsHeatmap(game, game.playerToPlay()));
+
+        final int idx = bestMove(this.game, color);
+        if (idx == -1)
+        {
+            System.err.println("No best move found! Resign!");
+            move = Move.resign(color); //BUG!
+        }
+        else if (ttable.lastRatiosSorted()[idx] < minWinRatioForResign)
+        {
+            move = Move.resign(color);
+        }
+        else if (ttable.lastRatiosSorted()[idx] > minWinRatioForPass)
         {
             move = Move.pass(color);
-            debugln("genMove " + Move.shortToString(move) + " -- too much death stones, giving up.");
         }
         else
         {
-            mcts();
-
-            final int idx = bestMove(this.game, color);
-
-            if (idx == -1)
-            {
-                move = Move.pass(color);
-                debugln("genMove " + Move.shortToString(move) + " -- Couldn't find any good move.");
-            }
-            else if (ttable.lastRatiosSorted()[idx] < minWinRatioForResign ||
-                ttable.lastRatiosSorted()[idx] > minWinRatioForPass)
-            {
-                move = Move.pass(color);
-                debugln("genMove " + Move.shortToString(move) + " with confidence " + ttable.lastRatiosSorted()[idx] + " this is too good/bad");
-            }
-            else
-            {
-                final short[] moves = ttable.topsFor(game, boardSize * boardSize + 1, color);
-                move = moves[idx]; //do better instead of ttable.topsFor twice
-                debugln("genMove " + Move.shortToString(move) + " with confidence " + ttable.lastRatiosSorted()[idx]);
-            }
+            final short[] moves = ttable.topsFor(game, boardSize * boardSize + 1, color);
+            move = moves[idx]; //do better instead of ttable.topsFor twice
         }
+        debugln("genMove " + Move.shortToString(move) + " with confidence " + (idx < 0 ? "Unknown" : ttable.lastRatiosSorted()[idx]) + ".");
+
         game.play(move);
 
         debugln(game.toString());
@@ -145,13 +136,14 @@ public class MC2Engine extends BaseEngine
 
     private void mcts()
     {
-        tickNo.set(0);
+        tickNo = 0;
         ttable.clearInterest();
         timeManager.newGenerateMove();
         final short[] exploration = new short[boardSize * boardSize * boardSize];
         exploration[0] = Move.INVALID;
-        while (!timeManager.tick(genMovePlys.get(), 0.1f))
+        while (!timeManager.tick(0, 0.1f))
         {
+            tickNo++;
             mcts(game, exploration, 0);
         }
         debugln("");
@@ -159,7 +151,6 @@ public class MC2Engine extends BaseEngine
 
     private long mcts(final Game game, final short[] exploration, final int explorationIdx)
     {
-        tickNo.incrementAndGet();
         final Game copy = gameBuffers.lease();
         try
         {
@@ -178,7 +169,7 @@ public class MC2Engine extends BaseEngine
                 return IntIntAsLong.enc(blackWins, whiteWins);
             }
 
-            if (!ttable.contains(game))
+            if (!ttable.contains(game)) // never been here, it needs to seed with some random moves for UTC
             {
                 final long wins = seed(game, seedingSize, true);
                 blackWins += IntIntAsLong.left(wins);
@@ -237,9 +228,11 @@ public class MC2Engine extends BaseEngine
             final int validMovesQ = game.validMoves(validMoves, validMovesGameBuffer);
             for (int m = 0; m < validMovesQ; m++)
             {
+                final short move = validMoves[m];
+                int moveBlackWins = 0;
+                int moveWhiteWins = 0;
                 for (int s = 0; s < lotSize; s++)
                 {
-                    final short move = validMoves[m];
                     game.copyTo(copy);
                     copy.play(move);
                     copy.finishRandomly();
@@ -247,18 +240,32 @@ public class MC2Engine extends BaseEngine
                     if (Color.BLACK == winner)
                     {
                         blackWins++;
+                        moveBlackWins++;
                     }
                     else
                     {
                         whiteWins++;
+                        moveWhiteWins++;
                     }
-                    if (account)
+                }
+                if (account)
+                {
+                    if (Move.color(move) == Color.WHITE)
                     {
-                        ttable.account(game, move, winner == Move.color(move) ? 1 : 0, winner == Move.color(move) ? 0 : 1);
+                        ttable.account(game, move, moveWhiteWins, moveBlackWins);
+                    }
+                    else if (Move.color(move) == Color.BLACK)
+                    {
+                        ttable.account(game, move, moveBlackWins, moveWhiteWins);
+                    }
+                    else
+                    {
+                        throw new IllegalStateException("game.validMoves() returned a non black/white move?");
                     }
                 }
             }
-            genMovePlys.addAndGet(validMovesQ * seedingSize);
+            timeManager.tick(validMovesQ * lotSize, 0f);
+
             return IntIntAsLong.enc(blackWins, whiteWins);
         }
         finally
@@ -279,7 +286,7 @@ public class MC2Engine extends BaseEngine
         }
         lastLog = System.currentTimeMillis();
 
-        debug(" UCT " + tickNo.get() + "; " + timeManager + "; Candidates: ");
+        debug(" UCT " + tickNo + "; " + timeManager + "; Candidates: ");
         logMoves(this::debug, cutOnFirstInvalid(ttable.uct(game, uctTopCandidates, game.playerToPlay(), uctFactor)));
         debug("[");
         logRatios(this::debug, ttable.lastRatiosSorted(), uctTopCandidates);

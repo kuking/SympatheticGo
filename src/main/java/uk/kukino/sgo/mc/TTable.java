@@ -21,6 +21,8 @@ public class TTable
     private final IntHashSet keys;
     private final Int2IntHashMap interests;
 
+    private static final float UCT_FACTOR = 2.0f;
+
     private short[] results;
     private float[] ratios;
 
@@ -75,6 +77,35 @@ public class TTable
         return playoutsFor(game.getBoard().hashCode());
     }
 
+
+    public Heatmap topsHeatmap(final Game game, final Color playerToPlay)
+    {
+        if (playerToPlay != Color.BLACK && playerToPlay != Color.WHITE)
+        {
+            throw new IllegalArgumentException("I can't handle color " + playerToPlay);
+        }
+        Arrays.fill(ratios, 0f);
+        final int[] table = cache.lookup(game.getBoard().hashCode());
+        for (int i = 0; i < table.length - 1; i += 2)
+        {
+            final int blackWin = table[i];
+            final int whiteWin = table[i + 1];
+            if (blackWin != 0 || whiteWin != 0)
+            {
+                if (playerToPlay == Color.WHITE)
+                {
+                    ratios[i / 2] = (float) whiteWin / (float) (blackWin + whiteWin);
+                }
+                else
+                {
+                    ratios[i / 2] = (float) blackWin / (float) (blackWin + whiteWin);
+                }
+            }
+        }
+        return new Heatmap(game.getBoard().size(), ratios);
+    }
+
+
     public short[] topsFor(final int boardHash, final int qty, final Color color)
     {
         Arrays.fill(ratios, Float.NaN);
@@ -109,6 +140,35 @@ public class TTable
     {
         return topsFor(game.getBoard().hashCode(), qty, color);
     }
+
+
+    public Heatmap uctHeatmap(final Game game, final Color color)
+    {
+        Arrays.fill(ratios, 0);
+
+        final Heatmap coordByMoveHM = boardSize != 9 || coordByMove9x9 == null ? null : coordByMove9x9.get(game.lastMove());
+        final int[] table = cache.lookup(game.getBoard().hashCode());
+        final int n = playoutsFor(game.getBoard().hashCode());
+        final double c2logn = UCT_FACTOR * Math.log(n);
+        for (int i = 0; i < table.length - 1; i += 2)
+        {
+            final float blackWin = table[i];
+            final float whiteWin = table[i + 1];
+            if (blackWin != 0 || whiteWin != 0)
+            {
+                final float tj = blackWin + whiteWin;
+                final float xj = ((color == Color.WHITE) ? whiteWin : blackWin) / tj;
+                final float uct = xj + (float) Math.sqrt(c2logn / tj);
+                ratios[i / 2] = uct;
+                if (coordByMoveHM != null)
+                {
+                    ratios[i / 2] += coordByMoveHM.heatLineal(i / 2) * 0.25f;
+                }
+            }
+        }
+        return new Heatmap(game.getBoard().size(), ratios);
+    }
+
 
     public short[] uct(final int boardHash, final int moveNo, final int qty, final Color color, final float factor)
     {
@@ -286,5 +346,6 @@ public class TTable
         account(game.getBoard().hashCode(), move, wins);
         account(game.getBoard().hashCode(), Move.oppositePlayer(move), losses);
     }
+
 
 }
