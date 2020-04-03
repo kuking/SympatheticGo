@@ -4,6 +4,8 @@ import uk.kukino.sgo.util.Parsing;
 
 import java.util.SplittableRandom;
 
+import static uk.kukino.sgo.util.Parsing.parseColor;
+
 public final class Move
 {
 
@@ -62,39 +64,8 @@ public final class Move
             return INVALID;
         }
 
-        if (j - i == 1)
-        {
-            final char ch = Character.toUpperCase(seq.charAt(i));
-            if (ch == 'B')
-            {
-                color = Color.BLACK;
-            }
-            else if (ch == 'W')
-            {
-                color = Color.WHITE;
-            }
-            else
-            {
-                return INVALID;
-            }
-        }
-        else if (j - i == 5)
-        {
-            final char a = Character.toUpperCase(seq.charAt(i)); // not weird, on purpose to to avoid memory allocation i.e. char[]
-            final char b = Character.toUpperCase(seq.charAt(i + 1));
-            final char c = Character.toUpperCase(seq.charAt(i + 2));
-            final char d = Character.toUpperCase(seq.charAt(i + 3));
-            final char e = Character.toUpperCase(seq.charAt(i + 4));
-            if (a == 'B' && b == 'L' && c == 'A' && d == 'C' && e == 'K')
-            {
-                color = Color.BLACK;
-            }
-            else if (a == 'W' && b == 'H' && c == 'I' && d == 'T' && e == 'E')
-            {
-                color = Color.WHITE;
-            }
-        }
-        else
+        color = parseColor(seq, i, j);
+        if (color == null)
         {
             return INVALID;
         }

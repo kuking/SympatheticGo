@@ -1,5 +1,7 @@
 package uk.kukino.sgo.util;
 
+import uk.kukino.sgo.base.Color;
+
 public class Parsing
 {
 
@@ -135,6 +137,41 @@ public class Parsing
         }
         return (float) value / (float) divider;
     }
+
+
+    public static Color parseColor(final CharSequence input, final int start, final int end)
+    {
+        if (end - start == 1)
+        {
+            final char ch = Character.toUpperCase(input.charAt(start));
+            if (ch == 'B')
+            {
+                return Color.BLACK;
+            }
+            else if (ch == 'W')
+            {
+                return Color.WHITE;
+            }
+        }
+        else if (end - start == 5)
+        {
+            final char a = Character.toUpperCase(input.charAt(start)); // not weird, on purpose to to avoid memory allocation i.e. char[]
+            final char b = Character.toUpperCase(input.charAt(start + 1));
+            final char c = Character.toUpperCase(input.charAt(start + 2));
+            final char d = Character.toUpperCase(input.charAt(start + 3));
+            final char e = Character.toUpperCase(input.charAt(start + 4));
+            if (a == 'B' && b == 'L' && c == 'A' && d == 'C' && e == 'K')
+            {
+                return Color.BLACK;
+            }
+            else if (a == 'W' && b == 'H' && c == 'I' && d == 'T' && e == 'E')
+            {
+                return Color.WHITE;
+            }
+        }
+        return null;
+    }
+
 
     public static float parseFloat(final CharSequence input)
     {
