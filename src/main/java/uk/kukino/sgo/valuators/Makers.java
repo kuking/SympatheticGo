@@ -1,46 +1,24 @@
 package uk.kukino.sgo.valuators;
 
 import com.google.common.base.Stopwatch;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Move;
 import uk.kukino.sgo.sgf.Header;
 import uk.kukino.sgo.sgf.Node;
-import uk.kukino.sgo.sgf.SGFReader;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Consumer;
+
+import static uk.kukino.sgo.util.SgfUtils.forEachInTarXz;
 
 public class Makers
 {
 
-    private Stopwatch stopwatch;
+    static final String TAR_FILENAME = "misc/sgfs/gnugo-lvl3-100k-self-play.tar.xz";
+    static final String OUTPUT_HEATMAP_XZ_FILE = "src/main/resources/9x9-coord-by-move-heatmap.xz";
 
-    public void forEachInTarXz(final String tarXz,
-                               final Consumer<String> newFile,
-                               final Consumer<Header> headerC, final Consumer<Node> nodeC) throws IOException
-    {
-        final SGFReader sgfReader = new SGFReader();
-        final InputStream fileIs = new FileInputStream(tarXz);
-        final XZCompressorInputStream xzIs = new XZCompressorInputStream(fileIs);
-        final TarArchiveInputStream tarIs = new TarArchiveInputStream(xzIs);
-        TarArchiveEntry entry;
-        while ((entry = tarIs.getNextTarEntry()) != null)
-        {
-            if (entry.isFile())
-            {
-                newFile.accept(entry.getName());
-                final Reader r = new InputStreamReader(tarIs);
-                sgfReader.parse(r, headerC, nodeC);
-            }
-        }
-        tarIs.close();
-        xzIs.close();
-        fileIs.close();
-    }
+    private Stopwatch stopwatch;
 
     private int[][] ingest9x9GnuGoLvl3SelfPlay() throws IOException
     {
@@ -102,9 +80,9 @@ public class Makers
             }
         };
 
-        final String tarFilename = "misc/sgfs/gnugo-lvl3-100k-self-play.tar.xz";
-        System.out.println(stopwatch + " - Ingesting " + tarFilename + " ... ");
-        forEachInTarXz(tarFilename, newFileC, headerC, nodeC);
+
+        System.out.println(stopwatch + " - Ingesting " + TAR_FILENAME + " ... ");
+        forEachInTarXz(TAR_FILENAME, newFileC, headerC, nodeC);
         System.out.print("                                                          \r");
         System.out.println(stopwatch + " - " + fileCount[0] + " game files ingested.");
         System.out.println(stopwatch + " - " + highestMoveNo[0] + " moves in the longest game.");
@@ -139,9 +117,8 @@ public class Makers
 
     private void store9x9CoordByMoveHeatmaps(final Heatmaps heatmaps) throws IOException
     {
-        final String outputFile = "src/main/resources/9x9-coord-by-move-heatmap.xz";
-        System.out.println(stopwatch + " - Writting " + outputFile + " ...");
-        heatmaps.writeToFile(outputFile);
+        System.out.println(stopwatch + " - Writting " + OUTPUT_HEATMAP_XZ_FILE + " ...");
+        heatmaps.writeToFile(OUTPUT_HEATMAP_XZ_FILE);
     }
 
     public void gen9x9MoveProbabilityMatrix() throws IOException
