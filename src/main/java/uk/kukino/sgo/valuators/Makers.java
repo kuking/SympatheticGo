@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
-import static uk.kukino.sgo.util.SgfUtils.forEachInTarXz;
+import static uk.kukino.sgo.util.PacksUtils.forEachInTarXz;
 
 public class Makers
 {

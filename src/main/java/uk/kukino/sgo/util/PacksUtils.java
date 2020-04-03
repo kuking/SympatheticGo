@@ -10,7 +10,7 @@ import uk.kukino.sgo.sgf.SGFReader;
 import java.io.*;
 import java.util.function.Consumer;
 
-public class SgfUtils
+public class PacksUtils
 {
     public static void forEachInTarXz(final String tarXz,
                                       final Consumer<String> newFile,
