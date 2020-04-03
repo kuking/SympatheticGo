@@ -59,55 +59,66 @@ public class Maker
             {
                 g.play(node.move);
             }
-            if (g.finished())
+            if (!g.finished() && g.lastMove() % 20 != 0)
             {
-                try
-                {
-                    if (result[0] == null || !result[0].hasWinner() ||
-                        result[0].outcome() == Result.Outcome.Timeout ||
-                        result[0].outcome() == Result.Outcome.Forfeit)
-                    {
-                        return;
-                    }
-                    final BufferedImage image = renderer.render(g, result[0], 224);
+                return;
+            }
+            if (result[0] == null || !result[0].hasWinner() ||
+                result[0].outcome() == Result.Outcome.Timeout ||
+                result[0].outcome() == Result.Outcome.Forfeit)
+            {
+                return;
+            }
 
-                    final String baseName = filename[0].substring(filename[0].lastIndexOf('/'), filename[0].length() - 4);
-                    final String folderWinner = result[0].winner() == Color.WHITE ? "white" : "black";
-                    final String folderRate;
-                    if (result[0].outcome() == Result.Outcome.Resign)
+            try
+            {
+                final BufferedImage image = renderer.render(g, result[0], 224);
+
+                final String baseName = filename[0].substring(filename[0].lastIndexOf('/'), filename[0].length() - 4);
+                final String folderWinner = result[0].winner() == Color.WHITE ? "white" : "black";
+                final String folderGameState;
+                if (g.finished())
+                {
+                    folderGameState = "finished";
+                }
+                else
+                {
+                    folderGameState = "move-" + game[0].lastMove();
+                }
+                final String folderRate;
+                if (result[0].outcome() == Result.Outcome.Resign)
+                {
+                    folderRate = "resign";
+                }
+                else if (result[0].outcome() == Result.Outcome.Standard)
+                {
+                    if (result[0].points() < 5)
                     {
-                        folderRate = "resign";
+                        folderRate = "close";
                     }
-                    else if (result[0].outcome() == Result.Outcome.Standard)
+                    else if (result[0].points() < game[0].getBoard().size())
                     {
-                        if (result[0].points() < 5)
-                        {
-                            folderRate = "close";
-                        }
-                        else if (result[0].points() < game[0].getBoard().size())
-                        {
-                            folderRate = "fair";
-                        }
-                        else
-                        {
-                            folderRate = "bad";
-                        }
+                        folderRate = "fair";
                     }
                     else
                     {
-                        folderRate = "unknown";
+                        folderRate = "easy";
                     }
-
-                    final File target = new File(TARGET_FOLDER, folderRate + '/' + folderWinner + '/' + baseName + ".png");
-                    target.getParentFile().mkdirs();
-
-                    ImageIO.write(image, "PNG", target);
-//                    System.exit(0);
                 }
-                catch (final IOException e)
+                else
                 {
-                    e.printStackTrace();
+                    folderRate = "unknown";
                 }
+
+                final File target = new File(TARGET_FOLDER,
+                    folderGameState + '/' + folderRate + '/' + folderWinner + '/' + baseName + ".png");
+                target.getParentFile().mkdirs();
+
+                ImageIO.write(image, "PNG", target);
+            }
+            catch (final IOException e)
+            {
+                e.printStackTrace();
             }
         };
 
@@ -120,6 +131,7 @@ public class Maker
         maker.stopwatch = Stopwatch.createStarted();
         maker.cleanUpTarget();
         maker.createSGFImages();
+        // $ tar cvjf gnugo-self-play-lvl3-9x9.txz gnugo-self-play-lvl3-9x9/
         System.out.println(maker.stopwatch);
     }
 }
