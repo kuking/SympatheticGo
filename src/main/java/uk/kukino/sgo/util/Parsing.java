@@ -53,7 +53,10 @@ public class Parsing
         {
             return false;
         }
-
+        if (left.length() != right.length())
+        {
+            return false;
+        }
         for (int i = 0; i < left.length(); i++)
         {
             if (Character.toUpperCase(left.charAt(i)) != Character.toUpperCase(right.charAt(i)))
