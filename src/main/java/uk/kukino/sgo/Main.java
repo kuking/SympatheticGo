@@ -5,6 +5,7 @@ import uk.kukino.sgo.engines.MC2Engine;
 import uk.kukino.sgo.engines.RandomEngine;
 import uk.kukino.sgo.gtp.Engine;
 import uk.kukino.sgo.gtp.Streamed;
+import uk.kukino.sgo.sgf.Benchmark;
 import uk.kukino.sgo.valuators.Makers;
 
 import java.io.FileOutputStream;
@@ -20,12 +21,16 @@ public class Main
         {
             System.out.println("Main for SympatheticGO.");
             System.out.println("try: ./gradlew run --args 'perf'");
+            System.out.println("..or: java -jar build/libs/sgo.jar sgf:perf");
             System.out.println("..or: java -jar build/libs/sgo.jar gtp:random");
             System.out.println("..or: java -jar build/libs/sgo.jar gtp:mc1");
             System.out.println("..or: java -jar build/libs/sgo.jar gtp:mc2");
             System.out.println("");
             System.out.println("$ java -jar build/libs/sgo.jar gen:9x9:matrix");
-
+        }
+        else if ("sgf:perf".equals(args[0]))
+        {
+            Benchmark.main(args);
         }
         else if ("perf".equals(args[0]))
         {
