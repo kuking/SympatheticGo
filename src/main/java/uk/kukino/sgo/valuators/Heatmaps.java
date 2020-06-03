@@ -2,7 +2,7 @@ package uk.kukino.sgo.valuators;
 
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream;
-import uk.co.real_logic.agrona.collections.Long2ObjectHashMap;
+import org.agrona.collections.Long2ObjectHashMap;
 
 import java.io.*;
 import java.util.Collection;

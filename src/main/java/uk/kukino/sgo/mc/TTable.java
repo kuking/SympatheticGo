@@ -1,8 +1,8 @@
 package uk.kukino.sgo.mc;
 
-import uk.co.real_logic.agrona.collections.Int2IntHashMap;
-import uk.co.real_logic.agrona.collections.IntHashSet;
-import uk.co.real_logic.agrona.collections.IntLruCache;
+import org.agrona.collections.Int2IntHashMap;
+import org.agrona.collections.IntHashSet;
+import org.agrona.collections.IntLruCache;
 import uk.kukino.sgo.base.Color;
 import uk.kukino.sgo.base.Coord;
 import uk.kukino.sgo.base.Game;
@@ -32,8 +32,8 @@ public class TTable
     {
         this.boardSize = boardSize;
         final int capacity = (int) Math.pow(wide, levels);
-        keys = new IntHashSet(capacity, Integer.MIN_VALUE);
-        interests = new Int2IntHashMap(capacity, 0.67d, 0);
+        keys = new IntHashSet(capacity, 0.5f);
+        interests = new Int2IntHashMap(capacity, 0.67f, 0);
         buffers = new Buffers<>(capacity + 1, () -> new int[boardSize * boardSize * 2 + 2 + 1]); // last two are pass moves, the last is the key
         cache = new IntLruCache<>(capacity, key ->
         {
